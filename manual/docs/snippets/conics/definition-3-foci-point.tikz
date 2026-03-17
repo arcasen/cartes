@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \P{1,1} = 2; \P{2,1} = 1; \P{3,1} = 1;
+    \A{1,1} = -1; \A{2,1} = -1; \A{3,1} = 1;
+    \B{1,1} = 2; \B{2,1} = 0; \B{3,1} = 1;
+  }
+  \tikzset{
+    conics/define/ellipse/foci-point={\A,\B,\P,\Ca},
+    conics/define/hyperbola/foci-point={\A,\B,\P,\Cb},
+  }
+
+  \coordinate (F1) at (\A{1,1},\A{2,1});
+  \coordinate (F2) at (\B{1,1},\B{2,1});
+  \coordinate (P) at (\P{1,1},\P{2,1});
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=violet,thick] (\Ca);
+  \conic[draw=teal,thick] (\Cb);
+
+  \foreach \p/\placement in {F1/left,F2/right,P/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+\documentclass{ctexart}
+\usepackage{tikz}
+\usepackage{xfp}
+\usetikzlibrary{math}
+
+\begin{document}
+
+
+\tikzmath{
+  \myangle = 90; % TikZ 默认这是 90 度
+  \s1 = sin(\myangle); % TikZ 结果是 1
+}
+
+\s1
+
+% 此时如果在 \fpeval 中直接用 \myangle
+\fpeval{sin(\myangle)} 实际上计算的是 sin(90 弧度) ≈ 0.8939
+\end{document}

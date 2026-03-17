@@ -1,0 +1,104 @@
+\ProvidesFile{tikzlibrarycartes.code.tex}[2026/05/01 v1.0.0 A tikz library for geometry computations]
+
+\RequirePackage{tikz}
+\RequirePackage{tikz-3dplot}
+\RequirePackage{ifthen}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{bm}
+
+\usetikzlibrary{math,calc,quotes,mc,vc,conics}
+
+% pgfmath-solution to the error:
+% Package PGF Math: Could not parse input 'A' as a floating 
+% point number, sorry. The unreadable part was near 'A'..
+% https://tex.stackexchange.com/questions/455991/pgfmath-function-for-strings-and-numbers
+\pgfkeys{
+  /pgf/fpu/handlers/invalid number/.code = {%
+    \pgfmathfloatparsenumber{3Y0.0e0]}%
+  }
+}
+
+\makeatletter
+
+% ===============================================
+% Caveats
+% ===============================================
+
+% function 'intersect/eqs' conflicts with siunitx package
+
+% 在 TikZ 中，函数本身并没有直接的“返回多个值”的机制，因为 TikZ 是一种基于 TeX 的绘图语言，主要用于描述图形，
+% 而不是像编程语言那样处理多返回值逻辑。不过，通过一些技巧，你可以在 TikZ 中模拟类似“返回多个值”的效果。
+% https://tex.stackexchange.com/questions/510418/tikz-declare-function-with-multiple-outputs
+
+% tikzset 中不要有空行
+
+% 注意: 计算过程是保留坐标单位(pt)的, 所以存在乘除法单位的问题, 首先数值始终携带单位, 
+% 在 calc 运算时有的需要转换为标量; 将坐标转换为 pt 值, 数值可能超出限值, 出现 
+% Dimension too large 错误, 在计算长度时及时进行缩小 
+% https://tex.stackexchange.com/questions/475556/tikz-why-is-dimension-too-large
+% 具体方法是修改默认的 1cm, 如: [scale=1.0,x=0.5cm,y=0.5cm]
+% 注意此处的变量不要和 tikzpicture 环境重名, 否则被替换掉
+% triangle centers: 
+% https://mathworld.wolfram.com/BarycentricCoordinates.html
+
+% Syntax of parabola: y = a * x * x + b * x + c
+%   \parabola [options] (a,b,c); 
+\newcommand\parabola{} % just for safety
+\def\parabola[#1]#2(#3,#4,#5){
+  \path[smooth,domain=-2:2,#1,variable=\euclidea@var]
+    plot({\euclidea@var},
+      {(#3)*\euclidea@var*\euclidea@var+(#4)*\euclidea@var+(#5)})
+}
+
+% Syntax of ellipse:
+%   \ellipse [options] (a,b); 
+% wherein, a,b are major/minor semi axis.
+\newcommand\ellipse{} % just for safety
+\def\ellipse[#1]#2(#3,#4){
+  \path[#1] (0,0) ellipse ({#3} and {#4})
+}
+
+% Syntax of hyperbola:
+%   \hyperbola [options] (a,b); 
+% wherein, a,b are major/minor semi axis.
+\newcommand\hyperbola{} % just for safety
+\def\hyperbola[#1]#2(#3,#4){
+  \path[smooth,domain=-1.5:1.5,#1,variable=\euclidea@var]
+    plot({-(#3)*cosh(\euclidea@var)},
+      {(#4)*sinh(\euclidea@var)})% right arm
+    plot({ (#3)*cosh(\euclidea@var)},
+      {(#4)*sinh(\euclidea@var)})% left arm
+}
+
+% Syntax of asymptote:
+%   \asymptote [options] (a,b); 
+% wherein, a,b are major/minor semi axis.
+\newcommand\asymptote{} % just for safety
+\def\asymptote[#1]#2(#3,#4){
+  \path[domain=-2:2,#1,variable=\euclidea@var,]
+    plot({\euclidea@var},{ (#4)/(#3)*(\euclidea@var)})  
+    plot({\euclidea@var},{-(#4)/(#3)*(\euclidea@var)}) 
+}
+
+% Syntax: \axes[grid] (xmin:xmax, ymin:ymax)
+\newcommand{\axes}[2][]{%
+  \axesinternal[#1]#2%
+}
+
+% 辅助宏：接收 [options] 和 (content)
+\def\axesinternal[#1](#2:#3,#4:#5){%
+  % Check if the "grid" option is provided
+  \ifthenelse{\equal{#1}{grid}}{%
+    \draw[help lines] (#2,#4) grid[step=1] (#3,#5);
+  }{}%
+
+  % Axes
+  \draw[-latex] ({(#2)-0.5},0) -- ({(#3)+0.5},0) node[below] {$x$};
+  \draw[-latex] (0,{(#4)-0.5}) -- (0,{(#5)+0.5}) node[left] {$y$};
+  
+  % Origin
+  \node at (0,0) [below left] {$O$};
+}
+
+\makeatother

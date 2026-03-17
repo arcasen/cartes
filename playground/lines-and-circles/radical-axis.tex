@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+
+\usetikzlibrary{cartes}
+\input{../../tikzlibraryvc.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \ra = 1;
+    \rb = 2;
+    \A{1} = 1; \A{2} = 1;
+    \B{1} = 0; \B{2} = 2;
+  }
+  \tikzset{
+    plane/radical axis={\A,\ra,\B,\rb,\C,\U},
+    plane/scale/origin={\U,2,\V},
+    plane/add/origin={\C,\V,\D},
+    plane/sub/origin={\C,\V,\E},
+  }
+  \axes[grid] (-4:4,-4:4);
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+
+  \draw[thick,red] (A) circle (\ra);
+  \draw[thick,red] (B) circle (\rb);
+
+  \draw[thick] (D) -- (E);
+  
+  \foreach \p/\placement in {A/left,B/right,C/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}

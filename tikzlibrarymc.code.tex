@@ -1,10 +1,22 @@
-\ProvidesFile{tikzlibrarymc.code.tex}[2025/03/28 v1.2.1 A tikz library for matrix computations and linear algebra]
+\ProvidesFile{tikzlibrarymc.code.tex}[2025/05/01 v1.3.0 A tikz library for matrix computations and linear algebra]
 
 % 提高数值计算精度
 % https://tex.stackexchange.com/questions/521857/tikz-fpu-seems-to-be-inaccurate
 \RequirePackage{xfp}
 
 \usetikzlibrary{math,calc,quotes}
+
+% 格式化输出数字
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\pgfkeys{
+    /pgf/number format/.cd,
+    fixed,
+    precision=5,          % 保留两位小数
+    fixed zerofill=true,  % 不足两位补 0
+    % 1000 sep={,}	% 分隔符
+    assume math mode=true % 自动使用数学字体（省去 $$）
+}
 
 % ===============================================
 % Caveats
@@ -66,8 +78,10 @@
 \makeatletter
 
 \tikzmath {
+  % Maximum Iterations for Power Method
+  \PowerMaxIter = 50;
   % threshold, numbers not more than epsilon will be treated as zero.
-  \EPSILON = 0.00001;
+  \EPSILON = 0.00005;
   % Jacobi maximum number of iterations, default: 3*(n-1)^2
   % wherein, n is size of the symetric matrix, 
   % User can override it with a positive integer
@@ -89,11 +103,11 @@
     int \stop;
     \stop = 0;
     % for 的第一项总是执行的，要限制范围
-    for \k in {1,...,\n-1} {
+    for \k in {1,...,\n-1}{
       if \stop == 0 then {
         \pivotRow = \k;
         \pivot = abs(\mc@mat{\k,\k});
-        for \i in {\k+1,...,\n} {
+        for \i in {\k+1,...,\n}{
           if \pivot < abs(\mc@mat{\i,\k}) then {
             \pivotRow = \i;
             \pivot = abs(\mc@mat{\i,\k});
@@ -131,63 +145,111 @@
 
 \tikzset {
   % display matrix: show={\a,m,n}
-  show/.code args={#1,#2,#3} {
+  mat/show/.code args={#1,#2,#3}{
     \tikzmath{
       print{\ \\\detokenize{#1}\\};% convert to string
       int \mc@i, \mc@j;
-      for \mc@i in {1,...,(#2)} {
-        for \mc@j in {1,...,(#3)} {
-          print{[\mc@i,\mc@j]:\ #1{\mc@i,\mc@j}, \ \ };
+      for \mc@i in {1,...,(#2)}{
+        for \mc@j in {1,...,(#3)}{
+          % print{[\mc@i,\mc@j]:\ #1{\mc@i,\mc@j}, \ \ };
+          \mc@temp = #1{\mc@i,\mc@j};
+          print{[\mc@i,\mc@j]:\ \pgfmathprintnumber{\mc@temp}, \ \ };
         };
         print{\\};
       };
     }%tikzmath
   },
   % display matrix: stdout={\a,m,n}
-  stdout/.code args={#1,#2,#3} {
+  mat/stdout/.code args={#1,#2,#3}{
     \message{matrix \detokenize{#1}:^^J}% convert to string
-    \foreach \i in {1,...,#2} {
-      \foreach \j in {1,...,#3} {
-        \message{[\i,\j]: #1{\i,\j} }
+    \foreach \i in {1,...,#2}{
+      \foreach \j in {1,...,#3}{
+        \pgfmathprintnumberto{#1{\i,\j}}{\mc@temp}
+        \message{[\i,\j]: \mc@temp}
       }
       \message{^^J}%line break
     }
   },
   % scalar multiplication: show={\a,m,n,k,\b}
   % b = k * a
-  scalar/.code args={#1,#2,#3,#4,#5} {
+  mat/scale/.code args={#1,#2,#3,#4,#5}{
     \tikzmath{
       int \mc@i, \mc@j;
-      for \mc@i in {1,...,(#2)} {
-        for \mc@j in {1,...,(#3)} {
+      for \mc@i in {1,...,(#2)}{
+        for \mc@j in {1,...,(#3)}{
           #5{\mc@i,\mc@j} = (#4)*(#1{\mc@i,\mc@j});
+        };
+      };
+    }%tikzmath
+  },
+  mat/assign/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \mc@i, \mc@j;
+      for \mc@i in {1,...,(#2)}{
+        for \mc@j in {1,...,(#3)}{
+          #4{\mc@i,\mc@j} = #1{\mc@i,\mc@j};
         };
       };
     }%tikzmath
   },
   % transpose matrix: transpose={\a,m,m,\b}
   % b = transpose(a)
-  transpose/.code args={#1,#2,#3,#4} {
+  mat/transpose/.code args={#1,#2,#3,#4}{
     \tikzmath{
       int \mc@i, \mc@j;
-      for \mc@i in {1,...,(#2)} {
-        for \mc@j in {1,...,(#3)} {
+      for \mc@i in {1,...,(#2)}{
+        for \mc@j in {1,...,(#3)}{
           #4{\mc@j,\mc@i} = #1{\mc@i,\mc@j};
         };
       };
     }%tikzmath
   },
+  % linear combination: C = a A + b B
+  % mat/combine={\A,\B,\m,\n,\a,\b,\C}
+  mat/combine/.code args={#1,#2,#3,#4,#5,#6,#7}{
+    \tikzmath{
+      int \mc@i, \mc@j;
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#4)}{
+          % #7{\mc@i,\mc@j} = (#5) * #1{\mc@i,\mc@j} + (#6) * #2{\mc@i,\mc@j};
+          #7{\mc@i,\mc@j} = \fpeval{(#5) * (#1{\mc@i,\mc@j}) + (#6) * (#2{\mc@i,\mc@j})};
+        };
+      };
+    }
+  },
+  % matrix addition: add={\a,\b,\m,\n,\c}
+  mat/add/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      int \mc@i, \mc@j;
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#4)}{
+          #5{\mc@i,\mc@j} = \fpeval{#1{\mc@i,\mc@j} + #2{\mc@i,\mc@j}};
+        };
+      };
+    }
+  },
+  % matrix subtraction: sub={\a,\b,\m,\n,\c}
+  mat/sub/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      int \mc@i, \mc@j;
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#4)}{
+          #5{\mc@i,\mc@j} = \fpeval{#1{\mc@i,\mc@j} - #2{\mc@i,\mc@j}};
+        };
+      };
+    }
+  },
   % matrix multiplication: product={\a,\b,row1,col1,col2,\c}
   % returns the matrix product of two matrices: c = a * b
   % size(a) = row1 x col1, size(b) = row2 x col2
   % col1 = row2
-  product/.code args={#1,#2,#3,#4,#5,#6} {
+  mat/product/.code args={#1,#2,#3,#4,#5,#6}{
     \tikzmath{
       int \mc@i, \mc@j, \mc@k;
-      for \mc@i in {1,...,(#3)} {
-        for \mc@j in {1,...,(#5)} {
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#5)}{
           #6{\mc@i,\mc@j} = 0.0;
-          for \mc@k in {1,...,(#4)} {
+          for \mc@k in {1,...,(#4)}{
             #6{\mc@i,\mc@j} = \fpeval{#6{\mc@i,\mc@j} + 
                               #1{\mc@i,\mc@k} * #2{\mc@k,\mc@j}};
           };
@@ -198,7 +260,7 @@
   % Determinant calculation using Gaussian elimination with partial pivoting
   % det={\a,n,d}
   % the result is stored in d, the original matrix is not modified.
-  det/.code args={#1,#2,#3} {
+  mat/det/.code args={#1,#2,#3}{
     \tikzmath{
       int \mc@i, \mc@j;
       % keep the original matrix
@@ -217,7 +279,7 @@
   % minors={\a,\n,\b}
   % the result is stored in \minor, 
   % the original matrix is not modified.
-  minors/.code args={#1,#2,#3}{
+  mat/minors/.code args={#1,#2,#3}{
     \tikzmath{
       int \mc@r, \mc@c, \mc@n;
       int \mc@i, \mc@j;
@@ -226,8 +288,8 @@
         for \mc@c in {1,...,\mc@n}{
           % initalize \mc@mat
           int \mc@nexti, \mc@nextj;
-          for \mc@i in {1,...,\mc@n} {
-            for \mc@j in {1,...,\mc@n} {
+          for \mc@i in {1,...,\mc@n}{
+            for \mc@j in {1,...,\mc@n}{
               if \mc@i != \mc@r && \mc@j != \mc@c then{
                 if \mc@i < \mc@r then {
                   \mc@nexti = \mc@i;
@@ -252,16 +314,16 @@
       };
     }% No commas after it
   },
-  cofactors/.code args={#1,#2,#3}{
+  mat/cofactors/.code args={#1,#2,#3}{
     \tikzset{
-      minors={#1,#2,#3},
+      mat/minors={#1,#2,#3},
     }
     \tikzmath{
       int \mc@r, \mc@c, \mc@n;
       \mc@n = #2;
       for \mc@r in {1,...,\mc@n}{
         for \mc@c in {1,...,\mc@n}{
-          #3{\mc@r,\mc@c} = (-1)^(\mc@r+\mc@c) * #3{\mc@r,\mc@c};
+          #3{\mc@r,\mc@c} = \fpeval{(-1)^(\mc@r+\mc@c) * #3{\mc@r,\mc@c}};
         };
       };
     }%tikzmath
@@ -270,7 +332,7 @@
   % solve={\a,\b,row1,col2,\c}
   % solve ax=b, size(a) = row1 x row1, size(b) = row1 x col2, size(c) = row1 x col2
   % if the system is solvable, \status is 1; otherwise 0.
-  solve/.code args={#1,#2,#3,#4,#5}{
+  mat/solve/.code args={#1,#2,#3,#4,#5}{
     \tikzmath{
       % print{Solve linear system...\\};
       \status = 1; % succeed
@@ -279,24 +341,24 @@
       \mc@row1 = #3;
       \mc@col2 = #4;
       % keep the original matrices
-      for \mc@i in {1,...,\mc@row1} {
-        for \mc@j in {1,...,\mc@row1} {
+      for \mc@i in {1,...,\mc@row1}{
+        for \mc@j in {1,...,\mc@row1}{
           \mc@a{\mc@i,\mc@j} = #1{\mc@i,\mc@j};
         };
-        for \mc@j in {1,...,\mc@col2} {
+        for \mc@j in {1,...,\mc@col2}{
           #5{\mc@i,\mc@j} = #2{\mc@i,\mc@j};
         };
       };
       int \mc@stop;
       \mc@stop = 0;
       % for 的第一项总是执行的，要限制范围
-      for \mc@k in {1,...,\mc@row1} {
+      for \mc@k in {1,...,\mc@row1}{
         if \mc@stop == 0 then {
           \mc@pivotRow = \mc@k;
           \mc@pivot = abs(\mc@a{\mc@k,\mc@k});
           % pivoting
           if \mc@k < \mc@row1 then {
-            for \mc@i in {\mc@k+1,...,\mc@row1} {
+            for \mc@i in {\mc@k+1,...,\mc@row1}{
               if \mc@pivot < abs(\mc@a{\mc@i,\mc@k}) then {
                 \mc@pivotRow = \mc@i;
                 \mc@pivot = abs(\mc@a{\mc@i,\mc@k});
@@ -306,6 +368,9 @@
           if \mc@pivot < \EPSILON then { 
             \mc@stop = 1;
             \status = 0; % failed
+            % 要在 tikzmath 内部正确触发错误提示，需要使用一组大括号 {} 将其包裹起来，
+            % 将其作为普通 TeX 代码块执行
+            {\pgferror{Singular matrix detected}};
           };
           if \mc@stop == 0 then {
             % swap
@@ -356,25 +421,28 @@
       };%for
     }%tikzmath
   },
-  % inverse matrix: inverse={\a,n,\b}
-  % b = inverse(a)
-  inverse/.code args={#1,#2,#3}{
+  % initialize identity matrix
+  % mat/identity={\I,\n}
+  mat/identity/.code args={#1,#2}{
     \tikzmath{
-      int \mc@n;
-      \mc@n = #2;
-      % initialize
-      for \mc@i in {1,...,\mc@n} {
-        for \mc@j in {1,...,\mc@n} {
+      int \mc@i, \mc@j;
+      for \mc@i in {1,...,#2}{
+        for \mc@j in {1,...,#2}{
           if \mc@i == \mc@j then {
-            \mc@temp{\mc@i,\mc@j} = 1.0;
+            #1{\mc@i,\mc@j} = 1.0;
           } else {
-            \mc@temp{\mc@i,\mc@j} = 0.0;
+            #1{\mc@i,\mc@j} = 0.0;
           };
         };
       };
-    }%tikzmath
+    }
+  },
+  % inverse matrix: inverse={\a,n,\b}
+  % b = inverse(a)
+  mat/inverse/.code args={#1,#2,#3}{
     \tikzset {
-      solve={#1,\mc@temp,\mc@n,\mc@n,#3},
+      mat/identity={\mc@identity,#2},
+      mat/solve={#1,\mc@identity,#2,#2,#3},
     }
   },
   % Egienvalues and Egienvectors of a symetric matrix
@@ -385,7 +453,7 @@
   % n: size of matrix 'a'
   % change \status to 1 if maximum number of iterations 
   % hasn't been exceeded, otherwise 0;
-  jacobi/.code args = {#1,#2,#3,#4} {
+  mat/jacobi/.code args = {#1,#2,#3,#4}{
     \tikzmath{
       \status = 1;
       int \mc@i, \mc@j, \mc@k, \mc@n;
@@ -396,8 +464,8 @@
         \JacobiMaxIter = 3 * (\mc@n-1)^2;
       };
       % Initialize eigenvector matrix as identity
-      for \mc@i in {1,...,\mc@n} {
-        for \mc@j in {1,...,\mc@n} {
+      for \mc@i in {1,...,\mc@n}{
+        for \mc@j in {1,...,\mc@n}{
           #3{\mc@i,\mc@j} = #1{\mc@i,\mc@j};
           if \mc@i == \mc@j then {
             #4{\mc@i,\mc@j} = 1.0;
@@ -409,15 +477,15 @@
       % print{JacobiMaxIter: \JacobiMaxIter\\};
       int \mc@stop;
       \mc@stop = 0;
-      for \mc@k in {1,...,\JacobiMaxIter} {
+      for \mc@k in {1,...,\JacobiMaxIter}{
         % Performs a single Jacobi rotation to eliminate an off-diagonal element
         if \mc@stop == 0 then {
           % find the maximum off-diagnoal element
           int \mc@p, \mc@q; % position p < q
           real \mc@temp;
           \mc@p = 1; \mc@q = 2; \mc@temp = 0.0;
-          for \mc@i in {1,...,\mc@n-1} {
-            for \mc@j in {\mc@i+1,...,\mc@n} {
+          for \mc@i in {1,...,\mc@n-1}{
+            for \mc@j in {\mc@i+1,...,\mc@n}{
               % print{[\mc@i,\mc@j]:\ #2{\mc@i,\mc@j}\\};
               if abs(#3{\mc@i,\mc@j}) > \mc@temp then {
                 \mc@temp = abs(#3{\mc@i,\mc@j});
@@ -441,15 +509,13 @@
             % we can compute all relevant quantities without 
             % using trigonometric functions,
             % t = sign(tau)/(abs(tau)+sqrt(1+tau^2)) 
-            % i.e. t = -tau + sqrt(1+tau^2), if tau >=0; 
-            %      t = -tau - sqrt(1+tau^2), otherwise.
             % c = 1/sqrt(1+t^2), s = c*t
             real \mc@c, \mc@s, \mc@t, \mc@tau;
             \mc@tau = \fpeval{(#3{\mc@p,\mc@p}-#3{\mc@q,\mc@q})/(2*#3{\mc@p,\mc@q})};
             if \mc@tau >= 0 then {
-              \mc@t = \fpeval{- \mc@tau + sqrt(1+(\mc@tau)^2)};
+              \mc@t = \fpeval{1.0 / (\mc@tau + sqrt(1+(\mc@tau)^2))};
             } else {
-              \mc@t = \fpeval{- \mc@tau - sqrt(1+(\mc@tau)^2)};
+              \mc@t = \fpeval{-1.0 / (- \mc@tau + sqrt(1+(\mc@tau)^2))};
             };
             \mc@c = \fpeval{1 / sqrt(1+(\mc@t)^2)};
             \mc@s = \fpeval{\mc@t * \mc@c};
@@ -485,8 +551,8 @@
               #4{\mc@i,\mc@q} = \mc@vq{\mc@i};
             };
             #3{\mc@q,\mc@p} = 0.0;
-            % for \mc@i in {1,...,\mc@n} {
-            %   for \mc@j in {1,...,\mc@n} {
+            % for \mc@i in {1,...,\mc@n}{
+            %   for \mc@j in {1,...,\mc@n}{
             %     print{[\mc@i,\mc@j]:\ #2{\mc@i,\mc@j}, \ };
             %   };
             %   print{\\};
@@ -496,36 +562,212 @@
       };%for
       if \mc@stop == 0 then {
         \status = 0;
+        {\pgferror{Jacobi method: Maximum iterations exceeded}};
       };
     }%tikzmath
   },%jacobi
   % maximum in absolute value
-  % maxabs={\a,m,n,\max}
-  maxabs/.code args = {#1,#2,#3,#4} {
+  % mat/maxabs={\a,m,n,\max}
+  mat/maxabs/.code args = {#1,#2,#3,#4}{
     \tikzmath {  
       int \mc@i, \mc@j;
       \mc@max = 0.0;
-      for \mc@i in {1,...,(#2)} {
-        for \mc@j in {1,...,(#3)} {
+      for \mc@i in {1,...,(#2)}{
+        for \mc@j in {1,...,(#3)}{
           if \mc@max < abs(#1{\mc@i,\mc@j}) then {
             \mc@max = abs(#1{\mc@i,\mc@j});
           };
         };
       };
       #4 = \mc@max;
-    }
+    }%tikzmath
   },
   % normalize={\a,m,n,\b}
-  normalize/.code args = {#1,#2,#3,#4} {
-    \tikzset{maxabs={#1,#2,#3,\mc@max},}
+  mat/normalize/.code args = {#1,#2,#3,#4}{
+    \tikzset{mat/maxabs={#1,#2,#3,\mc@max},}
     \tikzmath{
       int \mc@i, \mc@j;
-      for \mc@i in {1,...,(#2)} {
-        for \mc@j in {1,...,(#3)} {
+      if \mc@max <= \EPSILON then {
+        {\pgferror{Zero matrix detected}};
+        \mc@max = 1.0;
+      };
+      for \mc@i in {1,...,(#2)}{
+        for \mc@j in {1,...,(#3)}{
           #4{\mc@i,\mc@j} = \fpeval{(#1{\mc@i,\mc@j})/\mc@max};
         };
       };
     }%tikzmath
+  },
+  % Power Method for Approximating Eigenvalues
+  mat/power method/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \mc@i, \mc@j, \mc@k;
+      % initialize vector
+      for \mc@i in {1,...,#2}{
+        \mc@u{\mc@i,1} = 1.0;
+      };%for
+      % power method iteration
+      int \mc@stop;
+      \mc@stop = 0;
+      for \mc@k in {1,...,\PowerMaxIter}{
+        if \mc@stop == 0 then {
+          % matrix production: v = A * u
+          for \mc@i in {1,...,(#2)}{
+            \mc@sum = 0.0;
+            for \mc@j in {1,...,(#2)}{
+              \mc@sum = \fpeval{\mc@sum + #1{\mc@i,\mc@j} * \mc@u{\mc@j,1}};
+            };%for
+            \mc@v{\mc@i,1} = \mc@sum;
+          };%for
+          % infinity norm (max abs) 
+          \mc@max = 0.0;
+          for \mc@i in {1,...,(#2)}{
+            if abs(\mc@v{\mc@i,1}) > \mc@max then {
+              \mc@max = abs(\mc@v{\mc@i,1});
+            };%if
+          };%for
+          % normalize and determine whether it converges.
+          \mc@diff = 0.0;
+          for \mc@i in {1,...,(#2)}{
+            \mc@temp{\mc@i,1} = \fpeval{\mc@v{\mc@i,1} / \mc@max};
+            if abs(\mc@u{\mc@i,1} - \mc@temp{\mc@i,1}) > \mc@diff then {
+              \mc@diff = abs(\mc@u{\mc@i,1} - \mc@temp{\mc@i,1});
+            };
+          };%for
+          if \mc@diff > \EPSILON then {
+            for \mc@i in {1,...,(#2)}{
+              \mc@u{\mc@i,1} = \mc@temp{\mc@i,1};
+            };
+          } else {
+            \mc@stop = 1;
+            \status = 1;
+            % eigen value and vector
+            \mc@suma = 0.0;
+            \mc@sumb = 0.0;
+            for \mc@i in {1,...,(#2)}{
+              \mc@suma = \fpeval{\mc@suma + \mc@u{\mc@i,1} * \mc@v{\mc@i,1}};
+              \mc@sumb = \fpeval{\mc@sumb + \mc@u{\mc@i,1} * \mc@u{\mc@i,1}};
+              #4{\mc@i,1} = \mc@temp{\mc@i,1};
+            };
+            #3 = \fpeval{\mc@suma / \mc@sumb};
+          };
+        };%if not stop
+      };%end of power method iteration
+      if \mc@stop == 0 then {
+        \status = 0;
+        {\pgferror{Power method: Maximum iterations exceeded}};
+      };
+    }%tikzmath
+  },
+  % pivot
+  % mat/pivot={\A,\m,\n,\pivot,\i,\j}
+  mat/pivot/.code args={#1,#2,#3,#4,#5,#6}{
+    \tikzmath{
+      int \mc@m, \mc@n, \mc@i, \mc@j;
+      \mc@i = 1;
+      \mc@j = 1;
+      \mc@pivot = 0.0;
+      for \mc@m in {1,...,(#2)}{
+        for \mc@n in {1,...,(#3)}{
+          if abs(#1{\mc@m,\mc@n}) > \mc@pivot then {
+            \mc@i = \mc@m;
+            \mc@j = \mc@n;
+            \mc@pivot = abs(#1{\mc@m,\mc@n});
+          };
+        };
+      };
+      #4 = \mc@pivot;
+      #5 = \mc@i;
+      #6 = \mc@j;
+    }%tikzmath
+  },
+  % extract the i-th row as a column vector
+  % mat/row={\A,\row,\col,\i,\v}
+  mat/row/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      if #4 <= 0 || #4 > #2 then {
+        {\pgferror{Row index exceeds range}};
+      };
+      int \mc@i;
+      for \mc@i in {1,...,(#3)}{
+        #5{\mc@i,1} = #1{#4,\mc@i};
+      };
+    }%tikzmath
+  },
+  % extract the i-th column as a column vector
+  % mat/column={\A,\row,\col,\i,\v}
+  mat/column/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      if #4 <= 0 || #4 > #3 then {
+        {\pgferror{Column index exceeds range}};
+      };
+      int \mc@i;
+      for \mc@i in {1,...,(#2)}{
+        #5{\mc@i,1} = #1{\mc@i,#4};
+      };
+    }%tikzmath
+  },
+  % congrunence transformation
+  % A transformation of the form A to P^T A P, 
+  % where A and P are square matrices, P is invertible, 
+  % and P^T denotes the transpose of P
+  % mat/congruence={\A,\P,\n,\B}
+  mat/congruence/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \mc@i, \mc@j, \mc@k, \mc@l;
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#3)}{
+          #4{\mc@i,\mc@j} = 0.0;
+          for \mc@k in {1,...,(#3)}{
+            for \mc@l in {1,...,(#3)}{
+              #4{\mc@i,\mc@j} = \fpeval{#4{\mc@i,\mc@j} + 
+                              #2{\mc@k,\mc@i} * #1{\mc@k,\mc@l} * #2{\mc@l,\mc@j}};
+            };
+          };
+        };
+      };
+    }%tikzmath
+  },
+  % bilinear form
+  % If the n × 1 matrix x represents a vector x with respect to this basis, 
+  % and similarly, the n × 1 matrix y represents another vector y, then:
+  % B(x,y) = x^T A y
+  % mat/bilinear={\A,\x,\y,\n,\b}
+  mat/bilinear/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      int \mc@i, \mc@j;
+      #5 = 0.0;
+      for \mc@i in {1,...,(#4)}{
+        for \mc@j in {1,...,(#4)}{
+          #5 = \fpeval{#5 + #1{\mc@i,\mc@j} * #2{\mc@i,1} * #3{\mc@j,1}};
+        };
+      };
+    }%tikzmath
+  },
+  % The process of breaking down a rank-1 matrix into its constituent vectors 
+  % is formally called Rank-1 Decomposition or Outer Product Decomposition.
+  % Mathematically, for a rank-1 matrix A (mxn), the goal is to find vectors
+  % u (mx1) and v (nx1), such that: A = maxabs · u · v^T
+  % decompose rank-1: extracting i-th row and j-th column
+  % where abs(A[i,j]) is the maximum of all
+  % mat/decompose rank-1={\A,\m,\n,\u,\v}
+  mat/decompose rank-1/.code args={#1,#2,#3,#4,#5}{
+    \tikzset{
+      mat/pivot={#1,#2,#3,\mc@max,\mc@i,\mc@j},
+    }
+
+    \tikzmath{
+      if \mc@max <= \EPSILON then {
+        {\pgferror{Unable to find nonzero entry}};
+      };
+      % extract i-th row and j-th column (vectors)
+      for \mc@k in {1,...,(#3)}{
+        #4{\mc@k,1} = \fpeval{#1{\mc@i,\mc@k} / \mc@max};
+      };
+      for \mc@k in {1,...,(#2)}{
+        #5{\mc@k,1} = \fpeval{#1{\mc@k,\mc@j} / \mc@max};
+      };
+    }
   },
 }
 

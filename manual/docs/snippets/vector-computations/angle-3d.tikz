@@ -1,0 +1,36 @@
+\begin{tikzpicture}
+  % 设置 pgf 数字打印格式
+  \pgfkeys{/pgf/number format/.cd,
+    fixed,          % 固定小数点表示 (非科学计数法)
+    precision=2,    % 保留位小数
+  }
+
+  \tikzmath{
+    \A{1} = 3; \A{2} = 0; \A{3} = 3;
+    \B{1} = 3; \B{2} = 3; \B{3} = 0;
+    \C{1} = 0; \C{2} = 3; \C{3} = 3;
+  }
+
+  \tikzset{
+    space/angle={\A,\B,\C,\a},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0,0) -- (1,0,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0,0) -- (0,1,0) node[below left]{$y$};
+  \draw[help lines,teal,-latex] (0,0,0) -- (0,0,1) node[above]{$z$};
+
+  \coordinate (A) at (\A{1},\A{2},\A{3});
+  \coordinate (B) at (\B{1},\B{2},\B{3});
+  \coordinate (C) at (\C{1},\C{2},\C{3});
+
+  \draw[thick,-latex] (A) -- (B);
+  \draw[thick,-latex] (A) -- (C);
+
+  \pic[draw, "$\pgfmathprintnumber{\a}^\circ$", angle radius=.75cm, angle eccentricity=1.5] {angle = B--A--C};
+
+  \foreach \p/\placement in {A/below,B/below,C/above} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

@@ -1,0 +1,55 @@
+\begin{tikzpicture}
+  % Step 1. Compute coordinates
+  \tikzmath{
+    \A{1} = 4; \A{2} = 0;
+    \B{1} = 3; \B{2} = 4;
+    \C{1} = -3; \C{2} = 1;
+  }
+
+  \tikzset{
+    plane/circumcenter={\A,\B,\C,\O},
+    plane/length={\O,\A,\radius},
+    plane/rotate={\O,\A,-50,\P},
+    plane/project={\B,\P,\C,\D},
+    plane/project={\C,\P,\A,\E},
+    plane/project={\A,\P,\B,\F},
+  }
+
+  % Step 2. Define coordinates
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+  \coordinate (O) at (\O{1},\O{2});
+  \coordinate (P) at (\P{1},\P{2});
+
+  % Step 3. Draw shapes
+  % triangle ABC
+  \draw[thick] (B) -- (F);
+  \draw[thick,fill=cyan,opacity=.45] (A) -- (B) -- (C) -- cycle;
+
+  % circumcircle
+  \draw[purple] (O) circle (\radius);
+
+  % perpendicular lines
+  \draw[teal] (P) -- (D) (P) -- (E) (P) -- (F);
+
+  % Simson line
+  \draw[thick,magenta] ($(D)!-.5!(F)$) -- ($(D)!1.25!(F)$);
+  
+  % Step 4. Annotate shapes
+  \pic[draw,red,angle radius=2mm]{right angle= P--D--C};
+  \pic[draw,red,angle radius=2mm]{right angle= P--E--C};
+  \pic[draw,red,angle radius=2mm]{right angle= P--F--A};
+
+  \draw (0,4) node (L) {Simson Line};
+  \draw[->,>=latex] (L) to[out=-90,in=45] ($(D)!-.25!(F)$);
+
+  \foreach \p/\placement in {A/below right, B/above right,
+  C/left, D/above, E/above, F/above right, P/below}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

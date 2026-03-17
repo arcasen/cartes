@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+
+  \tikzmath{
+    \n = 6; 
+    \r = 3;
+    % 计算并存储顶点坐标
+    int \i; 
+    for \i in {1,...,\n} {
+      \ang = (360/\n) * (\i - 1);
+      \x{\i} = \r * cos(\ang);
+      \y{\i} = \r * sin(\ang);
+    };
+    for \i in {1,...,\n}{
+      % 计算下一个点的索引
+      int \j;
+      if \i == \n then { \j = 1; } else { \j = \i + 1; };
+      {\draw[thick, teal] (\x{\i}, \y{\i}) -- (\x{\j}, \y{\j});};
+    };
+  }
+  
+  \draw[help lines] (-3,-3) grid (3,3);
+  \draw[red] (0,0) circle(\r);
+
+\end{tikzpicture}

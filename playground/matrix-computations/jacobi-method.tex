@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage{xfp}
+\usepackage{tikz}
+\usetikzlibrary{math}
+
+\input{../../tikzlibrarymc.code.tex}
+
+\begin{document}
+
+% -----------------------------------------------
+\tikzmath{
+  print{\ \\===== Eigenvalues and eigenvectors of a symetric matrix =====};
+  \a{1,1} = 0; \a{1,2} = -0.5; \a{1,3} = 0;
+  \a{2,1} = -0.5; \a{2,2} = -1; \a{2,3} = 2;
+  \a{3,1} = 0; \a{3,2} = 2; \a{3,3} = 0;
+}
+
+\tikzset{
+  mat/jacobi={\a,3,\d,\v},
+  mat/show={\a,3,3},
+  mat/show={\d,3,3},
+  mat/show={\v,3,3},
+}
+
+\tikzmath{
+  print{\ \\status:\status};
+  print{\ \\$V^T \cdot A \cdot V$:};
+}
+
+\tikzset{
+  mat/congruence={\a,\v,3,\b},
+  mat/show={\b,3,3},
+}
+
+\end{document}

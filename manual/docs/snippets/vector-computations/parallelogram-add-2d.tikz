@@ -1,0 +1,46 @@
+\begin{tikzpicture}
+  % tikzmath 和 tikzset 也可置于 tikzpicture 外部
+  \tikzmath{% 定义点 A, B, C 的坐标
+    \A{1} = 1; \A{2} = 1;
+    \B{1} = 5; \B{2} = 1;
+    \C{1} = 6.5; \C{2} = 4;
+  }
+  
+  \tikzset{% 调用向量运算库命令
+    plane/add={\B,\A,\C,\D},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0) -- (1,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0) -- (0,1) node[below left]{$y
+  $};
+  \draw[teal] (0,0) node[below left]{$O$};
+
+  % 定义 tikz 坐标
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+
+  % 绘制平行四边形
+  \draw (A) node[below]{$A$} -- (B) node[below]{$B$}
+    -- (C) node[above]{$C$} -- (D) node[above]{$D$} -- cycle
+    (A) -- (C)  (B) -- (D);
+  
+  % 标准边
+  \draw
+    ($(A)!.5!(B)$) node {$|$} 
+    ($(C)!.5!(D)$) node {$|$}
+    ($(A)!.5!(D)$) node[rotate=70] {$||$} 
+    ($(B)!.5!(C)$) node[rotate=70] {$||$};
+  
+  % 标注角
+  \pic [draw,pic text=$\alpha$,angle radius=4mm, 
+      angle eccentricity=1.5] {angle=D--B--A};
+  \pic [draw,pic text=$\alpha$,angle radius=4mm, 
+      angle eccentricity=1.5] {angle = B--D--C};
+  \pic [draw,pic text=$\beta$,angle radius=5mm, 
+      angle eccentricity=1.5] {angle = A--D--B};
+  \pic [draw,pic text=$\beta$,angle radius=5mm, 
+      angle eccentricity=1.5] {angle = C--B--D};
+\end{tikzpicture}

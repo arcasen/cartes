@@ -1,0 +1,10 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \radius = 4;
+    \x = \radius * cos(60);
+    \y = \radius * sin(60);
+  }
+
+  \draw[help lines] (0,0) grid (4,4);
+  \draw[thick, teal] (0,0) -- (\x, \y);
+\end{tikzpicture}

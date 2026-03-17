@@ -1,0 +1,35 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{cartes}
+
+% \input{../../tikzlibraryconics.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = 1; \coefs{2} = -2; \coefs{3} = 1; \coefs{4} = -2; \coefs{5} = 4; \coefs{6} = 0;
+    \l{1,1} = 1; \l{2,1} = 1; \l{3,1} = -1;
+  }
+  \tikzset{
+    conics/define/quadratic={\coefs,\A},
+    conics/intersect cn={\A,\l,\P,\Q},
+    conics/dehomogenize={\P,\PP},
+    conics/dehomogenize={\Q,\QQ},
+  }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,domain=-3:3] (\A);
+  \segment[draw=red,clip=(-4:4,-4:4)] (\l);
+
+  \coordinate (P) at (\PP{1},\PP{2});
+  \coordinate (Q) at (\QQ{1},\QQ{2});
+
+  \foreach \p/\placement in {P/above, Q/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+   
+\end{tikzpicture}
+
+\end{document}  

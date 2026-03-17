@@ -1,0 +1,13 @@
+\begin{tikzpicture}
+  \tikzmath{
+    for \i in {0,1,2,3} {
+      for \j in {0,1,2} {
+        % 计算 x 和 y 坐标
+        \x = \i * 1.25;  
+        \y = \j * 1.25;  
+        % 注意：绘图命令需要用花括号包围
+        { \fill[red] (\x, \y) circle (2pt); }; 
+      };
+    };
+  }
+\end{tikzpicture}

@@ -1,0 +1,44 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = 3; \A{2} = 3;
+    \ra = 3;
+    \B{1} = 1; \B{2} = 0;
+    \rb = 2;
+    \C{1} = 5; \C{2} = 0;
+    \rc = 3;
+  }
+
+  \tikzset{
+    plane/radical axis={\A,\ra,\B,\rb,\Pa,\Ua},
+    plane/radical axis={\B,\rb,\C,\rc,\Pb,\Ub},
+    plane/radical axis={\C,\rc,\A,\ra,\Pc,\Uc},
+    plane/add/origin={\Pa,\Ua,\Qa},
+    plane/add/origin={\Pb,\Ub,\Qb},
+    plane/add/origin={\Pc,\Uc,\Qc},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+
+  \coordinate (Pa) at (\Pa{1},\Pa{2});
+  \coordinate (Pb) at (\Pb{1},\Pb{2});
+  \coordinate (Pc) at (\Pc{1},\Pc{2});
+
+  \coordinate (Qa) at (\Qa{1},\Qa{2});
+  \coordinate (Qb) at (\Qb{1},\Qb{2});
+  \coordinate (Qc) at (\Qc{1},\Qc{2});
+
+  \draw[thick] (A) circle (\ra);
+  \draw[thick] (B) circle (\rb);
+  \draw[thick] (C) circle (\rc);
+
+  \draw[thick,teal]  ($(Pa)!-2.5!(Qa)$) -- ($(Pa)!2!(Qa)$);
+  \draw[thick,purple] ($(Pb)!-2.5!(Qb)$) -- ($(Pb)!2!(Qb)$);
+  \draw[thick,magenta] ($(Pc)!-2.5!(Qc)$) -- ($(Pc)!3!(Qc)$);
+  
+  \foreach \p/\placement in {A/left,B/right,C/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

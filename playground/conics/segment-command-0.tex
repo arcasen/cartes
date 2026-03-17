@@ -1,0 +1,50 @@
+\documentclass{article}
+
+\usepackage{tikz}
+
+\makeatletter
+% 1. 主命令：负责接收可选参数 [] 和圆括号内容 ()
+\newcommand{\segment}[2][]{%
+  \message{#2}
+  \segment@impl[#1]#2%
+}
+
+\def\segment@impl[#1](#2){
+  \pgfutil@in@{,}{#2}
+  \ifpgfutil@in@%
+    % 如果括号内包含逗号，调用处理双点的宏
+    \segmentAB[#1](#2)%
+  \else%
+    % 如果不包含逗号，调用处理单点/标签的宏
+    \segmentL[#1](#2)%
+  \fi%
+}
+
+% 2. 辅助宏 A：处理 \segment[options](A,B)
+% 注意这里的参数定界符 (#2,#3)
+\def\segmentAB[#1]#2(#3,#4){%
+  \draw[#1] (#3) -- (#4);
+}
+
+% 3. 辅助宏 B：处理 \segment[options](L)
+\def\segmentL[#1]#2(#3){%
+  \fill[#1] (0,0) -- (#3);
+}
+\makeatother
+
+% --- 文档开始 ---
+\begin{document}
+
+\begin{tikzpicture}
+  % 1. 测试双点模式 (A,B)
+  % 定义两个坐标
+  \coordinate (P1) at (1,-1);
+  \coordinate (P2) at (3,2);
+  \segment[blue, dashed,thick](P1,P2)
+
+  % % 2. 测试单点模式 (L)
+  % 定义一个中心点
+  \segment[orange,thick](P2)
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,21 @@
+\begin{tikzpicture}
+  \clip (-6,-6) rectangle (4,4); % 剪裁区域
+  \tikzmath{
+    % focus
+    \F{1,1} = 0.0; \F{2,1} = 0.0; \F{3,1} = 1.0;
+    % directrix: 2 x + y + 4 = 0 
+    \D{1,1} = 2.0; \D{2,1} = 1.0; \D{3,1} = 4.0;
+  }
+  \tikzset{
+    conics/define/focus-directrix={\F,\D,0.5,\Ca},
+    conics/define/focus-directrix={\F,\D,1.0,\Cb},
+    conics/define/focus-directrix={\F,\D,1.5,\Cc},
+  }
+
+  \axes[grid] (-5:3,-5:3);
+  \conic[draw=violet,thick] (\Ca);
+  \conic[draw=magenta,thick] (\Cb);
+  \conic[draw=teal,thick] (\Cc);
+  \segment[draw=red,clip=(-4:4,-4:4)] (\D);
+
+\end{tikzpicture}

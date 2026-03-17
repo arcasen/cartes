@@ -1,0 +1,50 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % 定义三角形 A, B, C
+    \A{1} = -1; \A{2} = 4;
+    \B{1} = -2; \B{2} = 0;
+    \C{1} = 4; \C{2} = 0;
+    % 定义三角形内部任意一点的重心坐标 
+    \x = 1; \y = 2; \z = 3; 
+  }
+  \tikzset{
+    plane/barycenter={\A,\B,\C,\x,\y,\z,\PP},
+    plane/rotate={\B,\A,60,\CC},% A 绕 B 旋转 60 度
+    plane/rotate={\A,\C,60,\BB},
+    plane/rotate={\C,\B,60,\AA},
+    plane/intersect ll={\A,\AA,\B,\BB,\P},
+    plane/rotate={\C,\P,60,\Q},
+    plane/rotate={\C,\PP,60,\QQ},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (P) at (\P{1},\P{2});
+  \coordinate (Q) at (\Q{1},\Q{2});
+  \coordinate (A') at (\AA{1},\AA{2});
+  \coordinate (B') at (\BB{1},\BB{2});
+  \coordinate (C') at (\CC{1},\CC{2});
+  \coordinate (P') at (\PP{1},\PP{2});
+  \coordinate (Q') at (\QQ{1},\QQ{2});
+  
+  \foreach \point in {A,B,C,A',B',C',P,Q,P',Q'}
+    \fill (\point) [red] circle (2pt);
+  \draw[thick,red] (A) -- (A') (B) -- (B') (C) -- (C');
+  \draw[magenta] (Q) -- (C);
+  \draw[thick] (A) -- (B) -- (C') -- cycle;
+  \draw[thick] (B) -- (C) -- (A') -- cycle;
+  \draw[thick] (C) -- (A) -- (B') -- cycle;
+  \draw[blue] (A) -- (P') -- (Q') -- (A') 
+    (P') -- (C) (Q') -- (C) (P') -- (B);
+  \draw (A) node[above] {$A$};
+  \draw (B) node[below left] {$B$};
+  \draw (C) node[below right] {$C$};
+  \draw (A') node[below] {$A'$};
+  \draw (B') node[above right] {$B'$};
+  \draw (C') node[above left] {$C'$};
+  \draw (P) node[left] {$P$};
+  \draw (Q) node[left] {$Q$};
+  \draw (P') node[right] {$P'$};
+  \draw (Q') node[left] {$Q'$};
+\end{tikzpicture}

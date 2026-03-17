@@ -1,0 +1,56 @@
+%\tdplotsetmaincoords{70}{110}
+
+%\begin{tikzpicture}[tdplot_main_coords]
+% 设置主视角：仰角 70 度，方位角 110 度
+
+\begin{tikzpicture}[
+    x={({0.5*cos(-135)},{0.5*sin(-135)})}, % default: cm
+    y={(1cm,0cm)}, 
+    z={(0cm,1cm)}
+]
+
+\tikzmath{
+    % 平面上 A B C
+    \A{1}=4; \A{2}=0; \A{3}=0;
+    \B{1}=0; \B{2}=4; \B{3}=0;
+    \C{1}=0; \C{2}=0; \C{3}=2;
+    %\A{1}=0; \A{2}=0; \A{3}=0;
+    %\B{1}=2; \B{2}=0; \B{3}=0;
+    %\C{1}=0; \C{2}=2; \C{3}=0;
+    % 目标点 D
+    \D{1}=2; \D{2}=3; \D{3}=4;
+    %\D{1}=2; \D{2}=2; \D{3}=2;
+}
+
+\tikzset{
+    space/sub/origin={\B,\A,\AB},
+    space/sub/origin={\C,\A,\AC},
+    space/sub/origin={\D,\A,\AD},
+    space/cross/origin={\AB,\AC,\N},
+    space/reject/origin={\AD,\N,\AE},
+    space/add/origin={\A,\AE,\E},
+}
+
+% 绘制坐标轴
+\draw[help lines,teal,-latex] (0,0,0) -- (1,0,0) node[right]{$x$};
+\draw[help lines,teal,-latex] (0,0,0) -- (0,1,0) node[below left]{$y$};
+\draw[help lines,teal,-latex] (0,0,0) -- (0,0,1) node[above]{$z$};
+
+\coordinate (A) at (\A{1},\A{2},\A{3});
+\coordinate (B) at (\B{1},\B{2},\B{3});
+\coordinate (C) at (\C{1},\C{2},\C{3});
+\coordinate (D) at (\D{1},\D{2},\D{3});
+\coordinate (E) at (\E{1},\E{2},\E{3});
+    
+%\draw (0,0,0) -- (4,0,0) -- (4,4,0) -- (0,4,0) -- cycle;
+%\draw (0,0,4) -- (4,0,4) -- (4,4,4) -- (0,4,4) -- cycle;
+
+\draw[thick,teal] (A) -- (B) -- (C) -- cycle;
+\draw[thick,purple] (D) -- (E);
+
+\foreach \p/\placement in {A/below,B/below,C/above,D/below,E/below} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+}
+
+\end{tikzpicture}

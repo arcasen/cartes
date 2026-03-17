@@ -1,0 +1,39 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{cartes}
+
+% \input{../../tikzlibraryconics.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = 1; \coefs{2} = 1; \coefs{3} = -1; 
+    \coefs{4} = -2; \coefs{5} = -4; \coefs{6} = 0;
+    % 点的齐次坐标
+    \U{1,1} = -1; \U{2,1} = -1; \U{3,1} = 1; 
+  }
+  \tikzset{
+    conics/define/quadratic={\coefs,\A},
+    conics/tangents={\A,\U,\P,\Q},
+    conics/dehomogenize={\U,\UU},
+    conics/dehomogenize={\P,\PP},
+    conics/dehomogenize={\Q,\QQ},
+  }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick] (\A);
+  \segment[draw=violet,clip=(-4:4,-4:4)] (\U,\P);
+  \segment[draw=violet,clip=(-4:4,-4:4)] (\U,\Q);
+
+  \coordinate (U) at (\UU{1},\UU{2});
+  \coordinate (P) at (\PP{1},\PP{2});
+  \coordinate (Q) at (\QQ{1},\QQ{2});
+
+  \foreach \p/\placement in {P/above, Q/above, U/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}  

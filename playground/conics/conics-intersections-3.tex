@@ -1,0 +1,70 @@
+\documentclass{article}
+\usepackage{xfp}
+\usepackage{tikz}
+\usetikzlibrary{cartes}
+\usetikzlibrary{math}
+
+% \input{../../tikzlibrarymc.code.tex}
+% \input{../../tikzlibraryconics.code.tex}
+
+
+\begin{document}
+
+\tikzmath{
+  % x^2-y^2=0
+  \coefa{1} = 1; \coefa{2} = 0; \coefa{3} = -1; 
+  \coefa{4} = 0; \coefa{5} = 0; \coefa{6} = -1;  
+  % x^2+4y^2-2x-3=0
+  \coefb{1} = 1; \coefb{2} = 0; \coefb{3} = 4; 
+  \coefb{4} = -2; \coefb{5} = 0; \coefb{6} = -3; 
+}
+
+\tikzset{
+  conics/define/quadratic={\coefa,\Ca},
+  conics/define/quadratic={\coefb,\Cb},
+  conics/intersect cc={\Ca,\Cb,\C,\l,\m},
+  mat/show={\Ca,3,3},
+  mat/show={\Cb,3,3},
+  mat/show={\C,3,3},
+  mat/show={\l,3,1},
+  mat/show={\m,3,1},
+  conics/intersect cn={\Ca,\l,\Pa,\Qa},
+  conics/dehomogenize={\Pa,\Ua},
+  conics/dehomogenize={\Qa,\Va},
+  conics/intersect cn={\Ca,\m,\Pb,\Qb},
+  conics/dehomogenize={\Pb,\Ub},
+  conics/dehomogenize={\Qb,\Vb},
+}
+
+\begin{tikzpicture}
+  \clip (-6,-6) rectangle (6,6);% 裁剪区域
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw] (\Ca);
+  \conic[draw] (\Cb);
+
+  \coordinate (P1) at (\Ua{1},\Ua{2});
+  \coordinate (P2) at (\Va{1},\Va{2});
+  \coordinate (P3) at (\Ub{1},\Ub{2});
+  \coordinate (P4) at (\Vb{1},\Vb{2});
+
+  \foreach \x in {30,60,...,90}{
+    \tikzset{%color
+      mat/combine={\Ca,\Cb,3,3,\x/100,-0.75,\C},
+    }
+    \conic[draw=teal!\x] (\C);
+  }
+
+  \foreach \x in {30,60,...,90}{
+    \tikzset{%color
+      mat/combine={\Ca,\Cb,3,3,\x/100,0.75,\C},
+    }
+    \conic[draw=red!\x] (\C);
+  }
+
+  \foreach \p/\placement in {P1/above, P2/above, P3/above, P4/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}  

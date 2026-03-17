@@ -1,0 +1,37 @@
+\tdplotsetmaincoords{70}{110}
+
+\begin{tikzpicture}[tdplot_main_coords]
+% 设置主视角：仰角 70 度，方位角 110 度
+
+\tikzmath{
+    % 直线上 A 和 B
+    \A{1}=4; \A{2}=0; \A{3}=0;
+    \B{1}=0; \B{2}=4; \B{3}=0;
+    % 目标点 C
+    \C{1}=0; \C{2}=0; \C{3}=4;
+}
+
+\tikzset{space/project={\A,\C,\B,\D}}
+
+% 绘制坐标轴
+\draw[help lines,teal,-latex] (0,0,0) -- (1,0,0) node[right]{$x$};
+\draw[help lines,teal,-latex] (0,0,0) -- (0,1,0) node[below left]{$y$};
+\draw[help lines,teal,-latex] (0,0,0) -- (0,0,1) node[above]{$z$};
+
+\coordinate (A) at (\A{1},\A{2},\A{3});
+\coordinate (B) at (\B{1},\B{2},\B{3});
+\coordinate (C) at (\C{1},\C{2},\C{3});
+\coordinate (D) at (\D{1},\D{2},\D{3});
+
+\draw[thick] (A) -- (B);
+\draw[thick] (C) -- (D);
+
+\pic [draw,red,thin,angle radius=1.5mm]
+      {right angle = A--D--C};
+
+\foreach \p/\placement in {A/below,B/below,C/above,D/below} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+}
+
+\end{tikzpicture}

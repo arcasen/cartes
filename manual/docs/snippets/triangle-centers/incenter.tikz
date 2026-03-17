@@ -1,0 +1,37 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = -2; \A{2} = 0;
+    \B{1} = 4; \B{2} = 0;
+    \C{1} = -1; \C{2} = 4;
+  }
+
+  \tikzset{
+    plane/incenter={\A,\B,\C,\I},
+    plane/excenter={\A,\B,\C,\Ja},
+    plane/excenter={\B,\C,\A,\Jb},
+    plane/excenter={\C,\A,\B,\Jc},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (I) at (\I{1},\I{2});
+
+  \node[draw,red] at (I) [circle through=($(B)!(I)!(C)$)]{};
+  \draw[thick] (A) -- (B) -- (C) -- cycle;
+  \draw (A) -- (I) (B) -- (I) (C) -- (I);
+
+  \pic [draw,angle radius=12pt] {angle=I--A--C};
+  \pic [draw,angle radius=15pt] {angle=B--A--I};
+  \pic [draw,double,angle radius=12pt] {angle=A--C--I};
+  \pic [draw,double,angle radius=15pt] {angle=I--C--B};
+  \pic [draw,pic text=.,angle radius=12pt, 
+    angle eccentricity=1.2] {angle=C--B--I};
+  \pic [draw,pic text=.,angle radius=15pt, 
+    angle eccentricity=1.2] {angle=I--B--A};
+
+  \foreach \p/\placement in {A/left,B/right,C/above,I/right} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

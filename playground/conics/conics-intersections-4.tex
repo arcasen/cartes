@@ -1,0 +1,64 @@
+\documentclass{article}
+\usepackage{xfp}
+\usepackage{tikz}
+\usetikzlibrary{cartes}
+\usetikzlibrary{math}
+
+% \input{../../tikzlibrarymc.code.tex}
+% \input{../../tikzlibraryconics.code.tex}
+
+
+\begin{document}
+
+\tikzmath{
+  % 2x^2+xy+y^2-4x-4y=0
+  \coefa{1} = 2; \coefa{2} = 1; \coefa{3} = 1; 
+  \coefa{4} = -4; \coefa{5} =-4; \coefa{6} = 0;  
+  % 4x^2+xy+y^2-8x-4y=0
+  \coefb{1} = 4; \coefb{2} = 1; \coefb{3} = 1; 
+  \coefb{4} = -8; \coefb{5} =-4; \coefb{6} = 0; 
+}
+
+\tikzset{
+  conics/define/quadratic={\coefa,\Ca},
+  conics/define/quadratic={\coefb,\Cb},
+  conics/intersect cc={\Ca,\Cb,\C,\l,\m},
+  mat/show={\Ca,3,3},
+  mat/show={\Cb,3,3},
+  mat/show={\C,3,3},
+  mat/show={\l,3,1},
+  mat/show={\m,3,1},
+}
+
+\begin{tikzpicture}
+  \clip (-6,-6) rectangle (6,6);% 裁剪区域
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw] (\Ca);
+  \conic[draw] (\Cb);
+
+  \coordinate (P1) at (0,0);
+  \coordinate (P2) at (2,0);
+  \coordinate (P3) at (2,2);
+  \coordinate (P4) at (0,4);
+
+  \foreach \x in {30,60,...,90}{
+    \tikzset{%color
+      mat/combine={\Ca,\Cb,3,3,\x/100,-0.75,\C},
+    }
+    \conic[draw=teal!\x] (\C);
+  }
+
+  \foreach \x in {30,60,...,90}{
+    \tikzset{%color
+      mat/combine={\Ca,\Cb,3,3,\x/100,0.75,\C},
+    }
+    \conic[draw=red!\x] (\C);
+  }
+
+  \foreach \p/\placement in {P1/above, P2/above, P3/above, P4/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}  

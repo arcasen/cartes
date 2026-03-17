@@ -1,0 +1,19 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{cartes}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \P{1,1} = 0.5; \P{2,1} = -2.5; \P{3,1} = 1;
+    \Q{1,1} = -1; \Q{2,1} = -2.5; \Q{3,1} = 1;
+    \R{1,1} = 0.5; \R{2,1} = 2; \R{3,1} = 1;
+  }
+  \axes[grid] (-3:3,-3:3);
+  \segment[draw=red,clip=(-2:1,-3:3)] (\P,\Q);
+  \segment[draw=red,clip=(-2:1,-3:3)] (\P,\R);
+\end{tikzpicture}
+
+\end{document}  

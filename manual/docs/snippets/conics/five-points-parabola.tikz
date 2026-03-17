@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % 5 点的齐次坐标
+    \Pa{1,1} = 1; \Pa{2,1} = 2; \Pa{3,1} = 1; 
+    \Pb{1,1} = 4; \Pb{2,1} = 2; \Pb{3,1} = 1; 
+    \Pc{1,1} = 1; \Pc{2,1} = -2; \Pc{3,1} = 1; 
+    \Pd{1,1} = 4; \Pd{2,1} = 4; \Pd{3,1} = 1; 
+    \Pe{1,1} = 5; \Pe{2,1} = 4; \Pe{3,1} = 1; 
+  }
+  \tikzset{
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\A},
+    mat/stdout={\A,3,3},
+  }
+
+  \axes[grid] (-3:6,-3:6);
+  \conic[draw=teal,domain=-5:5] (\A);
+
+  \coordinate (P1) at (\Pa{1,1},\Pa{2,1});
+  \coordinate (P2) at (\Pb{1,1},\Pb{2,1});
+  \coordinate (P3) at (\Pc{1,1},\Pc{2,1});
+  \coordinate (P4) at (\Pd{1,1},\Pd{2,1});
+  \coordinate (P5) at (\Pe{1,1},\Pe{2,1});
+
+  \foreach \p/\placement in {P1/above, P2/above, P3/above, P4/above, P5/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  } 
+\end{tikzpicture}

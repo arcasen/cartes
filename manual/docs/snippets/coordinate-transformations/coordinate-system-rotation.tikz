@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \xmin = 0;
+    \xmax = 3;
+    \ymin = 0;
+    \ymax = 3;
+    \a = 15;
+  }
+  % original coordinate system
+  \draw[-latex] ({(\xmin)-0.5},0) -- ({(\xmax)+0.5},0) node[below] {$x$};
+  \draw[-latex] (0,{(\ymin)-0.5}) -- (0,{(\ymax)+0.5}) node[left] {$y$};
+  \draw (0,0) node[below left] {$O$};
+  % the transformed coordinate system
+  \draw[rotate=\a,red,-latex] ({(\xmin)-0.5},0) -- ({(\xmax)+0.5},0) node[below] {$x'$};
+  \draw[rotate=\a,red,-latex] (0,{(\ymin)-0.5}) -- (0,{(\ymax)+0.5}) node[left] {$y'$};
+  % \draw (0,0) node[below left] {$O$};
+
+  \coordinate (O) at (0,0);
+  \coordinate (P) at (2.5,2.5);
+  \coordinate (A) at (1,0);
+  \coordinate (B) at (\a:1);
+
+  \pic[draw,teal,"$\phi$",angle eccentricity=1.25,angle radius=8mm] {angle=A--O--P};
+  \pic[draw,red,"$\theta$",angle eccentricity=1.25,angle radius=12mm] {angle=A--O--B};
+
+  \draw[teal] (O) -- (P);
+  \foreach \p/\placement in {P/above}{
+    \fill[teal] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

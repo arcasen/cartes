@@ -1,0 +1,39 @@
+\begin{tikzpicture}[scale=.5]
+  \tikzmath{
+    \A{1} = -2; \A{2} = 0;
+    \B{1} = 4; \B{2} = 0;
+    \C{1} = -1; \C{2} = 4;
+  }
+
+  \tikzset{
+    plane/incenter={\A,\B,\C,\I},
+    plane/excenter={\A,\B,\C,\Ja},
+    plane/excenter={\B,\C,\A,\Jb},
+    plane/excenter={\C,\A,\B,\Jc},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (I) at (\I{1},\I{2});
+  \coordinate (Ja) at (\Ja{1},\Ja{2});
+  \coordinate (Jb) at (\Jb{1},\Jb{2});
+  \coordinate (Jc) at (\Jc{1},\Jc{2});
+
+  \foreach \point in {I,Ja,Jb,Jc}
+    \fill (\point) [red] circle (2pt);
+
+  \node[draw,red] at (I) [circle through=($(B)!(I)!(C)$)]{};
+  \node[draw,red] at (Ja) [circle through=($(B)!(Ja)!(C)$)]{};
+  \node[draw,red] at (Jb) [circle through=($(B)!(Jb)!(C)$)]{};
+  \node[draw,red] at (Jc) [circle through=($(B)!(Jc)!(C)$)]{};
+
+  \draw[teal,thick] ($(A)!-1!(B)$) -- ($(A)!2!(B)$);
+  \draw[teal,thick] ($(B)!-1!(C)$) -- ($(B)!2!(C)$);
+  \draw[teal,thick] ($(C)!-1!(A)$) -- ($(C)!2!(A)$);
+
+  \foreach \p/\placement in {A/left,B/right,C/above,I/right,Ja/right,Jb/right,Jc/right} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

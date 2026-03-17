@@ -1,0 +1,70 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+
+\input{../../tikzlibraryconics.code.tex}
+\input{../../tikzlibrarycartes.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = 1; \coefs{2} = -2; \coefs{3} = 1; \coefs{4} = -2; \coefs{5} = 4; \coefs{6} = 0;
+  }
+  % \tikzset{
+  %   conics/define/quadratic={\coefs,\A},
+  % }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick,conics/define/quadratic={\coefs,\A},domain=-3:3] (\A);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = 1/2; \coefs{2} = 0; \coefs{3} = 0; \coefs{4} = 0; \coefs{5} = 1; \coefs{6} = -1;
+  }
+  % \tikzset{
+  %   conics/define/quadratic={\coefs,\A},
+  % }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick,conics/define/quadratic={\coefs,\A},domain=-1:2] (\A);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = -1/2; \coefs{2} = 0; \coefs{3} = 0; \coefs{4} = 0; \coefs{5} = 1; \coefs{6} = -1;
+  }
+  % \tikzset{
+  %   conics/define/quadratic={\coefs,\A},
+  % }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick,conics/define/quadratic={\coefs,\A},domain=-1:2] (\A);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = 0; \coefs{2} = 0; \coefs{3} = 1/2; \coefs{4} = 1; \coefs{5} = 0; \coefs{6} = -1;
+  }
+  % \tikzset{
+  %   conics/define/quadratic={\coefs,\A},
+  % }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick,conics/define/quadratic={\coefs,\A},domain=-1:2] (\A);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \coefs{1} = 0; \coefs{2} = 0; \coefs{3} = -1/2; \coefs{4} = 1; \coefs{5} = 0; \coefs{6} = -1;
+  }
+  % \tikzset{
+  %   conics/define/quadratic={\coefs,\A},
+  % }
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick,conics/define/quadratic={\coefs,\A},domain=-1:2] (\A);
+\end{tikzpicture}
+
+\end{document}  

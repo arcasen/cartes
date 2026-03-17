@@ -1,0 +1,46 @@
+\documentclass{standalone}
+\usepackage{tikz}
+% \usetikzlibrary{cartes}
+\input{../../tikzlibraryvc.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = 4; \A{2} = 0;
+    \B{1} = -1; \B{2} = -1;
+    \C{1} = 0; \C{2} = 4;
+    \A{1} = 4 * cos(120); \A{2} = 4 * sin(120);
+    \B{1} = 4 * cos(210); \B{2} = 4 * sin(210);
+    \C{1} = 4 * cos(-30); \C{2} = 4 * sin(-30);
+  }
+
+  \tikzset{
+    plane/centroid={\A,\B,\C,\G},
+    plane/intersect ll={\B,\C,\A,\G,\D},
+    plane/intersect ll={\C,\A,\B,\G,\E},
+    plane/intersect ll={\A,\B,\C,\G,\F},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0) -- (1,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0) -- (0,1) node[below left]{$y$};
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+  \coordinate (G) at (\G{1},\G{2});
+
+  \draw[thick] (A) -- (B) -- (C) -- cycle;
+  \draw[thick,teal] (A) -- (D) (B) -- (E) (C) -- (F);
+
+  \foreach \p/\placement in {A/below,B/below,C/above,D/above,E/above,F/above,G/above} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}

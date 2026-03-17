@@ -1,0 +1,97 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\input{../../tikzlibraryconics.code.tex}
+\input{../../tikzlibrarycartes.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  % 利用退化的六边形求每条直线上的切点, 再由切点构造圆锥曲线
+  \tikzmath {
+    \coefs{1} = 1; \coefs{2} = 1; \coefs{3} = 1; \coefs{4} = -2; \coefs{5} = -4; \coefs{6} = 0;
+    % 5 点的齐次坐标
+    \Pa{1,1} = 0; \Pa{2,1} = 0; \Pa{3,1} = 1; 
+    \Pb{1,1} = 2; \Pb{2,1} = 0; \Pb{3,1} = 1; 
+    \Pc{1,1} = 2; \Pc{2,1} = 2; \Pc{3,1} = 1; 
+    \Pd{1,1} = 0; \Pd{2,1} = 4; \Pd{3,1} = 1; 
+    \Pe{1,1} = -2; \Pe{2,1} = 2; \Pe{3,1} = 1; 
+  }
+  \tikzset{
+    conics/define/quadratic={\coefs,\A},
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\X},
+    % 5 tangents
+    product={\A,\Pa,3,3,1,\La},
+    product={\A,\Pb,3,3,1,\Lb},
+    product={\A,\Pc,3,3,1,\Lc},
+    product={\A,\Pd,3,3,1,\Ld},
+    product={\A,\Pe,3,3,1,\Le},
+    % normalize={\La,3,1,\La},
+    % normalize={\Lb,3,1,\Lb},
+    % normalize={\Lc,3,1,\Lc},
+    % normalize={\Ld,3,1,\Ld},
+    % normalize={\Le,3,1,\Le},
+    % 5 个顶点
+    conics/cross={\La,\Lb,\Qa},
+    conics/cross={\Lb,\Lc,\Qb},
+    conics/cross={\Lc,\Ld,\Qc},
+    conics/cross={\Ld,\Le,\Qd},
+    conics/cross={\Le,\La,\Qe},
+    % 5 条对角线
+    conics/cross={\Qa,\Qc,\da},
+    conics/cross={\Qb,\Qd,\db},
+    conics/cross={\Qc,\Qe,\dc},
+    conics/cross={\Qd,\Qa,\dd},
+    conics/cross={\Qe,\Qb,\de},
+    % 5 Brianchon points
+    conics/cross={\da,\de,\Ba},
+    conics/cross={\db,\da,\Bb},
+    conics/cross={\dc,\db,\Bc},
+    conics/cross={\dd,\dc,\Bd},
+    conics/cross={\de,\dd,\Be},
+    % 5 tangent points
+    conics/cross={\Ba,\Qd,\temp},
+    conics/cross={\temp,\Lb,\Ta},
+    conics/cross={\Bb,\Qe,\temp},
+    conics/cross={\temp,\Lc,\Tb},
+    conics/cross={\Bc,\Qa,\temp},
+    conics/cross={\temp,\Ld,\Tc},
+    conics/cross={\Bd,\Qb,\temp},
+    conics/cross={\temp,\Le,\Td},
+    conics/cross={\Be,\Qc,\temp},
+    conics/cross={\temp,\La,\Te},
+    % conics/define/five points={\Ta,\Tb,\Tc,\Td,\Te,\C},
+  }
+
+  \coordinate (B1) at (\Ba{1,1}/\Ba{3,1},\Ba{2,1}/\Ba{3,1});
+  \coordinate (B2) at (\Bb{1,1}/\Bb{3,1},\Bb{2,1}/\Bb{3,1});
+  \coordinate (B3) at (\Bc{1,1}/\Bc{3,1},\Bc{2,1}/\Bc{3,1});
+  \coordinate (B4) at (\Bd{1,1}/\Bd{3,1},\Bd{2,1}/\Bd{3,1});
+  \coordinate (B5) at (\Be{1,1}/\Be{3,1},\Be{2,1}/\Be{3,1});
+
+  \coordinate (Q1) at (\Qa{1,1}/\Qa{3,1},\Qa{2,1}/\Qa{3,1});
+  \coordinate (Q2) at (\Qb{1,1}/\Qb{3,1},\Qb{2,1}/\Qb{3,1});
+  \coordinate (Q3) at (\Qc{1,1}/\Qc{3,1},\Qc{2,1}/\Qc{3,1});
+  \coordinate (Q4) at (\Qd{1,1}/\Qd{3,1},\Qd{2,1}/\Qd{3,1});
+  \coordinate (Q5) at (\Qe{1,1}/\Qe{3,1},\Qe{2,1}/\Qe{3,1});
+
+  \coordinate (T1) at (\Ta{1,1}/\Ta{3,1},\Ta{2,1}/\Ta{3,1});
+  \coordinate (T2) at (\Tb{1,1}/\Tb{3,1},\Tb{2,1}/\Tb{3,1});
+  \coordinate (T3) at (\Tc{1,1}/\Tc{3,1},\Tc{2,1}/\Tc{3,1});
+  \coordinate (T4) at (\Td{1,1}/\Td{3,1},\Td{2,1}/\Td{3,1});
+  \coordinate (T5) at (\Te{1,1}/\Te{3,1},\Te{2,1}/\Te{3,1});
+
+  \foreach \p/\placement in {B1/above, B2/above, B3/above, B4/above, B5/above,
+  Q1/above, Q2/above, Q3/above, Q4/above, Q5/above,
+  T1/above, T2/above, T3/above, T4/above, T5/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+
+  \axes[grid] (-1:5,-1:5);
+  \conic[draw,thick,teal] (\A);
+  % \conic[draw,thick,red] (\C);
+
+\end{tikzpicture}
+
+\end{document}

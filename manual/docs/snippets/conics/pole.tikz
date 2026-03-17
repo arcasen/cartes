@@ -1,0 +1,35 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % 圆锥曲线系数
+    \coefs{1} = 1; \coefs{2} = 1; \coefs{3} = 1; 
+    \coefs{4} = -2; \coefs{5} = -4; \coefs{6} = 0;
+    % 线的齐次坐标
+    \l{1,1} = 1; \l{2,1} = 2; \l{3,1} = -2;
+    \m{1,1} = 1; \m{2,1} = 4; \m{3,1} = -3;
+  }
+  \tikzset{
+    conics/define/quadratic={\coefs,\A},
+    conics/pole={\A,\l,\P},% 直线 l 关于曲线 A 的极点 P
+    conics/pole={\A,\m,\Q},% 直线 m 关于曲线 A 的极点 Q
+    conics/cross={\P,\Q,\n},% 过点 P Q 的直线 n
+    conics/pole={\A,\n,\R},% 直线 n 关于曲线 A 的极点 R, 应为 l 和 m 的交点
+    conics/dehomogenize={\P,\PP},
+    conics/dehomogenize={\Q,\QQ},
+    conics/dehomogenize={\R,\RR},
+  }
+
+  \coordinate (P) at (\PP{1},\PP{2});
+  \coordinate (Q) at (\QQ{1},\QQ{2});
+  \coordinate (R) at (\RR{1},\RR{2});
+
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick] (\A);
+  \segment[draw=magenta,thick,clip=(-3:3,-4:4)] (\l);
+  \segment[draw=violet,thick,clip=(-3:3,-4:4)] (\m);
+  \segment[draw=purple,thick,clip=(-3:3,-4:4)] (\n);
+
+  \foreach \p/\placement in {P/below,Q/below,R/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

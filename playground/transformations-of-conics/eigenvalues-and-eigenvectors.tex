@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage{xfp}
+\usepackage{tikz}
+\usetikzlibrary{math,cartes}
+
+\begin{document}
+
+% -----------------------------------------------
+\tikzmath{
+  print{\ \\===== Eigenvalues and eigenvectors of a symetric matrix =====};
+  \a{1,1} = 1; \a{1,2} = 0; \a{1,3} = -1;
+  \a{2,1} = 0; \a{2,2} = 1; \a{2,3} = -1;
+  \a{3,1} = -1; \a{3,2} = -1; \a{3,3} = 1;
+  % \JacobiMaxIter = 7;
+  \EPSILON =  0.00004; % solve 'Dimension too large' error.
+}
+
+\tikzset{
+  % Dimension too large.
+  mat/jacobi={\a,3,\d,\v},
+  mat/show={\a,3,3},
+  mat/show={\d,3,3},
+  mat/show={\v,3,3},
+  % verify
+  mat/congruence={\a,\v,3,\temp},
+  mat/show={\temp,3,3},
+}
+
+\tikzmath{
+  print{\ \\status:\status};
+}
+
+\end{document}

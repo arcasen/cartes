@@ -1,0 +1,25 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \radius = 3;
+    \A{1} = 1; \A{2} = 2;
+    % 过 (-2,5) 和 (3,-1) 直线的齐次坐标
+    \l{1,1} = 6; \l{2,1} = 5; \l{3,1} = -13;
+  }
+
+  \tikzset{
+    plane/intersect cn={\A,\radius,\l{1,1},\l{2,1},\l{3,1},\Pa,\Pb},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (P1) at (\Pa{1},\Pa{2});
+  \coordinate (P2) at (\Pb{1},\Pb{2});
+
+  \axes[grid] (-3:5,-2:6);
+  \draw[teal] (A) circle (\radius);
+  \segment[draw=black,clip=(-2:3.5,-6:6.5)] (\l);% 绘制直线
+
+  \foreach \p/\placement in {A/left,P1/left,P2/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

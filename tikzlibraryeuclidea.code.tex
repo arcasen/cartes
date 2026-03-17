@@ -1,7 +1,11 @@
-\ProvidesFile{tikzlibraryeuclidea.code.tex}[2026/02/28 v1.8.1 A tikz library for Euclidean geometry constructions]
+\ProvidesFile{tikzlibraryeuclidea.code.tex}[2026/05/01 v1.8.2 A tikz library for Euclidean geometry constructions]
 
+\RequirePackage{tikz}
+\RequirePackage{tikz-3dplot}
 \RequirePackage{ifthen}
 \RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{bm}
 
 \usetikzlibrary{math,calc,quotes,mc}
 
@@ -86,7 +90,7 @@
       ($(#1)!(#3)!(#2)$)
     }
   },
-  % circle inverse={O,A,P}: returns inverse point P with respect to 
+  % circle mat/inverse={O,A,P}: returns inverse point P with respect to 
   % a reference circle(O,A). 
   circle inverse/.style args = {#1,#2,#3}{
     insert path = {
@@ -154,6 +158,7 @@
       \pgfmathparse{#1}
     \else
       % Compute the Number of Arguments
+      \pgfkeyssetvalue{/tikz/revolve/@argn}{0} % 重置计数器
       \pgfutil@for\arg:=#1\do{
         \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/revolve/@argn},1))}
         \pgfkeysalso{/tikz/revolve/@argn = \pgfmathresult}
@@ -228,18 +233,18 @@
   % system of linear equations in two variables
   % intersect/eqs={a1,b1,c1,a2,b2,c2}: intersection of two lines defined by equations
   % i.e. solving a1x+b1y+c1=0 and a2x+b2y+c2=0 
-  intersect/eqs/.code args = {#1,#2,#3,#4,#5,#6} {
+  intersect/eqs/.code args = {#1,#2,#3,#4,#5,#6}{
     \tikzmath{
       \intersect@a{1,1} = #1; \intersect@a{1,2} = #2; \intersect@b{1,1} = -(#3);
       \intersect@a{2,1} = #4; \intersect@a{2,2} = #5; \intersect@b{2,1} = -(#6);
     }
-    \tikzset{solve={\intersect@a,\intersect@b,2,1,\intersect@ans},}
+    \tikzset{mat/solve={\intersect@a,\intersect@b,2,1,\intersect@ans},}
     \typeout{=========================}
     \typeout{Line-Line Intersection:}
     \tikzset{
-      stdout={\intersect@a,2,2},
-      stdout={\intersect@b,2,1},
-      stdout={\intersect@ans,2,1},
+      mat/stdout={\intersect@a,2,2},
+      mat/stdout={\intersect@b,2,1},
+      mat/stdout={\intersect@ans,2,1},
     }
     \typeout{=========================}
     % \coordinate (ll) at (\c{1,1},\c{2,1});
@@ -497,7 +502,7 @@
   % circle-line/eqs={xo,yo,r,a,b,c}: intersections of circle and line 
   % defined by equations, 
   % (x-xo)^2+(y-yo)^2=r^2 and ax+by+c=0
-  circle-line/eqs/.code args = {#1,#2,#3,#4,#5,#6} {
+  circle-line/eqs/.code args = {#1,#2,#3,#4,#5,#6}{
     \tikzmath {
       % x sinθ - y cosθ + C = 0
       % θ: angle between the line and x-axis, [0,pi)
@@ -614,7 +619,7 @@
   % tangent points (named: tp1, tp2, tp1 is on the left side of OP )
   % O,A: center of circle and an abitary point on the circle 
   % P: a point outside the circle
-  circle-tangent/.code args = {#1,#2,#3} {
+  circle-tangent/.code args = {#1,#2,#3}{
     \coordinate (euclidea@mid) at ($(#1)!.5!(#3)$);
     \tikzset{circle-circle={#1,#2,euclidea@mid,#1},}
     \coordinate (tp1) at (cc1);
@@ -667,18 +672,18 @@
     }
   },
   % alias for parallel={A,B,A}
-  extend/.style args = {#1,#2} {
+  extend/.style args = {#1,#2}{
     parallel={#1,#2,#1}
   },
   % rotate around the origin by `angle` and then 
   % shift by (`xshift`,`yshift`)
   % rotate-translate = {angle:(xshift,yshift)}
   % {x',y'} = {{cosθ,-sinθ},{sinθ,cosθ}}*{x,y}+{xshift,yshift}
-  rotate-translate/.style args = {#1:(#2,#3)} {
+  rotate-translate/.style args = {#1:(#2,#3)}{
     cm={cos(#1), sin(#1), -sin(#1), cos(#1), (#2,#3)}
   },
   % {x',y'} = {{cosθ,-sinθ},{sinθ,cosθ}}*{x+xshift, y+yshift}
-  translate-rotate/.style args = {#1:(#2,#3)} {
+  translate-rotate/.style args = {#1:(#2,#3)}{
     cm={cos(#1), sin(#1), -sin(#1), cos(#1), 
     ({(#2)*cos(#1)-(#3)*sin(#1)},{(#2)*sin(#1)+(#3)*cos(#1)})}
   },
@@ -1054,7 +1059,7 @@
   % ========== Conics Transformaitons ==========
   % create the matrix of a quadratic form
   % conic/matrix={\q,a,b,c,d,e,f}
-  conic/matrix/.code args = {#1,#2,#3,#4,#5,#6,#7} {
+  conic/matrix/.code args = {#1,#2,#3,#4,#5,#6,#7}{
     \tikzmath {
       #1{1,1} = (#2);     #1{1,2} = (#3) / 2; #1{1,3} = (#5) / 2; 
       #1{2,1} = (#3) / 2; #1{2,2} = (#4);     #1{2,3} = (#6) / 2; 
@@ -1065,15 +1070,15 @@
   % conic/rotate={\q,\qr,\angle}
   % \qr: the quadratic matrix after rotation 
   % \angle: rotation angle
-  conic/rotate/.code args = {#1,#2,#3} {
+  conic/rotate/.code args = {#1,#2,#3}{
     \tikzmath {
       if abs(#1{1,2}) > \EPSILON then {
         real \cs@c, \cs@s, \cs@t, \cs@tau;
         \cs@tau = \fpeval{(#1{1,1}-#1{2,2})/(2*#1{1,2})};
         if \cs@tau >= 0 then {
-          \cs@t = \fpeval{- \cs@tau + sqrt(1+(\cs@tau)^2)};
+          \cs@t = \fpeval{1.0 / (\cs@tau + sqrt(1+(\cs@tau)^2))};
         } else {
-          \cs@t = \fpeval{- \cs@tau - sqrt(1+(\cs@tau)^2)};
+          \cs@t = \fpeval{-1.0 / (- \cs@tau + sqrt(1+(\cs@tau)^2))};
         };
         \cs@c = \fpeval{1 / sqrt(1+(\cs@t)^2)};
         \cs@s = \fpeval{\cs@t * \cs@c};
@@ -1094,8 +1099,8 @@
         % unchanged
         #3 = 0;
         int \cs@i, \cs@j;
-        for \cs@i in {1,2,3} {
-          for \cs@j in {1,2,3} {
+        for \cs@i in {1,2,3}{
+          for \cs@j in {1,2,3}{
             #2{\cs@i,\cs@j} = #1{\cs@i,\cs@j};
           };
         };
@@ -1107,9 +1112,9 @@
   % conic/translate={\q,\qt,\xshift,\yshift}
   % \qt : the quadratic matrix after translation 
   % \xshift,\yshift: the center or vertex
-  conic/translate/.code args = {#1,#2,#3,#4} {
+  conic/translate/.code args = {#1,#2,#3,#4}{
     \tikzset{
-      cofactors={#1,3,\cs@cofactors},
+      mat/cofactors={#1,3,\cs@cofactors},
     }
     \tikzmath{
       if abs(\cs@cofactors{3,3}) > \EPSILON then {
@@ -1144,11 +1149,11 @@
   % \qs: the quadratic matrix in a standard form
   % \angle: rotation angle
   % \xshift,\yshift: new origin 
-  conic/reduce/.code args = {#1,#2,#3,#4,#5} {
+  conic/reduce/.code args = {#1,#2,#3,#4,#5}{
     \tikzset {
       conic/rotate={#1,\cs@qr,#3},
       % xshift yshift names should not conflict with those of conic/define
-      conic/translate={\cs@qr,\cs@qt,\conic@xshift,\conic@yshift},
+      conic/translate={\cs@qr,\cs@qt,\cs@xshift,\cs@yshift},
     }
     \tikzmath {
       if abs(\cs@qt{1,1}) > \EPSILON && abs(\cs@qt{2,2}) > \EPSILON then {
@@ -1169,14 +1174,14 @@
         };%if
       };%if
       int \cs@i, \cs@j;
-      for \cs@i in {1,2,3} {
-        for \cs@j in {1,2,3} {
+      for \cs@i in {1,2,3}{
+        for \cs@j in {1,2,3}{
           #2{\cs@i,\cs@j} = \cs@qt{\cs@i,\cs@j};
         };
       };
       % restore xshift and yshift in the original coordinate system
-      #4 = \conic@xshift * cos(#3) - \conic@yshift * sin(#3);
-      #5 = \conic@xshift * sin(#3) + \conic@yshift * cos(#3);
+      #4 = \cs@xshift * cos(#3) - \cs@yshift * sin(#3);
+      #5 = \cs@xshift * sin(#3) + \cs@yshift * cos(#3);
     }%tikzmath
   },
   conic/define/.code args = {#1,#2,#3,#4,#5,#6}{
@@ -1215,9 +1220,9 @@
     }
     \typeout{=========================}
     \typeout{the matrix of the quadratic equation in general form:}
-    \tikzset{stdout={\cs@q,3,3},}
+    \tikzset{mat/stdout={\cs@q,3,3},}
     \typeout{the matrix of the quadratic equation in standard form:}
-    \tikzset{stdout={\cs@r,3,3},}
+    \tikzset{mat/stdout={\cs@r,3,3},}
     \typeout{a: \cs@a, b: \cs@b}
     \typeout{type: \cs@type}
     \typeout{transform: \cs@angle:(\cs@xshift,\cs@yshift)}
@@ -1291,7 +1296,7 @@
       \cs@a{6,4} = 0.0; \cs@a{6,5} = 0.0; \cs@a{6,6} = 0.0; 
     }
     \tikzset{
-      cofactors={\cs@a,6,\cs@b},
+      mat/cofactors={\cs@a,6,\cs@b},
       conic/define={\cs@b{6,1},\cs@b{6,2},\cs@b{6,3},\cs@max*\cs@b{6,4},\cs@max*\cs@b{6,5},\cs@max*\cs@max*\cs@b{6,6}}
     }
   },
@@ -1322,8 +1327,8 @@
       if \cs@TanCnt == 5 then {
         int \cs@i, \cs@j;
         \cs@max = 0.0;
-        for \cs@i in {1,...,5} {
-          for \cs@j in {1,...,4} {
+        for \cs@i in {1,...,5}{
+          for \cs@j in {1,...,4}{
             if \cs@max < abs(\cs@tangents{\cs@i,\cs@j}) then {
               \cs@max = abs(\cs@tangents{\cs@i,\cs@j});
             };
@@ -1331,12 +1336,12 @@
         };
         % improve numerical precision
         \cs@max = \fpeval{sqrt(\cs@max)};
-        for \cs@i in {1,...,5} {
-          for \cs@j in {1,...,4} {
+        for \cs@i in {1,...,5}{
+          for \cs@j in {1,...,4}{
             \cs@tangents{\cs@i,\cs@j} = \fpeval{\cs@tangents{\cs@i,\cs@j} / \cs@max};
           };
         };
-        for \cs@i in {1,...,5} {
+        for \cs@i in {1,...,5}{
           \cs@u = \fpeval{\cs@tangents{\cs@i,4} - \cs@tangents{\cs@i,2}};
           \cs@v = \fpeval{-(\cs@tangents{\cs@i,3} - \cs@tangents{\cs@i,1})};
           \cs@w = \fpeval{
@@ -1361,19 +1366,19 @@
     }
     \ifnum \cs@TanCnt = 5
     \tikzset{
-      % stdout={\cs@tangents,5,4},
-      cofactors={\cs@a,6,\cs@c},
-      % stdout={\cs@a,6,6},
-      % stdout={\cs@c,6,6},
+      % mat/stdout={\cs@tangents,5,4},
+      mat/cofactors={\cs@a,6,\cs@c},
+      % mat/stdout={\cs@a,6,6},
+      % mat/stdout={\cs@c,6,6},
       % maxabs={\cs@c,6,6,\cs@max},
-      normalize={\cs@c,6,6,\cs@b},
-      % stdout={\cs@b,6,6},
+      mat/normalize={\cs@c,6,6,\cs@b},
+      % mat/stdout={\cs@b,6,6},
       % find the dual conic
       conic/matrix={\cs@dual,\cs@b{6,1},\cs@b{6,2},\cs@b{6,3},\cs@b{6,4},\cs@b{6,5},\cs@b{6,6}},
-      % stdout={\cs@dual,3,3},
+      % mat/stdout={\cs@dual,3,3},
       % for non-degraded conic, the matrix is invertible
-      inverse={\cs@dual,3,\cs@q},
-      % stdout={\cs@q,3,3},
+      mat/inverse={\cs@dual,3,\cs@q},
+      % mat/stdout={\cs@q,3,3},
       % conic/define={\cs@q{1,1},2*\cs@q{1,2},\cs@q{2,2},2*\cs@max*\cs@q{1,3},2*\cs@max*\cs@q{2,3},\cs@max*\cs@max*\cs@q{3,3}},
       conic/define={\cs@q{1,1}/\cs@max,2*\cs@q{1,2}/\cs@max,\cs@q{2,2}/\cs@max,2*\cs@q{1,3},2*\cs@q{2,3},\cs@max*\cs@q{3,3}},
     }
@@ -1462,25 +1467,23 @@
     plot({\euclidea@var},{-(#4)/(#3)*(\euclidea@var)}) 
 }
 
-%\usepackage{ifthen} % Required for string comparison
-
 % Syntax: \axes[grid] (xmin:xmax, ymin:ymax)
-% If you don't need the grid, simply use: \axes (xmin:xmax, ymin:ymax)
-\newcommand\axes[1][]{%
-  \axesinternal[#1]%
+\newcommand{\axes}[2][]{%
+  \axes@impl[#1]#2%
 }
 
-\def\axesinternal[#1](#2:#3,#4:#5){
-  % 1. Check if the "grid" option is provided
-  \ifthenelse{\equal{#1}{grid}}{
+% 辅助宏：接收 [options] 和 (content)
+\def\axes@impl[#1](#2:#3,#4:#5){%
+  % Check if the "grid" option is provided
+  \ifthenelse{\equal{#1}{grid}}{%
     \draw[help lines] (#2,#4) grid[step=1] (#3,#5);
-  }{}
+  }{}%
 
-  % 2. Draw the Axes
+  % Axes
   \draw[-latex] ({(#2)-0.5},0) -- ({(#3)+0.5},0) node[below] {$x$};
   \draw[-latex] (0,{(#4)-0.5}) -- (0,{(#5)+0.5}) node[left] {$y$};
   
-  % 3. Label the Origin
+  % Origin
   \node at (0,0) [below left] {$O$};
 }
 

@@ -1,0 +1,29 @@
+\documentclass{ctexart}
+\usepackage{tikz}
+\usetikzlibrary{calc,math}
+
+\tikzset{
+    foo/.code args={#1,#2}{
+        % \pgfmathparse{#1} % 这里就是你想要的：自动处理 \a/3 这种计算
+        % \let\finalAngle\pgfmathresult
+        % \typeout{\finalAngle}
+        \typeout{#1}
+        \typeout{cos(#1)}
+        % \typeout{cos(\finalAngle)}
+        \tikzmath{
+          \a = sin(#1);
+        }
+        \typeout{\a}
+        \typeout{#2}
+    }
+}
+
+\begin{document}
+\tikzmath{
+  \aa = 10;
+}
+\tikzset{
+  foo={{atan2(1,50-5*8/(10-2))},hello},
+  foo={\aa/2,world},
+}
+\end{document}

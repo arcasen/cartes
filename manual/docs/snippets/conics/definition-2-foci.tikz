@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+  \clip (-6,-6) rectangle (6,6); % 剪裁区域
+  \tikzmath{
+    % focus
+    \Fa{1,1} = -2.0; \Fa{2,1} = -1.0; \Fa{3,1} = 1.0;
+    \Fb{1,1} = 2.0; \Fb{2,1} = 1.0; \Fb{3,1} = 1.0;
+  }
+  \tikzset{
+    conics/define/foci={\Fa,\Fb,3,\Ca},
+    conics/define/foci={\Fa,\Fb,1.5,\Cb},
+  }
+
+  \axes[grid] (-5:5,-5:5);
+  \coordinate (F1) at (\Fa{1,1},\Fa{2,1});
+  \coordinate (F2) at (\Fb{1,1},\Fb{2,1});
+
+  \conic[draw=magenta,thick] (\Ca);
+  \conic[draw=teal,thick,domain=-2:2] (\Cb);
+
+  \foreach \p/\placement in {F1/left,F2/right}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

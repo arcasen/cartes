@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \xmin = 0;
+    \xmax = 3;
+    \ymin = 0;
+    \ymax = 3;
+    \a = 15;
+  }
+  % original coordinate system
+  \draw[-latex] ({(\xmin)-0.5},0) -- ({(\xmax)+0.5},0) node[below] {$x$};
+  \draw[-latex] (0,{(\ymin)-0.5}) -- (0,{(\ymax)+0.5}) node[left] {$y$};
+  \draw (0,0) node[below left] {$O$};
+
+  \coordinate (O) at (0,0);
+  \coordinate (X) at (1,0);
+  \coordinate (P) at (2.5,1.5);
+  \coordinate (P') at($(O)!1.0!\a:(P)$); % rotate P around O by \a degrees
+
+  \pic[draw,teal,"$\phi$",angle eccentricity=1.25,angle radius=8mm] {angle=X--O--P};
+  \pic[draw,red,"$\theta$",angle eccentricity=1.25,angle radius=10mm] {angle=P--O--P'};
+
+  \draw[teal] (O) -- (P) (O) -- (P');
+  \fill[teal] (P) circle (2pt);
+  \draw (P) node[right] {$P(x,y)$};
+  \fill[red] (P') circle (2pt);
+  \draw (P') node[above] {$P'(x',y')$};
+\end{tikzpicture}

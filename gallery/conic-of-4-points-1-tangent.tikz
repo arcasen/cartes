@@ -1,0 +1,102 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % Define 5 points in homogeneous coordinates (x, y, w) 
+    % These serve as the basis for the initial conic construction.
+    \Pa{1,1} = 1; \Pa{2,1} = 1; \Pa{3,1} = 1; 
+    \Pb{1,1} = 2; \Pb{2,1} = 4; \Pb{3,1} = 1; 
+    \Pc{1,1} = 0; \Pc{2,1} = 4; \Pc{3,1} = 1; 
+    \Pd{1,1} = -1; \Pd{2,1} = 3; \Pd{3,1} = 1; 
+    \Pe{1,1} = -1; \Pe{2,1} = 0; \Pe{3,1} = 1; 
+    % Define a point for auxiliary circle construction
+    \Ua{1,1} = -2; \Ua{2,1} = 3; \Ua{3,1} = 1;
+  }
+  \tikzset{
+    % Define the original conic passing through the five points
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\A},
+    % Compute the tangent line \Le at point \Pe using the pole-polar relationship
+    conics/polar={\A,\Pe,\Le},
+    mat/stdout={\A,3,3},
+    % --- Construct a Complete Quadrilateral and Involution Points ---
+    % Find intersection lines (pencils) between pairs of points
+    conics/cross={\Pa,\Pb,\Lab}, % 1-2
+    conics/cross={\Pc,\Pd,\Lcd}, % 3-4
+    conics/cross={\Pa,\Pc,\Lac}, % 1-3
+    conics/cross={\Pb,\Pd,\Lbd}, % 2-4
+    % Determine intersection points of these lines with the tangent line \Le.
+    % (Qa, Qb) and (Qc, Qd) form pairs of involution points on the tangent line.
+    conics/cross={\Lab,\Le,\Qa},
+    conics/cross={\Lcd,\Le,\Qb},
+    conics/cross={\Lac,\Le,\Qc},
+    conics/cross={\Lbd,\Le,\Qd},
+    % --- Projection and Radical Axis Construction ---
+    % Define auxiliary circles passing through the involution pairs and the auxiliary point Ua
+    conics/define/circle={\Ua,\Qa,\Qb,\Circlea},
+    conics/define/circle={\Ua,\Qc,\Qd,\Circleb},
+    % Compute the radical axis \l of the two auxiliary circles
+    conics/radical axis={\Circlea,\Circleb,\l},
+    % Find the intersection of the radical axis with the tangent line
+    conics/cross={\l,\Le,\Ub},
+    % Construct tangents from Ub to Circleb to find contact points Va and Vb
+    conics/tangents={\Circleb,\Ub,\Va,\Vb},
+    % Define a third auxiliary circle centered at Ub passing through Va
+    conics/distance={\Ub,\Va,\dist},
+    conics/define/circle={\Ub,\dist,\Circlec},
+    % Solve for the intersection points Ta and Tb between Circlec and the tangent line Le
+    conics/intersect cn={\Circlec,\Le,\Ta,\Tb},
+    % Construct the final target conics passing through the original four points and 
+    % the newly computed points Ta or Tb
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Ta,\Ca},
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Tb,\Cb},
+    % --- Dehomogenization ---
+    conics/dehomogenize={\Qa,\QQa},
+    conics/dehomogenize={\Qb,\QQb},
+    conics/dehomogenize={\Qc,\QQc},
+    conics/dehomogenize={\Qd,\QQd},
+    conics/dehomogenize={\Ua,\UUa},
+    conics/dehomogenize={\Ub,\UUb},
+    conics/dehomogenize={\Va,\VVa},
+    conics/dehomogenize={\Vb,\VVb},
+    conics/dehomogenize={\Ta,\TTa},
+    conics/dehomogenize={\Tb,\TTb},
+  }
+
+  % Draw the calculated conics and auxiliary circles
+  \conic[draw=teal,thick] (\Ca);
+  \conic[draw=violet,thick] (\Cb);
+  \conic[draw=violet,thick] (\Circlea);
+  \conic[draw=violet,thick] (\Circleb);
+  \conic[draw=purple,thick] (\Circlec);
+
+  % Draw the lines (segments) with specified clipping regions
+  \segment[draw=red,thick,clip=(-8:8,-5:5)] (\Le);
+  \segment[draw=blue!80,clip=(-5:5,-1:5)] (\Lab);
+  \segment[draw=blue!80,clip=(-5:5,-5:5)] (\Lcd);
+  \segment[draw=green!60!red,clip=(-5:5,-1:5)] (\Lac);
+  \segment[draw=green!60!red,clip=(-8:5,-5:5)] (\Lbd);
+  \segment[draw=red,clip=(-5:5,-5:4)] (\l);
+
+  \coordinate (P1) at (\Pa{1,1},\Pa{2,1});
+  \coordinate (P2) at (\Pb{1,1},\Pb{2,1});
+  \coordinate (P3) at (\Pc{1,1},\Pc{2,1});
+  \coordinate (P4) at (\Pd{1,1},\Pd{2,1});
+  % \coordinate (P5) at (\Pe{1,1},\Pe{2,1});
+  \coordinate (Q1) at (\QQa{1},\QQa{2});
+  \coordinate (Q2) at (\QQb{1},\QQb{2});
+  \coordinate (Q3) at (\QQc{1},\QQc{2});
+  \coordinate (Q4) at (\QQd{1},\QQd{2});
+  \coordinate (U1) at (\UUa{1},\UUa{2});
+  \coordinate (U2) at (\UUb{1},\UUb{2});
+  \coordinate (V1) at (\VVa{1},\VVa{2});
+  \coordinate (V2) at (\VVb{1},\VVb{2});
+  \coordinate (T1) at (\TTa{1},\TTa{2});
+  \coordinate (T2) at (\TTb{1},\TTb{2});
+
+  \foreach \p/\placement in {P1/above, P2/above, P3/above, P4/above, %P5/above,
+  Q1/above, Q2/above, Q3/above, Q4/above,
+  U1/above, U2/above,
+  V1/above, V2/above,
+  T1/above, T2/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

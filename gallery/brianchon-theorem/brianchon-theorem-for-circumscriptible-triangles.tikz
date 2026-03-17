@@ -1,0 +1,57 @@
+\begin{tikzpicture}
+  \tikzmath {
+    % homogeneous coordinates of 5 points
+    \Pa{1,1} = -1; \Pa{2,1} = 2.25; \Pa{3,1} = 1; 
+    \Pb{1,1} = 1; \Pb{2,1} = 0; \Pb{3,1} = 1; 
+    \Pc{1,1} = -1; \Pc{2,1} = 0; \Pc{3,1} = 1; 
+    \Pd{1,1} = -1.75; \Pd{2,1} = 1; \Pd{3,1} = 1; 
+    \Pe{1,1} = -1.5; \Pe{2,1} = 2; \Pe{3,1} = 1; 
+  }
+  \tikzset{
+    % define a conic passing through the 5 points
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\C},
+    % calculate tangents passing through the 5 points
+    % matrix multiplication
+    conics/polar={\C,\Pa,\La},
+    conics/polar={\C,\Pb,\Lb},
+    conics/polar={\C,\Pc,\Lc},
+    conics/polar={\C,\Pd,\Ld},
+    conics/polar={\C,\Pe,\Le},
+    % calculate vertices of the exscribed pentagon
+    % cross product of homogeneous coordinates
+    conics/cross={\La,\Lb,\Qa},
+    conics/cross={\Lb,\Lc,\Qb},
+    conics/cross={\Lc,\La,\Qc},
+    % dehomogenize
+    conics/dehomogenize={\Pa,\Ua},
+    conics/dehomogenize={\Pb,\Ub},
+    conics/dehomogenize={\Pc,\Uc},
+    conics/dehomogenize={\Pd,\Ud},
+    conics/dehomogenize={\Pe,\Ue},
+    conics/dehomogenize={\Qa,\Va},
+    conics/dehomogenize={\Qb,\Vb},
+    conics/dehomogenize={\Qc,\Vc},
+  }
+
+  \coordinate (U1) at (\Ua{1},\Ua{2});
+  \coordinate (U2) at (\Ub{1},\Ub{2});
+  \coordinate (U3) at (\Uc{1},\Uc{2});
+  \coordinate (U4) at (\Ud{1},\Ud{2});
+  \coordinate (U5) at (\Ue{1},\Ue{2});
+  \coordinate (V1) at (\Va{1},\Va{2});
+  \coordinate (V2) at (\Vb{1},\Vb{2});
+  \coordinate (V3) at (\Vc{1},\Vc{2});
+
+  \draw[purple] (V1) -- (U3) (V2) -- (U1) (V3) -- (U2);
+  \draw[thick,violet] (V1) -- (V2) -- (V3) -- cycle;
+
+  \foreach \p/\placement in {U1/above, U2/below right, U3/below left,
+  V1/above right, V2/below, V3/left}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+
+  \axes[grid] (-4:3,-1:6);
+  \conic[draw,thick,teal] (\C);
+
+\end{tikzpicture}

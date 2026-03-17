@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = 1; \A{2} = 6;
+    \B{1} = 0; \B{2} = 0;
+    \C{1} = 8; \C{2} = 0;
+  }
+  \tikzset{
+    plane/angle={\A,\B,\C,\a},
+    plane/rotate={\A,\B,\a/3,\Ua},
+    plane/rotate={\A,\B,2*\a/3,\Ub},
+    plane/angle={\B,\C,\A,\b},
+    plane/rotate={\B,\C,\b/3,\Va},
+    plane/rotate={\B,\C,2*\b/3,\Vb},
+    plane/angle={\C,\A,\B,\c},
+    plane/rotate={\C,\A,\c/3,\Wa},
+    plane/rotate={\C,\A,2*\c/3,\Wb},
+    plane/intersect ll={\A,\Ua,\B,\Vb,\D},
+    plane/intersect ll={\B,\Va,\C,\Wb,\E},
+    plane/intersect ll={\C,\Wa,\A,\Ub,\F},
+  }
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+
+  \draw[fill=green] (A) -- (B) -- (D) -- cycle;
+  \draw[fill=cyan] (B) -- (C) -- (E) -- cycle;
+  \draw[fill=yellow] (C) -- (A) -- (F) -- cycle;
+  \draw[fill=purple] (D) -- (E) -- (F) -- cycle;
+  
+  \foreach \p/\placement in {A/above,B/below left,C/below right,
+  D/left,E/below,F/above}{
+    \fill[orange] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

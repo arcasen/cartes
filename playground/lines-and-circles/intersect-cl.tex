@@ -1,0 +1,61 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+
+\usetikzlibrary{cartes}
+\input{../../tikzlibraryvc.code.tex}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \radius = 1;
+    \A{1} = 1; \A{2} = 1;
+    \B{1} = 0; \B{2} = 2;
+    \C{1} = 2; \C{2} = 0;
+  }
+  \tikzset{
+    plane/intersect cl={\A,\radius,\B,\C,\D,\E},
+  }
+  \axes[grid] (-4:4,-4:4);
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \draw[thick,red] (A) circle (\radius);
+  \draw[thick] (B) -- (C);
+  \foreach \p/\placement in {A/left,B/right,
+  C/above left,D/below right,E/left}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+% 相离
+% \begin{tikzpicture}
+%   \tikzmath{
+%     \radius = 1;
+%     \A{1} = 1; \A{2} = 1;
+%     \B{1} = 0; \B{2} = 5;
+%     \C{1} = 5; \C{2} = 0;
+%   }
+%   \tikzset{
+%     plane/intersect cl={\A,\radius,\B,\C,\D,\E},
+%   }
+%   \axes[grid] (-4:4,-4:4);
+%   \coordinate (A) at (\A{1},\A{2});
+%   \coordinate (B) at (\B{1},\B{2});
+%   \coordinate (C) at (\C{1},\C{2});
+%   \coordinate (D) at (\D{1},\D{2});
+%   \coordinate (E) at (\E{1},\E{2});
+%   \draw[thick,red] (A) circle (\radius);
+%   \draw[thick] (B) -- (C);
+%   \foreach \p/\placement in {A/left,B/right,
+%   C/above left,D/below right,E/left}{
+%     \fill[red] (\p) circle (2pt);
+%     \draw (\p) node[\placement] {$\p$};
+%   }
+% \end{tikzpicture}
+
+\end{document}

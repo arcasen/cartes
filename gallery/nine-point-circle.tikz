@@ -1,0 +1,75 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % Define vertices of the triangle using polar coordinates
+    \A{1} = 4 * cos(120); \A{2} = 4 * sin(120);
+    \B{1} = 4 * cos(210); \B{2} = 4 * sin(210);
+    \C{1} = 4 * cos(-30); \C{2} = 4 * sin(-30);
+  }
+  \tikzset{
+    % --- Orthic Triangle Construction ---
+    % Project vertices onto opposite sides to find altitude feet (Ai, Bi, Ci)
+    plane/project={\B,\A,\C,\Ai},
+    plane/project={\C,\B,\A,\Bi},
+    plane/project={\A,\C,\B,\Ci},
+    % --- Medial Triangle Construction ---
+    % Find midpoints of the sides (Aj, Bj, Cj)
+    plane/scale={\B,\C,0.5,\Aj},
+    plane/scale={\C,\A,0.5,\Bj},
+    plane/scale={\A,\B,0.5,\Cj},
+    % --- Triangle Centers & Euler Line ---
+    % Compute the Orthocenter (H) and Circumcenter (O)
+    plane/orthocenter={\A,\B,\C,\H},
+    plane/circumcenter={\A,\B,\C,\O},
+    % The Nine-point center (N) is the midpoint of the Euler line segment OH
+    plane/scale={\O,\H,0.5,\N},
+    % --- Euler Points ---
+    % Find midpoints between vertices and the orthocenter (Ak, Bk, Ck)
+    plane/scale={\A,\H,0.5,\Ak},
+    plane/scale={\B,\H,0.5,\Bk},
+    plane/scale={\C,\H,0.5,\Ck},
+    % --- Geometric Radii ---
+    % Circumradius (Radius) and Nine-point radius (radius)
+    plane/length={\O,\A,\Radius},
+    plane/length={\N,\Ai,\radius},
+  }
+  
+  % Convert calculated vectors/points to TikZ coordinates
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (O) at (\O{1},\O{2});
+  \coordinate (H) at (\H{1},\H{2});
+  \coordinate (N) at (\N{1},\N{2});
+  \coordinate (A0) at (\Ai{1},\Ai{2});
+  \coordinate (B0) at (\Bi{1},\Bi{2});
+  \coordinate (C0) at (\Ci{1},\Ci{2});
+  \coordinate (A1) at (\Aj{1},\Aj{2});
+  \coordinate (B1) at (\Bj{1},\Bj{2});
+  \coordinate (C1) at (\Cj{1},\Cj{2});
+  \coordinate (A2) at (\Ak{1},\Ak{2});
+  \coordinate (B2) at (\Bk{1},\Bk{2});
+  \coordinate (C2) at (\Ck{1},\Ck{2});
+
+  % Draw the Circumcircle (brown) and the Nine-Point Circle (teal)
+  \draw[thick,brown] (O) circle (\Radius);
+  \draw[thick,teal] (N) circle (\radius);
+
+  % Draw the reference triangle and its altitudes
+  \draw[thick,violet!80] (A) -- (B) -- (C) -- cycle;
+  \draw[thick,violet!80] (A) -- (A0) (B) -- (B0) (C) -- (C0);
+
+  % Draw auxiliary quadrilaterals connecting midpoints and Euler points
+  \draw[dashed,violet] (A1) -- (B1) -- (A2) -- (B2) -- cycle;
+  \draw[dashed,teal] (B1) -- (C1) -- (B2) -- (C2) -- cycle;
+  \draw[dashed,magenta] (C1) -- (A1) -- (C2) -- (A2) -- cycle;
+
+  % Label all critical points
+  \foreach \p/\placement in {A/above,B/below left,C/below right,
+  A0/below,B0/above right,C0/above left,
+  A1/below,B1/above right,C1/above left,
+  A2/above left,B2/below,C2/below right,
+  O/above,H/below right,N/below right}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {\small $\p$};
+  }
+\end{tikzpicture}

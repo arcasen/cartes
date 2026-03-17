@@ -1,0 +1,1005 @@
+\ProvidesFile{tikzlibraryconics.code.tex}[2026/05/01 v1.2.0 A tikz library for conics]
+
+% 绝对不要在 \tikzmath 块内留空行
+% Paragraph ended before \tikz@math@parse@keyword@check was complete.
+% 有可能是未添加分号, if ... then ... else ... 之后也需要分号
+
+% 提高数值计算精度
+% https://tex.stackreversed.com/questions/521857/tikz-fpu-seems-to-be-inaccurate
+\RequirePackage{xfp}
+\RequirePackage{ifthen}
+
+% \usetikzlibrary{math,calc,quotes,mc}
+
+\makeatletter
+
+\tikzmath{
+  function cbrt(\n) {
+    if \n < 0 then {
+        return \fpeval{-((-\n)^(1/3))};
+        % return -((-\n)^(1/3));
+    } else {
+        return \fpeval{\n^(1/3)};
+        % return \n^(1/3);
+    };
+  };
+  % Cardano's formula, returns the real root of maximum absolute value
+  function cardano(\a,\b,\c,\d) {
+    \result = 0.0;
+    \p = \fpeval{\c/\a-(\b/\a)^2/3};
+    \q = \fpeval{(\b/\a)^3*2/27-(\b*\c)/(\a)^2/3+(\d/\a)};
+    \det = \fpeval{(\q/2)^2+(\p/3)^3};
+    % print{\ \\Solve $ax^3+bx^2+cx+d=0,(a=\a,b=\b,c=\c,d=\d):$};
+    % print{\ \\p:\p};
+    % print{\ \\q:\q};
+    % print{\ \\$\Delta$:\det};
+    if \det >=0 then {
+      \temp = \fpeval{sqrt(\det)};
+      \y = cbrt(-\q/2+\temp) + cbrt(-\q/2-\temp);
+      \result = \fpeval{\y - \b/\a/3};
+    } else {
+      \ang = acos(-\q/sqrt(-(\p/3)^3)/2);% degree
+      \ya = 2*sqrt(-\p/3)*cos(\ang/3);
+      \yb = 2*sqrt(-\p/3)*cos(\ang/3+120);
+      \yc = 2*sqrt(-\p/3)*cos(\ang/3+240);
+      \xa = \fpeval{\ya - \b/\a/3};
+      \xb = \fpeval{\yb - \b/\a/3};
+      \xc = \fpeval{\yc - \b/\a/3};
+      \result = \xa;
+      if abs(\xb) > abs(\result) then {
+        \result = \xb;
+      };
+      if abs(\xc) > abs(\result) then {
+        \result = \xc;
+      };
+      % print{\ \\$\theta$:\ang};
+      % print{\ \\$x_1$:\ya};
+      % print{\ \\$x_2$:\yb};
+      % print{\ \\$x_3$:\yc};
+    };
+    return \result;
+  };
+}
+
+\tikzset{
+  % Cartesian Coordinates -> Homogeneous Coordinates
+  conics/homogenize/.code args={#1,#2}{
+    \tikzmath{
+      #2{1,1} = #1{1};
+      #2{2,1} = #1{2};
+      #2{3,1} = 1.0;
+    }
+  },
+  % Homogeneous Coordinates -> Cartesian Coordinates
+  conics/dehomogenize/.code args={#1,#2}{
+    \tikzmath{
+      if abs(#1{3,1}) <= \EPSILON then {
+        {\pgferror{Unable to dehomogenize a point at infinity}};
+      } else {
+        #2{1} = #1{1,1} / #1{3,1};
+        #2{2} = #1{2,1} / #1{3,1};
+      };
+    }
+  },
+  % distance of two points (homogenous coordinates)
+  % conicss/distance={\P,\Q,\d}
+  conics/distance/.code args={#1,#2,#3}{
+    \tikzset{
+      conics/dehomogenize={#1,\cs@P},
+      conics/dehomogenize={#2,\cs@Q},
+      plane/length={\cs@P,\cs@Q,#3},
+    }
+  },
+  % cross product of two vector (homogeneous coordinates)
+  % conics/cross={\A,\B,C}
+  % C = A x B
+  conics/cross/.code args={#1,#2,#3}{
+    \tikzmath{
+      #3{1,1}=\fpeval{#1{2,1} * #2{3,1} - #1{3,1} * #2{2,1}};
+      #3{2,1}=\fpeval{#1{3,1} * #2{1,1} - #1{1,1} * #2{3,1}};
+      #3{3,1}=\fpeval{#1{1,1} * #2{2,1} - #1{2,1} * #2{1,1}};
+    }
+    \tikzset{
+      mat/normalize={#3,3,1,#3},
+    }
+  },
+  % x-intercept is the point where a line crosses or touches the x-axis.
+  % conics/x-intercept={\L,\P}
+  conics/x-intercept/.code args={#1,#2}{
+    \tikzmath{
+      % y = 0
+      \cs@xaxis{1,1} = 0.0; \cs@xaxis{2,1} = 1.0; \cs@xaxis{3,1} = 0.0; 
+    }
+    \tikzset{
+      conics/cross={\cs@xaxis,#1,#2},
+    }
+  },
+  % y-intercept is the point where a line crosses or touches the y-axis.
+  % conics/y-intercept={\L,\P}
+  conics/y-intercept/.code args={#1,#2}{
+    \tikzmath{
+      % x = 0
+      \cs@yaxis{1,1} = 1.0; \cs@yaxis{2,1} = 0.0; \cs@yaxis{3,1} = 0.0; 
+    }
+    \tikzset{
+      conics/cross={\cs@yaxis,#1,#2},
+    }
+  },
+  % a second-degree polynomial equation
+  % a x^2 + b xy + c y^2 + d x + e y + f = 0
+  % Matrix representation of conic sections
+  % transpose(X) C X = 0
+  % X - homogeneous coordinate vector
+  % C - the coefficient matrix of the quadratic equation
+  % conics/define/quadratic={\coefs,\C}
+  conics/define/quadratic/.code args={#1,#2}{
+    \tikzmath{
+      #2{1,1} = #1{1};     #2{1,2} = #1{2} / 2; #2{1,3} = #1{4} / 2;
+      #2{2,1} = #1{2} / 2; #2{2,2} = #1{3};     #2{2,3} = #1{5} / 2;
+      #2{3,1} = #1{4} / 2; #2{3,2} = #1{5} / 2; #2{3,3} = #1{6};
+    }
+  },
+  % focus-directrix definition of conics
+  % conics/define/focus-directrix={\F,\D,\e,\C}
+  % \F - focus \D - directrix, homogeneous coordinates
+  % \e - eccentricity
+  % \C - conic matrix
+  conics/define/focus-directrix/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      \cs@P{1,1} = 1.0;        \cs@P{1,2} = 0.0;        \cs@P{1,3} = -(#1{1,1});
+      \cs@P{2,1} = 0.0;        \cs@P{2,2} = 1.0;        \cs@P{2,3} = -(#1{2,1});
+      \cs@P{3,1} = -(#1{1,1}); \cs@P{3,2} = -(#1{2,1}); \cs@P{3,3} = (#1{1,1})^2 + (#1{2,1})^2;
+      \cs@scale = (#3)^2 / ((#2{1,1})^2 + (#2{2,1})^2);
+    }
+    \tikzset{
+      mat/transpose={#2,3,1,\cs@temp},
+      mat/product={#2,\cs@temp,3,1,3,\cs@tt},
+      mat/scale={\cs@tt,3,3,\cs@scale,\cs@Q},
+      mat/sub={\cs@P,\cs@Q,3,3,#4},
+    }
+  },
+  % bi-focal definition of ellipse or hyperbola
+  % conics/define/foci={\Fa,\Fb,\a,\C}
+  % \Fa and \Fb - two foci, homogeneous coordinates
+  % \a - the semi-major axis (for an ellipse), or
+  %      the semi-transverse axis (for a hyperbola)
+  % \C - conic matrix
+  conics/define/foci/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      \cs@a = abs(#3);% 半长轴长 Semi-major axis length
+    }
+    \tikzset{
+      conics/dehomogenize={#1,\cs@Fa},
+      conics/dehomogenize={#2,\cs@Fb},
+      plane/sub/origin={\cs@Fb,\cs@Fa,\cs@FF},
+      plane/length/origin={\cs@FF,\cs@fdist}, % 焦距 Focal Distance
+    }
+    \tikzmath{
+      \cs@c = \cs@fdist / 2;
+      if abs(\cs@c - \cs@a) <= \EPSILON then {
+        {\pgferror{Error in conic definition: c == a}};
+      } else {
+        if abs(\cs@c) <= \EPSILON then {% circle
+          \cs@xc = \fpeval{(\cs@Fa{1} + \cs@Fb{1}) / 2};
+          \cs@yc = \fpeval{(\cs@Fa{2} + \cs@Fb{2}) / 2};
+          #4{1,1} = 1.0;     #4{1,2} = 0.0;     #4{1,3} = -\cs@xc;
+          #4{2,1} = 0.0;     #4{2,2} = 1.0;     #4{2,3} = -\cs@yc;
+          #4{3,1} = -\cs@xc; #4{3,2} = -\cs@yc; #4{3,3} = \fpeval{(\cs@xc)^2 + (\cs@yc)^2 -(\cs@a)^2};
+        } else {% ellipse or hyperbola
+          \cs@e = \cs@c / \cs@a;% 离心率 Eccentricity
+        };
+      };
+    }
+    % \ifnum\fpeval{\cs@c <= \EPSILON ? 1: 0} = 1% circle
+    % \typeout{\cs@a,\cs@c,\cs@xc,\cs@yc}
+    % \tikzset{
+    %   stdout={#4,3,3},
+    % }
+    % \fi
+    % \typeout{semi-major axis length: \cs@a}
+    % \typeout{semi-focal distance: \cs@c}
+    % \typeout{eccentricity: \cs@e}
+    % 在 LaTeX 中，\ifnum 不能直接判断像 \a > 0 这样的表达式
+    % 除非 \a 是一个定义好的宏（Macro）, 且该宏展开后是一个纯整数数字
+    \ifnum\fpeval{\cs@c > \EPSILON ? 1: 0} = 1% \ifnum 不能直接判断大小
+      \tikzset{
+        plane/scale/origin={\cs@FF,-0.5/(\cs@e)^2,\cs@shift},
+        plane/scale={\cs@Fa,\cs@Fb,0.5,\cs@center},% Center
+        plane/rotate={\cs@center,\cs@Fb,90,\cs@N},
+        plane/add/origin={\cs@center,\cs@shift,\cs@P},% point on directrix
+        plane/add/origin={\cs@N,\cs@shift,\cs@Q},% point on directrix
+        conics/homogenize={\cs@P,\cs@PH},
+        conics/homogenize={\cs@Q,\cs@QH},
+        conics/cross={\cs@PH,\cs@QH,\cs@directrix},
+        conics/define/focus-directrix={#1,\cs@directrix,\cs@e,#4},
+      }
+    \fi
+  },
+  % conics/define/ellipse/foci-point={\Fa,\Fb,\P,\C}
+  conics/define/ellipse/foci-point/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      conics/dehomogenize={#1,\cs@Fa},
+      conics/dehomogenize={#2,\cs@Fb},
+      conics/dehomogenize={#3,\cs@P},
+      plane/length={\cs@Fa,\cs@P,\cs@da},
+      plane/length={\cs@Fb,\cs@P,\cs@db},
+      conics/define/foci={#1,#2,\fpeval{0.5*(\cs@da+\cs@db)},#4},
+    }
+  },
+  conics/define/hyperbola/foci-point/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      conics/dehomogenize={#1,\cs@Fa},
+      conics/dehomogenize={#2,\cs@Fb},
+      conics/dehomogenize={#3,\cs@P},
+      plane/length={\cs@Fa,\cs@P,\cs@da},
+      plane/length={\cs@Fb,\cs@P,\cs@db},
+      conics/define/foci={#1,#2,\fpeval{0.5*abs(\cs@da-\cs@db)},#4},
+    }
+  },
+  % define circle
+  % conics/define/circle={\Center,\radius,\C}
+  conics/define/circle/@center-radius/.code args={#1,#2,#3}{
+    \tikzset{
+      conics/define/foci={#1,#1,#2,#3},
+    }
+  },
+  % conics/define/circle={\A,\B,\C,\Circle}
+  conics/define/circle/@through/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \cs@j;
+      for \cs@j in {1,2,3}{
+        \cs@A{1,\cs@j} = \fpeval{#1{\cs@j,1} * #1{3,1}}; 
+        \cs@A{2,\cs@j} = \fpeval{#2{\cs@j,1} * #2{3,1}}; 
+        \cs@A{3,\cs@j} = \fpeval{#3{\cs@j,1} * #3{3,1}}; 
+        % {\message{\cs@A{1,\cs@j}}};
+      };
+      \cs@B{1,1} = \fpeval{-((#1{1,1})^2+(#1{2,1})^2)};
+      \cs@B{2,1} = \fpeval{-((#2{1,1})^2+(#2{2,1})^2)};
+      \cs@B{3,1} = \fpeval{-((#3{1,1})^2+(#3{2,1})^2)};
+    }
+    \tikzset{
+      mat/solve={\cs@A,\cs@B,3,1,\cs@C},
+      % mat/stdout={\cs@A,3,3},
+      % mat/stdout={\cs@B,3,1},
+      % mat/stdout={\cs@C,3,1},
+    }
+    \tikzmath{
+      \cs@coef{1} = 1; \cs@coef{2} = 0; \cs@coef{3} = 1;
+      \cs@coef{4} = \cs@C{1,1}; 
+      \cs@coef{5} = \cs@C{2,1}; 
+      \cs@coef{6} = \cs@C{3,1};
+    }
+    \tikzset{
+      conics/define/quadratic={\cs@coef, #4},
+    }
+  },
+  conics/define/circle/@argn/.initial=0,
+  conics/define/circle/.code={% dispatcher
+    % compute the number of arguments
+    \pgfkeyssetvalue{/tikz/conics/define/circle/@argn}{0} % 重置计数器
+    \pgfutil@for\arg:=#1\do{
+      \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/conics/define/circle/@argn},1))}
+      \pgfkeysalso{/tikz/conics/define/circle/@argn = \pgfmathresult}
+    }
+    \ifnum \pgfkeysvalueof{/tikz/conics/define/circle/@argn} = 3
+      \tikzset{conics/define/circle/@center-radius = {#1}}
+    \else\ifnum \pgfkeysvalueof{/tikz/conics/define/circle/@argn} = 4
+      \tikzset{conics/define/circle/@through = {#1}}
+    \else
+      \pgferror{Incorrect number of arguments for 'conics/circle'}
+    \fi\fi
+  },
+  % Richter-Gebert. Perspective on Projective Geometry. Springer,2011.
+  % find a conic section through five points
+  % conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\C}
+  % \Pi: 5 points, homogeneous coordinates, dimension 3x1
+  % \C: the coefficient matrix, dimension 3x3
+  % \C - non-degenerate conic
+  conics/define/five points/.code args={#1,#2,#3,#4,#5,#6}{
+    \tikzset{
+      conics/cross={#1,#2,\cs@Lab}, % line through Pa, Pb
+      conics/cross={#3,#4,\cs@Lcd}, % line through Pc, Pd
+      conics/cross={#1,#3,\cs@Lac}, % line through Pa, Pc
+      conics/cross={#2,#4,\cs@Lbd}, % line through Pb, Pd
+      % mat/transpose={\cs@Lab,3,1,\cs@Tab},
+      mat/transpose={\cs@Lcd,3,1,\cs@Tcd},
+      % mat/transpose={\cs@Lac,3,1,\cs@Tac},
+      mat/transpose={\cs@Lbd,3,1,\cs@Tbd},
+      mat/product={\cs@Lab,\cs@Tcd,3,1,3,\cs@Ca},
+      mat/product={\cs@Lac,\cs@Tbd,3,1,3,\cs@Cb},
+      mat/bilinear={\cs@Cb,#5,#5,3,\cs@a},
+      mat/bilinear={\cs@Ca,#5,#5,3,\cs@b},
+      mat/combine={\cs@Ca,\cs@Cb,3,3,\cs@a,(-\cs@b),\cs@M},
+      mat/transpose={\cs@M,3,3,\cs@N},
+      mat/add={\cs@M,\cs@N,3,3,#6},
+    }
+  },
+  % find a conic section tangent to five lines
+  % \C - non-degenerate conic
+  conics/define/five tangents/.code args={#1,#2,#3,#4,#5,#6}{
+    \tikzset{
+      conics/define/five points={#1,#2,#3,#4,#5,\cs@dual},
+      mat/cofactors={\cs@dual,3,#6},
+      % mat/cofactors={\cs@dual,3,\cs@temp},
+      % mat/normalize={\cs@temp,3,3,#6},
+    }
+  },
+  % eliminate the cross term in a quadratic form by rotation
+  % conics/rotate={\CO,\CR,\R,\ang}
+  % \CO: the coefficient matrix before rotation 
+  % \CR: the coefficient matrix after rotation 
+  % \R: the rotation matrix
+  % \ang: the rotation angle
+  conics/rotate/.code args = {#1,#2,#3,#4} {
+    \tikzmath {
+      if abs(#1{1,2}) > \EPSILON then {
+        real \cs@cos, \cs@sin, \cs@tan, \cs@tau;
+        \cs@tau = \fpeval{(#1{1,1} - #1{2,2}) / (2 * #1{1,2})};
+        if \cs@tau >= 0 then {
+          \cs@tan = \fpeval{1.0 / (\cs@tau + sqrt(1 + (\cs@tau)^2))};
+        } else {
+          \cs@tan = \fpeval{-1.0 / (-\cs@tau + sqrt(1 + (\cs@tau)^2))};
+        };
+        \cs@cos = \fpeval{1 / sqrt(1 + (\cs@tan)^2)};
+        \cs@sin = \fpeval{\cs@tan * \cs@cos};
+        % perform rotation
+        #2{1,1} = \fpeval{#1{1,1}*(\cs@cos)^2 + #1{1,2}*2*\cs@sin*\cs@cos + #1{2,2}*(\cs@sin)^2};
+        #2{1,2} = 0.0;
+        #2{1,3} = \fpeval{#1{1,3}*\cs@cos + #1{2,3}*\cs@sin};
+        #2{2,2} = \fpeval{#1{1,1}*(\cs@sin)^2 - #1{1,2}*2*\cs@sin*\cs@cos + #1{2,2}*(\cs@cos)^2};
+        #2{2,3} = \fpeval{-#1{1,3}*\cs@sin + #1{2,3}*\cs@cos};
+        #2{3,3} = #1{3,3};
+        % symetric
+        #2{2,1} = #2{1,2};
+        #2{3,1} = #2{1,3};
+        #2{3,2} = #2{2,3};
+        % rotation matrix
+        #3{1,1} = \cs@cos; #3{1,2} = - \cs@sin; #3{1,3} = 0.0;
+        #3{2,1} = \cs@sin; #3{2,2} = \cs@cos;   #3{2,3} = 0.0;
+        #3{3,1} = 0.0;     #3{3,2} = 0.0;       #3{3,3} = 1.0;
+        #4 = atan(\cs@tan);
+      } else {
+        % unchanged
+        int \cs@i, \cs@j;
+        for \cs@i in {1,2,3} {
+          for \cs@j in {1,2,3} {
+            #2{\cs@i,\cs@j} = #1{\cs@i,\cs@j};
+          };
+        };
+        % rotation matrix
+        #3{1,1} = 1.0; #3{1,2} = 0.0; #3{1,3} = 0.0;
+        #3{2,1} = 0.0; #3{2,2} = 1.0; #3{2,3} = 0.0;
+        #3{3,1} = 0.0; #3{3,2} = 0.0; #3{3,3} = 1.0;
+        #4 = 0;
+      };
+    }%tikzmath
+  },
+  % translate the origin of axes to the center(of ellipse or hyperbola)
+  % or vertex (of parabola)
+  % conics/translate={\CR,\CT,\T,\shift}
+  % \CR: the coefficient matrix after rotation (i.e. withou the cross term)
+  % \CT: the coefficient matrix after translation 
+  % \T: the translation matrix
+  % \shift: (xshift,yshift)
+  conics/translate/.code args = {#1,#2,#3,#4} {
+    \tikzmath{
+      int \cs@isparabola, \cs@index;
+      \cs@isparabola = 0;
+      \cs@index = 1;
+      if abs(#1{1,1}) < \EPSILON && abs(#1{2,2}) < \EPSILON then {
+        {\pgferror{Invalid conics}};
+      };
+      if abs(#1{1,1}) > \EPSILON && abs(#1{2,2}) > \EPSILON then {
+        % ellipse or hyperbola
+        \cs@xshift = \fpeval{- #1{3,1} / #1{1,1}};
+        \cs@yshift = \fpeval{- #1{3,2} / #1{2,2}};
+        {\message{Conic type: Ellipse/Hyperbola, center(\cs@xshift,\cs@yshift)^^J}};
+      } else {
+        % parabola
+        \cs@isparabola = 1;
+        if abs(#1{1,1}) > \EPSILON then {
+          \cs@index = 2;
+          \cs@xshift = \fpeval{- #1{1,3} / #1{1,1}};
+          \cs@yshift = \fpeval{((#1{1,3})^2 - #1{1,1}*#1{3,3})/(2*#1{1,1}*#1{2,3})};
+        } else {
+          \cs@index = 1;
+          \cs@xshift = \fpeval{((#1{2,3})^2 - #1{2,2}*#1{3,3})/(2*#1{2,2}*#1{1,3})};
+          \cs@yshift = \fpeval{- #1{2,3} / #1{2,2}};
+        };%if
+        {\message{Conic type: Parabola, vertex(\cs@xshift,\cs@yshift)^^J}};
+      };%if
+      % perform translation
+      #2{1,1} = #1{1,1}; #2{1,2} = #1{1,2};
+      #2{2,1} = #1{2,1}; #2{2,2} = #1{2,2};
+      #2{1,3} = \fpeval{#1{1,1}*\cs@xshift + #1{1,2}*\cs@yshift + #1{1,3}};
+      #2{2,3} = \fpeval{#1{1,2}*\cs@xshift + #1{2,2}*\cs@yshift + #1{2,3}};
+      #2{3,3} = \fpeval{(\cs@xshift)^2*#1{1,1} + 2*\cs@xshift*\cs@yshift*#1{1,2} + (\cs@yshift)^2*#1{2,2} + 
+                         2*\cs@xshift*#1{1,3} + 2*\cs@yshift*#1{2,3} + #1{3,3}};
+      % symetric
+      #2{3,1} = #2{1,3};
+      #2{3,2} = #2{2,3};
+      #4{1} = \cs@xshift;
+      #4{2} = \cs@yshift;
+      % patch for parabola (numerical stability)
+      if \cs@isparabola == 1 then {
+        #2{\cs@index,\cs@index} = 0.0;
+        #2{3,3} = 0.0;
+      };
+    }%tikzmath
+
+    \tikzset{
+      conics/translation matrix={\cs@xshift,\cs@yshift,#3},
+    }
+  },
+  % reduce conic matrix from general to standard form
+  % combine rotation and translation of conics
+  % conics/reduce={\CO,\CT,\ang,\shift}
+  conics/reduce/.code args = {#1,#2,#3,#4} {
+    \tikzset {
+      conics/rotate={#1,\cs@CR,\cs@R,#3},
+      conics/translate={\cs@CR,\cs@CT,\cs@T,#4},
+    }
+  },
+  % intersections of a conic and a line
+  % conics/intersect cl={\C,\A,\B,\P,\Q}
+  % \C: the coefficient matrix, dimension 3x3
+  % \A,\B: two points on the line (homogeneous coordinates, dimension 3x1)
+  % \P,\Q: intersections (homogeneous coordinates, dimension 3x1)
+  conics/intersect cl/.code args={#1,#2,#3,#4,#5}{
+    \tikzset{
+      mat/bilinear={#1,#2,#2,3,\cs@a},
+      mat/bilinear={#1,#2,#3,3,\cs@b},
+      mat/bilinear={#1,#3,#3,3,\cs@c},
+    }
+
+    \tikzmath{
+      % solve: a m^2 + 2 b m n + c n^2 = 0, return m/n
+      if abs(\cs@a) <= \EPSILON && abs(\cs@c) <= \EPSILON then {% a,c=0
+        % the two points are on the conic
+        % coefficients for intersections
+        \cs@ma = 1.0; \cs@na = 0.0; 
+        \cs@mb = 0.0; \cs@nb = 1.0;
+      } else {
+        \cs@delta = \fpeval{4 * (\cs@b)^2 - 4 * \cs@a * \cs@c};
+        % print {\ \\a,b,c:\cs@a,\cs@b,\cs@c};
+        if \cs@delta < 0.0 then {
+          {\pgferror{The line does not intersect the conic}};
+        };
+        % 为了判断 PQ 与 AB 的方向一致, 需要先去齐次化, 将向量 PQ 表示为 k·AB
+        % PQ 与 AB 方向一致 <=> k > 0
+        % PQ = (mb A12 + nb B12)/(mb wa + nb wb) - (ma A12 + na B12)/(ma wa + na wb)
+        % AB = B12/wb - A12/wa
+        % A12 代表点 A 的前两个分量, wa 代表 A 的最后一个分量（权重）
+        % 如果 wa 或 wb 为 0，则该点在无穷远处。在这种情况下，通常在欧几里得意义下讨论
+        % “方向”会失去常规意义，因为直线变成了射影直线（闭合环路）。但在通常的仿射应用中，
+        % 确保 wa, wb, ma wa + na wb 和 mb wa + nb wb 不等于 0 是计算的前提。
+        \cs@wa = #2{3,1}; \cs@wb = #3{3,1};
+        if abs(\cs@a) > \EPSILON then {% a != 0, solve m/n
+          \cs@ma = \fpeval{(-2 * \cs@b - sqrt(\cs@delta)) / (2 * \cs@a)}; 
+          \cs@mb = \fpeval{(-2 * \cs@b + sqrt(\cs@delta)) / (2 * \cs@a)}; 
+          \cs@na = 1.0;
+          \cs@nb = 1.0;
+          % 保持两交点与直线方向一致
+          if (\cs@mb-\cs@ma)*\cs@wa*\cs@wb*(\cs@ma*\cs@wa+\cs@wb)*(\cs@mb*\cs@wa+\cs@wb) > 0 then {
+            % swap
+            \cs@temp = \cs@ma; \cs@ma = \cs@mb; \cs@mb = \cs@temp;
+          };
+        } else {% c != 0, solve n/m
+          \cs@ma = 1.0;
+          \cs@mb = 1.0;
+          \cs@na = \fpeval{(-2 * \cs@b - sqrt(\cs@delta)) / (2 * \cs@c)}; 
+          \cs@nb = \fpeval{(-2 * \cs@b + sqrt(\cs@delta)) / (2 * \cs@c)}; 
+          % 保持两交点与直线方向一致
+          if (\cs@nb-\cs@na)*\cs@wa*\cs@wb*(\cs@wa+\cs@na*\cs@wb)*(\cs@wa+\cs@nb*\cs@wb) < 0 then {
+            % swap
+            \cs@temp = \cs@na; \cs@na = \cs@nb; \cs@nb = \cs@temp;
+          };
+        };
+        % print {\ \\m1,n1:\cs@ma,\cs@na};
+        % print {\ \\m2,n2:\cs@mb,\cs@nb};
+        % {\message{m1,n1:\cs@ma,\cs@na^^J}};
+        % {\message{m2,n2:\cs@mb,\cs@nb^^J}};
+      };
+    }
+
+    \tikzset{
+      mat/combine={#2,#3,3,1,\cs@ma,\cs@na,#4},
+      mat/combine={#2,#3,3,1,\cs@mb,\cs@nb,#5},
+    }
+  },
+  % The radical axis of two non-concentric circles
+  % conics/radical axis={\Ca,\Cb,\l}
+  conics/radical axis/.code args={#1,#2,#3}{
+    \tikzmath{
+      #3{1,1} = \fpeval{2*(#1{1,3}/#1{1,1}-#2{1,3}/#2{1,1})};
+      #3{2,1} = \fpeval{2*(#1{2,3}/#1{1,1}-#2{2,3}/#2{1,1})};
+      #3{3,1} = \fpeval{#1{3,3}/#1{1,1}-#2{3,3}/#2{1,1}};
+    }
+  },
+  % tangents to a conic section from a given point
+  % conics/tangents={\C,\P,\Ta,\Tb}
+  % \C: the coefficient matrix 3x3
+  % \P: point (homogeneous coordinates, dimension 3x1)
+  % \Ta,\Tb: tangent points (homogeneous coordinates, dimension 3x1)
+  conics/tangents/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      % mat/product={#1,#2,3,3,1,\cs@polar},
+      conics/polar={#1,#2,\cs@polar},
+    }
+    \tikzmath{
+      if abs(\cs@polar{1,1}) <= \EPSILON && abs(\cs@polar{2,1}) <= \EPSILON then {
+        {\pgferror{Impossible polar}};
+      };
+    }
+    \tikzset{
+      conics/intersect cn={#1,\cs@polar,#3,#4},
+    }
+  },
+  % define a conic with matrix representation
+  % transpose(X) C X =0
+  % conics/define={\C}
+  % \C: the coefficient matrix, dimension 3x3
+  conics/define/.style args={#1}{
+    % reduction of conic section to standard form
+    conics/rotate={#1,\cs@CR,\cs@R,\cs@angle},
+    conics/translate={\cs@CR,\cs@CT,\cs@T,\cs@shift},
+    mat/stdout={\cs@CR,3,3},
+    mat/stdout={\cs@CT,3,3},
+    conics/@compute-properties,%
+    insert path={
+      \ifnum \cs@type = 1 %ellipse
+        [rotate=\cs@angle,shift={(\cs@shift{1},\cs@shift{2})}] (0,0) ellipse ({sqrt(-\cs@CT{3,3}/\cs@CT{1,1})} and {sqrt(-\cs@CT{3,3}/\cs@CT{2,2})})
+      \else\ifnum \cs@type = 2%hyperbola
+        [rotate=\cs@angle,shift={(\cs@shift{1},\cs@shift{2})},variable=\cs@var] plot ({\cs@a*cosh(\cs@var)}, {\cs@b*sinh(\cs@var)})  plot ({-\cs@a*cosh(\cs@var)}, {\cs@b*sinh(\cs@var)})
+      \else\ifnum \cs@type = 3%hyperbola
+        [rotate=\cs@angle,shift={(\cs@shift{1},\cs@shift{2})},variable=\cs@var] plot ({\cs@a*sinh(\cs@var)}, {\cs@b*cosh(\cs@var)})  plot ({\cs@a*sinh(\cs@var)}, {-\cs@b*cosh(\cs@var)})
+      \else\ifnum \cs@type = 4%parabola
+        [rotate=\cs@angle,shift={(\cs@shift{1},\cs@shift{2})},variable=\cs@var] plot ({2*(\cs@p)*(\cs@var)^2}, {2*(\cs@p)*(\cs@var)})
+      \else\ifnum \cs@type = 5%parabola
+        [rotate=\cs@angle,shift={(\cs@shift{1},\cs@shift{2})},variable=\cs@var] plot ({2*(\cs@p)*(\cs@var)}, {2*(\cs@p)*(\cs@var)^2})
+      \fi\fi\fi\fi\fi
+    }
+  },
+  % analyze conic: classify and compute properties
+  % NOTE: 在 conics/define/.style args 中无法直接使用 \tikzmath
+  conics/@compute-properties/.code={
+    \tikzmath{
+      if abs(\cs@CT{3,3}) > \EPSILON then {
+        if abs(\cs@CT{1,1}) <= \EPSILON && abs(\cs@CT{2,2}) <= \EPSILON then {
+          {\pgferror{Degenerate conic deteted}};
+        };
+        \cs@sa = \fpeval{-\cs@CT{3,3}/\cs@CT{1,1}};
+        \cs@sb = \fpeval{-\cs@CT{3,3}/\cs@CT{2,2}};
+        if \cs@sa < 0 && \cs@sb < 0 then {
+          {\pgferror{Illeagal conic deteted}};
+        };
+        if \cs@sa > 0 && \cs@sb > 0 then {%ellipse
+          \cs@type = 1;
+          \cs@a = \fpeval{sqrt(\cs@sa)};
+          \cs@b = \fpeval{sqrt(\cs@sb)};
+        };
+        if \cs@sa > 0 && \cs@sb < 0 then {%hyperbola
+          \cs@type = 2;
+          \cs@a = \fpeval{sqrt(\cs@sa)};
+          \cs@b = \fpeval{sqrt(-\cs@sb)};
+        };
+        if \cs@sa < 0 && \cs@sb > 0 then {%hyperbola
+          \cs@type = 3;
+          \cs@a = \fpeval{sqrt(-\cs@sa)};
+          \cs@b = \fpeval{sqrt(\cs@sb)};
+        };
+      } else {% parabola
+        if abs(\cs@CT{1,1}) <= \EPSILON && abs(\cs@CT{2,2}) <= \EPSILON then {
+          {\pgferror{Degenerate conic deteted}};
+        };
+        if abs(\cs@CT{1,1}) <= \EPSILON then {
+          % y^2 = 2p x: x = 2p t, y = 2p t^2
+          \cs@type = 4;
+          \cs@p = \fpeval{-\cs@CT{1,3}/\cs@CT{2,2}};
+        } else {
+          % x^2 = 2p y: x = 2p t^2, x = 2p t
+          \cs@type = 5;
+          \cs@p = \fpeval{-\cs@CT{2,3}/\cs@CT{1,1}};
+        };
+      }; 
+    }
+  },
+  % rotation matrix: conics/rotation matrix={\ang,\R}
+  % \ang: angle in degrees
+  % \R: the rotation matrix, dimension 3x3
+  % NOTE: \fpeval 默认使用弧度制, 除非用 sind; tikzmath 默认使用角度制 Degrees
+  conics/rotation matrix/.code args={#1,#2}{
+    \tikzmath{
+      #2{1,1} = cos(#1); #2{1,2} = -sin(#1); #2{1,3} = 0.0;
+      #2{2,1} = sin(#1); #2{2,2} = cos(#1);  #2{2,3} = 0.0;
+      #2{3,1} = 0.0;     #2{3,2} = 0.0;      #2{3,3} = 1.0;
+    }
+  },
+  % translation matrix: conics/translation matrix={\xshift,\yshift,\T}
+  % \T: the translation matrix, dimension 3x3 
+  conics/translation matrix/.code args={#1,#2,#3}{
+    \tikzmath{
+      #3{1,1} = 1.0; #3{1,2} = 0.0; #3{1,3} = #1;
+      #3{2,1} = 0.0; #3{2,2} = 1.0; #3{2,3} = #2;
+      #3{3,1} = 0.0; #3{3,2} = 0.0; #3{3,3} = 1.0;
+    }
+  },
+  % conics/polar={\C,\P,\L}
+  % \C - non-degenerate conic
+  conics/polar/.code args={#1,#2,#3}{
+    \tikzset{
+      mat/product={#1,#2,3,3,1,#3},
+    }
+  },
+  % conics/pole={\C,\L,\P}
+  % \C - non-degenerate conic
+  conics/pole/.code args={#1,#2,#3}{
+    \tikzset{
+      mat/cofactors={#1,3,\cs@dual},
+      mat/product={\cs@dual,#2,3,3,1,#3},
+    }
+    \tikzmath{
+      if abs(#3{3,1}) > \EPSILON then {
+        #3{1,1} = #3{1,1} / #3{3,1};
+        #3{2,1} = #3{2,1} / #3{3,1};
+        #3{3,1} = 1.0;
+      };
+    }
+  },
+  % clip segment: obtain the line segment within the rectangle
+  conics/segment/@clip/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      \cs@xmin = #1; \cs@xmax = #2;
+      \cs@ymin = #3; \cs@ymax = #4;
+      % boundaries
+      \cs@left{1,1} = 1; \cs@left{2,1} = 0; \cs@left{3,1} = -(\cs@xmin);% left
+      \cs@right{1,1} = 1; \cs@right{2,1} = 0; \cs@right{3,1} = -(\cs@xmax);% right
+      \cs@bottom{1,1} = 0; \cs@bottom{2,1} = 1; \cs@bottom{3,1} = -(\cs@ymin);% bottom
+      \cs@top{1,1} = 0; \cs@top{2,1} = 1; \cs@top{3,1} = -(\cs@ymax);% up
+    }
+
+    \tikzset{
+      conics/cross={#5,\cs@left,\cs@pl},
+      conics/cross={#5,\cs@right,\cs@pr},
+      conics/cross={#5,\cs@bottom,\cs@pb},
+      conics/cross={#5,\cs@top,\cs@pt},
+      % mat/stdout={\cs@pl,3,1},
+      % mat/stdout={\cs@pr,3,1},
+      % mat/stdout={\cs@pb,3,1},
+      % mat/stdout={\cs@pt,3,1},
+    }
+
+    \tikzmath{
+      int \cs@horizontal, \cs@vertical, \cs@error;
+      \cs@horizontal = 1; \cs@vertical = 1; \cs@error = 0;
+      if abs(\cs@pl{3,1}) > \EPSILON then {
+        \cs@PL{1} = \cs@pl{1,1}/\cs@pl{3,1};
+        \cs@PL{2} = \cs@pl{2,1}/\cs@pl{3,1}; 
+        \cs@PR{1} = \cs@pr{1,1}/\cs@pr{3,1};
+        \cs@PR{2} = \cs@pr{2,1}/\cs@pr{3,1}; 
+        \cs@vertical = 0;   
+      };
+      if abs(\cs@pb{3,1}) > \EPSILON then {
+        \cs@PB{1} = \cs@pb{1,1}/\cs@pb{3,1};
+        \cs@PB{2} = \cs@pb{2,1}/\cs@pb{3,1}; 
+        \cs@PT{1} = \cs@pt{1,1}/\cs@pt{3,1};
+        \cs@PT{2} = \cs@pt{2,1}/\cs@pt{3,1}; 
+        \cs@horizontal = 0;
+      };
+      if \cs@horizontal == 1 then {
+        % {\message{Horizontal line^^J}};
+        if \cs@PL{2} >= \cs@ymin && \cs@PL{2} <= \cs@ymax then {
+          \cs@segment{1,1} = \cs@PL{1};
+          \cs@segment{1,2} = \cs@PL{2};
+          \cs@segment{2,1} = \cs@PR{1};
+          \cs@segment{2,2} = \cs@PR{2};
+        } else {
+          \cs@error = 1;
+        };
+        % {\message{Error code: \cs@error^^J}};
+      };
+      if \cs@vertical == 1 then {
+        % {\message{Vertical line^^J}};
+        if \cs@PB{1} >= \cs@xmin && \cs@PB{1} <= \cs@xmax then {
+          \cs@segment{1,1} = \cs@PB{1};
+          \cs@segment{1,2} = \cs@PB{2};
+          \cs@segment{2,1} = \cs@PT{1};
+          \cs@segment{2,2} = \cs@PT{2};
+        } else {
+          \cs@error = 1;
+        };
+        % {\message{Error code: \cs@error^^J}};
+      };
+      % find the intersection of intervals [x1, x2] and [x3, x4]
+      if \cs@horizontal == 0 && \cs@vertical == 0 then {
+        if \cs@PB{1} > \cs@PT{1} then {%swap
+          \cs@s = \cs@PB{1}; \cs@PB{1} = \cs@PT{1}; \cs@PT{1} = \cs@s;
+          \cs@s = \cs@PB{2}; \cs@PB{2} = \cs@PT{2}; \cs@PT{2} = \cs@s;
+        };
+        if \cs@PB{1} > \cs@xmax || \cs@PT{1} < \cs@xmin then {
+          \cs@error = 1;
+        } else {
+          if \cs@PB{1} <= \cs@xmin then {
+            \cs@segment{1,1} = \cs@PL{1};
+            \cs@segment{1,2} = \cs@PL{2};
+          } else {
+            \cs@segment{1,1} = \cs@PB{1};
+            \cs@segment{1,2} = \cs@PB{2};
+          };
+          if \cs@PT{1} >= \cs@xmax then {
+            \cs@segment{2,1} = \cs@PR{1};
+            \cs@segment{2,2} = \cs@PR{2};
+          } else {
+            \cs@segment{2,1} = \cs@PT{1};
+            \cs@segment{2,2} = \cs@PT{2};
+          };
+        };
+      };
+      if \cs@error == 1 then {
+        {\pgferror{Segment is out of the clipping rectangle}};
+      };
+    }
+  },
+  conics/segment/.style args={#1,#2,#3,#4,#5}{
+    % mat/stdout={#5,3,1},
+    conics/segment/@clip={#1,#2,#3,#4,#5},
+    % mat/stdout={\cs@segment,2,2},
+    insert path={
+      (\cs@segment{1,1},\cs@segment{1,2}) -- (\cs@segment{2,1},\cs@segment{2,2})
+    }
+  },
+  % Richter-Gebert. Perspective on Projective Geometry. Springer,2011.
+  % intersections of a conic and a line (normal vector form)
+  % conics/intersect cn={\C,\n,\P,\Q}
+  conics/intersect cn/.code args={#1,#2,#3,#4}{
+    % \tikzset{
+    %   conics/x-intercept={#2,\cs@U},
+    %   conics/y-intercept={#2,\cs@V},
+    %   conics/intersect cl={#1,\cs@U,\cs@V,#3,#4},
+    % }
+    \tikzset{
+      conics/skew-symmetric matrix={#2,\cs@ss},
+      mat/congruence={#1,\cs@ss,3,\cs@B},
+      mat/pivot={#2,3,1,\cs@max,\cs@i,\cs@j},
+    }
+
+    \tikzmath{
+      int \cs@i,\cs@k;
+      % print{\ \\i:\cs@i};
+      if \cs@max <= \EPSILON then {
+        {\pgferror{Illeagal line detected}};
+      };
+      int \cs@m,\cs@n;
+      \cs@m = mod(\cs@i,3)+1;
+      \cs@n = mod(\cs@m,3)+1;
+      % print{\ \\m,n:\cs@m,\cs@n};
+      \cs@delta = \fpeval{(\cs@B{\cs@m,\cs@n})^2 - (\cs@B{\cs@m,\cs@m}) * (\cs@B{\cs@n,\cs@n})};
+      % print{\ \\$\Delta$:\cs@delta};
+      if \cs@delta < 0.0 then {
+        {\pgferror{The line does not intersect the conic}};
+      };
+      \cs@alpha = \fpeval{sqrt(\cs@delta) / #2{\cs@i,1}};
+      % print{\ \\$\alpha$:\cs@alpha};
+    }
+
+    \tikzset{
+      mat/combine={\cs@B,\cs@ss,3,3,1.0,\cs@alpha,\cs@C},
+      mat/decompose rank-1={\cs@C,3,3,#3,#4},
+    }
+
+    \tikzmath{
+      if abs(#3{3,1}) > \EPSILON && abs(#4{3,1}) > \EPSILON then {
+        % dehomogenize
+        \cs@ax = \fpeval{#3{1,1}/#3{3,1}};
+        \cs@ay = \fpeval{#3{2,1}/#3{3,1}};
+        \cs@bx = \fpeval{#4{1,1}/#4{3,1}};
+        \cs@by = \fpeval{#4{2,1}/#4{3,1}};
+        if \cs@ay > \cs@by || (abs(\cs@ay - \cs@by) < \EPSILON && \cs@ax > \cs@ay) then {
+          \cs@temp{1,1} = #3{1,1}; #3{1,1} = #4{1,1}; #4{1,1} = \cs@temp{1,1};
+          \cs@temp{2,1} = #3{2,1}; #3{2,1} = #4{2,1}; #4{2,1} = \cs@temp{2,1};
+          \cs@temp{3,1} = #3{3,1}; #3{3,1} = #4{3,1}; #4{3,1} = \cs@temp{3,1};
+        };
+      };
+    }
+  },
+  % Richter-Gebert. Perspective on Projective Geometry. Springer,2011.
+  % intersections of two conics
+  % search for suitable parameters λ such that the matrix λ Ca + Cb is degenerate
+  % and then split the degenerate conic into two lines, l and m
+  % conics/intersect cc={\Ca,\Cb,\C,\l,\m}
+  conics/intersect cc/.code args={#1,#2,#3,#4,#5}{
+    \tikzmath{
+      int \cs@i, \cs@j;
+      for \cs@i in {1,2,3}{
+        % B1,A2,A3
+        \cs@BAA{\cs@i,1} = #2{\cs@i,1};
+        \cs@BAA{\cs@i,2} = #1{\cs@i,2};
+        \cs@BAA{\cs@i,3} = #1{\cs@i,3};
+        % A1,B2,A3
+        \cs@ABA{\cs@i,1} = #1{\cs@i,1};
+        \cs@ABA{\cs@i,2} = #2{\cs@i,2};
+        \cs@ABA{\cs@i,3} = #1{\cs@i,3};
+        % A1,A2,B3
+        \cs@AAB{\cs@i,1} = #1{\cs@i,1};
+        \cs@AAB{\cs@i,2} = #1{\cs@i,2};
+        \cs@AAB{\cs@i,3} = #2{\cs@i,3};
+        % A1,B2,B3
+        \cs@ABB{\cs@i,1} = #1{\cs@i,1};
+        \cs@ABB{\cs@i,2} = #2{\cs@i,2};
+        \cs@ABB{\cs@i,3} = #2{\cs@i,3};
+        % B1,A2,B3
+        \cs@BAB{\cs@i,1} = #2{\cs@i,1};
+        \cs@BAB{\cs@i,2} = #1{\cs@i,2};
+        \cs@BAB{\cs@i,3} = #2{\cs@i,3};
+        % B1,B2,A3
+        \cs@BBA{\cs@i,1} = #2{\cs@i,1};
+        \cs@BBA{\cs@i,2} = #2{\cs@i,2};
+        \cs@BBA{\cs@i,3} = #1{\cs@i,3};
+      };
+    }
+
+    \tikzset{
+      mat/det={#1,3,\cs@a},
+      mat/det={\cs@BAA,3,\cs@ba},
+      mat/det={\cs@ABA,3,\cs@bb},
+      mat/det={\cs@AAB,3,\cs@bc},
+      mat/det={\cs@ABB,3,\cs@ca},
+      mat/det={\cs@BAB,3,\cs@cb},
+      mat/det={\cs@BBA,3,\cs@cc},
+      mat/det={#2,3,\cs@d},
+    }
+
+    \tikzmath{
+      \cs@b = \fpeval{\cs@ba+\cs@bb+\cs@bc};
+      \cs@c = \fpeval{\cs@ca+\cs@cb+\cs@cc};
+      \cs@lambda = cardano(\cs@a,\cs@b,\cs@c,\cs@d);
+      % print{\ \\$\det(\lambda C_1 + C_2)=0$};
+      % print{\ \\$a\lambda^3+b\lambda^2+c\lambda+d=0(a=\cs@a,b=\cs@b,c=\cs@c,d=\cs@d)$};
+      % print{\ \\$\lambda$:\cs@lambda};
+    }
+
+    \tikzset{
+      mat/combine={#1,#2,3,3,\cs@lambda,1.0,#3},
+      % conics/split={#3,#4,#5},%deprecated
+      conics/decompose={#3,#4,#5},
+    }
+  },
+  % splitting a degenerate conic by SVD (Jacobi method)
+  conics/split/.code args={#1,#2,#3}{
+    \tikzset{
+      mat/jacobi={#1,3,\cs@d,\cs@v},
+      % mat/show={\cs@d,3,3},
+      % mat/show={\cs@v,3,3},
+    }
+
+    \tikzmath{
+      % verify degenerate conic
+      int \cs@k,\cs@i,\cs@j;
+      \cs@i = 0;
+      \cs@j = 0;
+      int \cs@flag;
+      \cs@flag = 0;
+      % print{\ \\$i,j$:\cs@d{1,1}};
+      for \cs@k in {1,2,3}{
+        if abs(\cs@d{\cs@k,\cs@k}) < 10 * \EPSILON then {
+          \cs@flag = 1;
+        } else {
+          if \cs@i == 0 then {
+            \cs@i = \cs@k;
+          } else {
+            \cs@j = \cs@k;
+          };
+        };
+      };
+      % print{\ \\$i,j$:\cs@i,\cs@j};
+      if \cs@flag == 0 then {
+        {\pgferror{Cannot split a non-degenerate conic}};
+      };
+      if \cs@i == 0 then {
+        {\pgferror{Zero matrix detected}};
+      };
+      if \cs@j == 0 then {
+        for \cs@k in {1,2,3}{
+          #2{\cs@k,1} = \cs@v{\cs@k,\cs@i};
+          #3{\cs@k,1} = \cs@v{\cs@k,\cs@i};
+        };
+      } else {
+        if \cs@d{\cs@i,\cs@i} * \cs@d{\cs@j,\cs@j} > 0 then {
+          {\pgferror{Cannot split a conic of ideal lines}};
+        };
+        \cs@a = \fpeval{sqrt(abs(\cs@d{\cs@i,\cs@i}))};
+        \cs@b = \fpeval{sqrt(abs(\cs@d{\cs@j,\cs@j}))};
+        for \cs@k in {1,2,3}{
+          #2{\cs@k,1} = \fpeval{\cs@a * \cs@v{\cs@k,\cs@i} + \cs@b * \cs@v{\cs@k,\cs@j}};
+          #3{\cs@k,1} = \fpeval{\cs@a * \cs@v{\cs@k,\cs@i} - \cs@b * \cs@v{\cs@k,\cs@j}};
+        };
+      };
+    }
+  },
+  % skew-symmetric matrix for a vector
+  conics/skew-symmetric matrix/.code args={#1,#2}{
+    \tikzmath{
+      #2{1,1} = 0.0;      #2{1,2} = -#1{3,1}; #2{1,3} = #1{2,1};
+      #2{2,1} = #1{3,1};  #2{2,2} = 0.0;      #2{2,3} = -#1{1,1};
+      #2{3,1} = -#1{2,1}; #2{3,2} = #1{1,1};  #2{3,3} = 0.0;
+    }
+  },
+  % Richter-Gebert. Perspective on Projective Geometry. Springer,2011.
+  % splitting a degenerate conic
+  conics/decompose/.code args={#1,#2,#3}{
+    \tikzset{
+      mat/cofactors={#1,3,\cs@adj},
+      % mat/stdout={\cs@adj,3,3},
+    }
+
+    \tikzmath{
+      int \cs@k,\cs@i,\cs@j;
+      \cs@i = 0;
+      \cs@max = 0.0;
+      for \cs@k in {1,2,3}{
+        if abs(\cs@adj{\cs@k,\cs@k}) > \cs@max then {
+          \cs@i = \cs@k;
+          \cs@max = abs(\cs@adj{\cs@k,\cs@k});
+        };
+      };
+      if \cs@max <= \EPSILON then {
+        {\pgferror{Unable to decompose the conic}};
+      };
+      % extract i-th column and normalize
+      for \cs@k in {1,2,3}{
+        \cs@p{\cs@k,1} = \fpeval{\cs@adj{\cs@k,\cs@i} / sqrt(\cs@max)};
+      };
+    }
+
+    \tikzset{%color
+      % construct skew-symmetric matrix
+      conics/skew-symmetric matrix={\cs@p,\cs@ss},
+      mat/add={#1,\cs@ss,3,3,\cs@C},
+      % mat/stdout={\cs@ss,3,3},
+      % mat/stdout={\cs@C,3,3},
+      mat/decompose rank-1={\cs@C,3,3,#2,#3},
+    }
+  },
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Conic command
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Syntax of conic: x'Cx = 0
+%   \conic [options] (\C); 
+% \newcommand\conic{} % just for safety
+\def\conic[#1]#2(#3){
+  \path[domain=-2:2,smooth,#1,conics/define={#3}]%domain can be overriden
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Segment command
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \def\segment[#1,clip=(#2:#3,#4:#5)]#6(#7){
+%   \path[#1,conics/segment={#2,#3,#4,#5,#7}]
+% }
+
+% 主命令: 负责接收可选参数 [] 和圆括号内容 ()
+\def\segment[#1,clip=(#2:#3,#4:#5)]#6(#7){
+  \pgfutil@in@{,}{#7}
+  \ifpgfutil@in@%
+    % 如果括号内包含逗号，调用处理双点(列向量 3x1)的宏
+    \segment@points[#1,clip=(#2:#3,#4:#5)](#7)%
+  \else%
+    % 如果不包含逗号，调用处理直线系数(列向量 3x1)的宏
+    \segment@normal[#1,clip=(#2:#3,#4:#5)](#7)%
+  \fi%
+}
+
+% 辅助宏: 处理 \segment[options](A,B)
+\def\segment@points[#1,clip=(#2:#3,#4:#5)]#6(#7,#8){%
+  \tikzset{conics/cross={#7,#8,\segment@l}}
+  \path[#1,conics/segment={#2,#3,#4,#5,\segment@l}]
+}
+
+% 辅助宏: 处理 \segment[options](L)
+\def\segment@normal[#1,clip=(#2:#3,#4:#5)]#6(#7){%
+  \path[#1,conics/segment={#2,#3,#4,#5,#7}]
+}
+
+\makeatother

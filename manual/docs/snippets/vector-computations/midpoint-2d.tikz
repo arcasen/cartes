@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+  % tikzmath 和 tikzset 也可置于 tikzpicture 外部
+  \tikzmath{% 定义点 A, B 的坐标
+    \A{1} = 1; \A{2} = 1;
+    \B{1} = 4; \B{2} = 2;
+  }
+  
+  \tikzset{% 调用向量运算库命令
+    plane/scale={\A,\B,1/2,\C},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0) -- (1,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0) -- (0,1) node[below left]{$y
+  $};
+  \draw[teal] (0,0) node[below left]{$O$};
+
+  % 定义 tikz 坐标
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+
+  % 绘制线段
+  \draw (A) -- (B);
+
+  % 标注点
+  \foreach \p/\placement in {A/below left, B/below right, C/below}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

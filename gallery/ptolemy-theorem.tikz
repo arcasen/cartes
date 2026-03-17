@@ -1,0 +1,41 @@
+\begin{tikzpicture}
+  % 使用反演变换证明托勒密定理
+  \tikzmath{
+    % 定义圆(O,radius)上四点 A, B, C, D
+    \radius = 2; 
+    \anga = 180;
+    \angb = -50;
+    \angc = 20;
+    \angd = 60;
+    \A{1} = \radius * cos(\anga); \A{2} = \radius * sin(\anga);
+    \B{1} = \radius * cos(\angb); \B{2} = \radius * sin(\angb);
+    \C{1} = \radius * cos(\angc); \C{2} = \radius * sin(\angc);
+    \D{1} = \radius * cos(\angd); \D{2} = \radius * sin(\angd);
+    % 以 A 为反演中心, 半径为 Radius, 作 B, C, D 的反演点
+    \Radius = 4.5;
+  }
+  \tikzset{
+    plane/inverse={\A,\Radius,\B,\Bi},
+    plane/inverse={\A,\Radius,\C,\Ci},
+    plane/inverse={\A,\Radius,\D,\Di},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (B') at (\Bi{1},\Bi{2});
+  \coordinate (C') at (\Ci{1},\Ci{2});
+  \coordinate (D') at (\Di{1},\Di{2});
+
+  \draw[teal] (0,0) circle (\radius);
+  \draw[purple,thick] (A) -- (B) -- (C) -- (D) -- cycle (A) -- (C) (B) -- (D);
+  \draw[magenta!80] (B) -- (B') (C) -- (C') (D) -- (D');
+  \draw[teal] ($(B')!-0.15!(D')$) -- ($(B')!1.15!(D')$);
+
+  \foreach \p/\placement in {A/left,B/below right,C/below right,D/above left,
+  B'/right,C'/right,D'/right}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

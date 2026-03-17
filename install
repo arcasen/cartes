@@ -4,10 +4,10 @@ OS=`uname -s`
 
 if [ "$OS" == "Darwin" ]; then
   # macOS
-  PKGDIR=~/Library/texmf/tex/latex/euclidea
+  PKGDIR=~/Library/texmf/tex/latex/cartes
 elif [ "$OS" == "Linux" ]; then
   # Debian
-  PKGDIR=~/texmf/tex/latex/euclidea
+  PKGDIR=~/texmf/tex/latex/cartes
 else
   echo "This OS is not supported."
   exit
@@ -15,4 +15,4 @@ fi
 
 rm -rf $PKGDIR
 mkdir -p $PKGDIR
-cp *.code.tex $PKGDIR 
+cp *.code.tex *.sty $PKGDIR 

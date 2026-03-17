@@ -1,0 +1,87 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+% \Asetikzlibrary{cartes}
+\input{../../tikzlibraryvc.code.tex}
+
+\begin{document}
+
+2D
+
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = 1;
+    \A{2} = 1;
+    \B{1} = 2;
+    \B{2} = 0;
+    \C{1} = 2;
+    \C{2} = 2;
+  }
+
+  \tikzset{
+    plane/dot={\A,\B,\C,\dot},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0) -- (1,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0) -- (0,1) node[below left]{$y$};
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+
+  \draw [thick,-latex] (0,0) -- (A);
+  \draw [thick,-latex] (A) -- (B);
+  \draw [thick,-latex] (A) -- (C);
+
+  \foreach \p/\placement in {A/below,B/below,C/above} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+
+  \draw (0,0) node[below] {dot=$\dot$};
+\end{tikzpicture}
+
+3D
+
+\begin{tikzpicture}[
+  x={({0.5*cos(-135)},{0.5*sin(-135)})}, % default: cm
+  y={(1cm,0cm)}, 
+  z={(0cm,1cm)}
+]
+  \tikzmath{
+    \A{1} = 1;
+    \A{2} = 1;
+    \A{3} = 0;
+    \B{1} = 2;
+    \B{2} = 0;
+    \B{3} = 2;
+    \C{1} = 2;
+    \C{2} = 2;
+    \C{3} = 2;
+  }
+
+  \tikzset{
+    space/dot={\A,\B,\C,\dot},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0,0) -- (1,0,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0,0) -- (0,1,0) node[below left]{$y$};
+  \draw[help lines,teal,-latex] (0,0,0) -- (0,0,1) node[above]{$z$};
+
+  \coordinate (A) at (\A{1},\A{2},\A{3});
+  \coordinate (B) at (\B{1},\B{2},\B{3});
+  \coordinate (C) at (\C{1},\C{2},\C{3});
+
+  \draw [thick,-latex] (0,0,0) -- (A);
+  \draw [thick,-latex] (A) -- (B);
+  \draw [thick,-latex] (A) -- (C);
+  
+  \foreach \p/\placement in {A/below,B/below,C/above} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}

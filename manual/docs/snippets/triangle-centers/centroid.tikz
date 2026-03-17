@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = -2; \A{2} = 0;
+    \B{1} = 4; \B{2} = 0;
+    \C{1} = -1; \C{2} = 4;
+  }
+
+  \tikzset{
+    plane/centroid={\A,\B,\C,\G},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (G) at (\G{1},\G{2});
+  \coordinate (D) at ($(B)!0.5!(C)$);
+  \coordinate (E) at ($(C)!0.5!(A)$);
+  \coordinate (F) at ($(A)!0.5!(B)$);
+  
+  \draw[thick] (A) -- (B) -- (C) -- cycle;
+  \draw[purple] (A) -- (D) (B) -- (E) (C) -- (F);
+
+  \draw (A) -- (B) node[near start,sloped] {$|$} node[near end,sloped] {$|$};
+  \draw (B) -- (C) node[near start,sloped] {$||$} node[near end,sloped] {$||$};
+  \draw (C) -- (A) node[near start,sloped] {$|||$} node[near end,sloped] {$|||$};
+
+  \foreach \p/\placement in {A/left,B/right,C/above,G/below} {
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

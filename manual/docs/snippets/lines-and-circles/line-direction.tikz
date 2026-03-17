@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % 直线方程的系数
+    \a = 1; \b = 2; \c = -5;
+  }
+  \tikzset{
+    plane/anchor={\a,\b,\c,\A},
+    plane/direct={\a,\b,\c,\V},
+    plane/add/origin={\A,\V,\B},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+
+  \axes[grid] (-2:4,-2:4);
+  \draw[teal,thick] (A) -- (B);
+
+  \foreach \p/\placement in {A/left,B/above right}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

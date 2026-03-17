@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+  \tikzmath{
+    \xmin = 0;
+    \xmax = 3;
+    \ymin = 0;
+    \ymax = 3;
+    \dx = 1.5;
+    \dy = 1;
+  }
+  % original coordinate system
+  \draw[-latex] ({(\xmin)-0.5},0) -- ({(\xmax)+0.5},0) node[below] {$x$};
+  \draw[-latex] (0,{(\ymin)-0.5}) -- (0,{(\ymax)+0.5}) node[left] {$y$};
+  \draw (0,0) node[below left] {$O$};
+  % the transformed coordinate system
+  \draw[red,-latex] ({(\xmin)-0.5},\dy) -- ({(\xmax)+0.5},\dy) node[below] {$x'$};
+  \draw[red,-latex] (\dx,{(\ymin)-0.5}) -- (\dx,{(\ymax)+0.5}) node[left] {$y'$};
+  \draw[red] (\dx,\dy) node[below left] {$O'$};
+  \coordinate (P) at (2.5,2.5);
+  \foreach \p/\placement in {P/above}{
+    \fill[teal] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

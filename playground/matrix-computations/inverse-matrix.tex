@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{xfp}
+\usepackage{tikz}
+\usetikzlibrary{math}
+
+\input{../../tikzlibrarymc.code.tex}
+
+\begin{document}
+
+% -----------------------------------------------
+% \tikzmath{
+%   print{\ \\===== Linear Equations =====};
+%   \a{1,1} = 2; \a{1,2} = 1; \a{1,3} = 3; \a{1,4} = 4; 
+%   \a{2,1} = 1; \a{2,2} = -2; \a{2,3} = 2; \a{2,4} = 3; 
+%   \a{3,1} = 3; \a{3,2} = 4; \a{3,3} = -1; \a{3,4} = 2; 
+%   \a{4,1} = 4; \a{4,2} = 3; \a{4,3} = 2; \a{4,4} = 1;
+%   \b{1,1} = 16; \b{1,2} = 20;
+%   \b{2,1} = 19; \b{2,2} = 11;
+%   \b{3,1} = -1; \b{3,2} = -3;
+%   \b{4,1} = 4; \b{4,2} = 5;
+% }
+
+% \tikzset{
+%   mat/solve={\a,\b,4,2,\c},
+%   mat/show={\a,4,4},
+%   mat/show={\b,4,2},
+%   mat/show={\c,4,2},% 1,2,-1,3
+% }
+
+% \tikzmath{
+%   print{\ \\status:\status};
+% }
+
+% -----------------------------------------------
+\tikzmath{
+  print{\ \\===== Inverse =====};
+  \a{1,1} = 2; \a{1,2} = 3; \a{1,3} = 4; \a{1,4} = 5; 
+  \a{2,1} = 9; \a{2,2} = 3; \a{2,3} = 1; \a{2,4} = 2; 
+  \a{3,1} = 4; \a{3,2} = 7; \a{3,3} = 6; \a{3,4} = 3; 
+  \a{4,1} = 5; \a{4,2} = 9; \a{4,3} = 8; \a{4,4} = 7;
+}
+
+\tikzset{
+  mat/inverse={\a,4,\b},
+  mat/product={\a,\b,4,4,4,\c},
+  mat/show={\a,4,4},
+  mat/show={\b,4,4},
+  mat/show={\c,4,4},
+}
+
+\tikzmath{
+  print{\ \\status:\status};
+}
+
+\end{document}
