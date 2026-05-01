@@ -1,0 +1,22 @@
+\documentclass[tikz,border=5mm]{standalone}
+\usetikzlibrary{math}
+
+\begin{document}
+
+% 在整个 document 环境内有效
+\tikzmath{\radius = 3;}
+
+\begin{tikzpicture}
+  {
+    % 在当前的分组内有效
+    % 屏蔽了 document 环境的 \radius
+    \tikzmath{\radius = 2;}
+    \draw (0,0) circle (\radius);%2
+  }
+
+  % 读取 document 环境内的 \radius
+  \draw[red] (0,0) circle (\radius);%3
+
+\end{tikzpicture}
+
+\end{document}

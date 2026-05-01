@@ -28,13 +28,13 @@
     \result = 0.0;
     \p = \fpeval{\c/\a-(\b/\a)^2/3};
     \q = \fpeval{(\b/\a)^3*2/27-(\b*\c)/(\a)^2/3+(\d/\a)};
-    \det = \fpeval{(\q/2)^2+(\p/3)^3};
+    \determinant = \fpeval{(\q/2)^2+(\p/3)^3};% \det is preserved!
     % print{\ \\Solve $ax^3+bx^2+cx+d=0,(a=\a,b=\b,c=\c,d=\d):$};
     % print{\ \\p:\p};
     % print{\ \\q:\q};
-    % print{\ \\$\Delta$:\det};
-    if \det >=0 then {
-      \temp = \fpeval{sqrt(\det)};
+    % print{\ \\$\Delta$:\determinant};
+    if \determinant >=0 then {
+      \temp = \fpeval{sqrt(\determinant)};
       \y = cbrt(-\q/2+\temp) + cbrt(-\q/2-\temp);
       \result = \fpeval{\y - \b/\a/3};
     } else {
@@ -853,7 +853,7 @@
       \cs@b = \fpeval{\cs@ba+\cs@bb+\cs@bc};
       \cs@c = \fpeval{\cs@ca+\cs@cb+\cs@cc};
       \cs@lambda = cardano(\cs@a,\cs@b,\cs@c,\cs@d);
-      % print{\ \\$\det(\lambda C_1 + C_2)=0$};
+      % print{\ \\$\determinant(\lambda C_1 + C_2)=0$};
       % print{\ \\$a\lambda^3+b\lambda^2+c\lambda+d=0(a=\cs@a,b=\cs@b,c=\cs@c,d=\cs@d)$};
       % print{\ \\$\lambda$:\cs@lambda};
     }

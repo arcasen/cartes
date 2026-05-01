@@ -35,6 +35,75 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 
 你也可以直接在 `\coordinate` 命令中嵌入计算，但 `tikzmath` 适合处理多步骤的复杂逻辑。
 
+#### 变量作用域
+
+`\tikzmath` 中声明的变量的作用域是 \TeX 组（\TeX Group），也即 `\tikzmath` 命令所在的组。
+
+简单来说，TeX 组是宏包开发者用来防止“副作用”泄露的围墙。
+
+在 \LaTeX 中，最常见的组形式就是大括号 `{ ... }`，或者是环境命令 `\begin{...} \end{...}`。
+
+::: note
+TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope）环境。它遵循“进入时记忆，退出时还原”的原则。
+
+进入组： TeX 记录下当前所有变量、宏和寄存器的状态。
+
+组内操作： 你可以随意修改变量、重定义宏。
+
+退出组： TeX 丢弃组内做的所有非全局修改，将一切状态回滚到进入组之前。
+:::
+
+示例 1：
+```latex
+\documentclass[tikz,border=5mm]{standalone}
+\usetikzlibrary{math}
+
+\begin{document}
+
+% 在整个 document 环境内有效
+\tikzmath{\radius = 3;}
+
+\begin{tikzpicture}
+  % 在当前的 tikzpicture 环境有效
+  % 屏蔽了 document 环境的 \radius
+  \tikzmath{\radius = 2;}
+  \draw (0,0) circle (\radius);%2
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  % 读取 document 环境内的 \radius
+  \draw (0,0) circle (\radius);%3 
+\end{tikzpicture}
+
+\end{document}
+```
+
+示例 2：
+```latex
+\documentclass[tikz,border=5mm]{standalone}
+\usetikzlibrary{math}
+
+\begin{document}
+
+% 在整个 document 环境内有效
+\tikzmath{\radius = 3;}
+
+\begin{tikzpicture}
+  {
+    % 在当前的分组内有效
+    % 屏蔽了 document 环境的 \radius
+    \tikzmath{\radius = 2;}
+    \draw (0,0) circle (\radius);%2
+  }
+
+  % 读取 document 环境内的 \radius
+  \draw[red] (0,0) circle (\radius);%3
+
+\end{tikzpicture}
+
+\end{document}
+```
+
 #### 循环语句：`for`
 
 `tikzmath` 提供了 `for` 循环功能，这对于绘制重复图形（如网格、多边形、分形）非常有用。
@@ -94,16 +163,13 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 * `tikzmath` 环境内部**不能包含空行**。空行会被 \LaTeX 解释为段落结束，从而终止 `tikzmath` 的解析，导致后续代码出错。
 * 即使是在注释之后，也不要留空行。
 
-3. **变量作用域与类型**
+3. **变量类型**
    
 * **默认实数**：`tikzmath` 中的变量默认是实数（floating point），即使你赋值为整数。
 * 索引必须声明为 int, 否则导致索引错误。
 * **局部变量**：在 `tikzmath` 块中定义的变量通常只在该块内部有效（除非使用了全局定义技巧，但一般不建议）。
-* **无需反斜杠定义变量**：在 `tikzmath` 块**内部**定义变量时，**不需要**加反斜杠 `\`。
-  *  内部：`x = 5;` (正确)
-  *  外部引用：`\x` (需要在 TikZ 坐标或节点中使用该变量时，必须加反斜杠，如 `(\x, 0)`)。
-  *  **特例**：如果在 `tikzmath` 内部引用已经存在的 TeX 宏或计数器，可能需要特殊处理，但通常定义新变量直接写名字即可。
-* 变量名不要与其它包的命令冲突，如不要命名 `\angle`
+* **无需反斜杠定义变量**：在 `tikzmath` 块**内部**定义变量时，**需要**加反斜杠 `\`。
+* 变量名不要与其它包的命令冲突，如不要命名 `\angle`，`\alpha`，`\det`等
 * 运算时添加 `()`，防止负号运算错误，如 当 `\x=-3;` 时，`\x^2` 被解析成 `-3^2`。
 
 4. **循环与条件语句的括号**
@@ -282,7 +348,7 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 \end{document}
 ```
 
-**总结**：对于大多数需要提高精度的场景，使用 `fpu` 库是最简单有效的方法。如果需要极高的精度或复杂的数学运算，可以考虑使用 `xfp` 包。
+对于大多数需要提高精度的场景，使用 `fpu` 库是最简单有效的方法。如果需要极高的精度或复杂的数学运算，可以考虑使用 `xfp` 包。
 
 ::: important
 浮点数比较的陷阱：TikZ 使用的是底层的 pgfmath 引擎（通常基于固定点算术或特定的浮点库）。 残差比较不要低于 `\eps = 0.00001`。
