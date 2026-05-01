@@ -38,7 +38,7 @@ tex: $(TEXS)
 .PRECIOUS: %.tex
 
 %.png: %.pdf
-	inkscape $< --export-type="png" --export-dpi=600 --export-background="white" --pdf-poppler -o $@
+	inkscape $< --export-type="png" --export-dpi=150 --export-background="white" --pdf-poppler -o $@
 
 %.pdf: %.tex
 	$(LATEXMK) $(LATEXMK_OPTIONS) $< -outdir=$(dir $<) -jobname=$(notdir $(basename $<))
