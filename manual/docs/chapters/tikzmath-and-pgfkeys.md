@@ -221,7 +221,7 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 
 要提高 `tikzmath` 的计算精度，主要有以下几种方法：
 
-1. 使用 `fpu` 库（推荐）
+#### 使用 `fpu` 库
 
 `TikZ` 提供了一个 `fpu`（浮点单元）库，可以提供更高的精度和更大的数值范围。这是最常用的方法。
 
@@ -275,7 +275,7 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 \end{document}
 ```
 
-2. 调整 `fpu` 的精度设置
+调整 `fpu` 的精度设置
 
 `fpu` 库允许你设置计算的精度：
 
@@ -287,7 +287,7 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 }
 ```
 
-3. 使用 `xfp` 包（LaTeX3 浮点运算）
+#### 使用 `xfp` 包
 
 对于需要极高精度的计算，可以使用 `xfp` 包，它提供了 LaTeX3 的浮点运算引擎。
 
@@ -310,7 +310,7 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 \end{document}
 ```
 
-4. 注意事项
+#### 注意事项
 
 - **性能影响**：使用 `fpu` 或 `xfp` 会增加编译时间。
 - **兼容性**：某些 `TikZ` 命令可能与 `fpu` 不兼容，需要小心使用。
@@ -368,55 +368,6 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 当你进行矩阵运算（如坐标变换中的 $C_{1,1}$ 计算）时，每一步加减乘除都会产生舍入。
 * 如果你的 $C_{1,1}$ 是通过多次乘法算出来的，它的理论值可能是 $0$，但 PGFMath 计算出的结果可能是 $0.00024$。
 * 由于 $0.00024 > 0.000001$，`if` 判断会直接跳入 `else` 分支。
-
-1. 解决方案
-
-方案 A：调大容差（最简单）
-在绘图领域，通常不需要物理级别的精度。将 `\eps` 设为一个肉眼不可见但在 PGFMath 处理范围内的值：
-```latex
-\tikzmath{
-    \eps = 0.001; % 或者是 0.01，取决于你的坐标缩放
-}
-```
-
-方案 B：使用 `fpu` 库（推荐）
-如果你需要处理很大或很小的数，可以开启 PGF 的**浮点运算单元 (FPU)**。它将数值范围扩大到 $\pm 10^{300}$。
-```latex
-\usepackage{pgfplots}
-\usepgflibrary{fpu}
-
-\begin{tikzpicture}
-    \pgfset{/pgf/fpu=true} % 开启 FPU
-    \tikzmath{
-        % 这里的运算将使用更高级的浮点逻辑
-        \a = abs(\C{1,1});
-        ...
-    }
-    \pgfset{/pgf/fpu=false} % 绘图前记得关闭，因为 \draw 不支持 FPU 格式
-\end{tikzpicture}
-```
-
-方案 C：调用 LuaTeX（终极方案）
-如果你使用的是 `lualatex` 编译，你可以利用 Lua 的双精度浮点数处理逻辑，这比任何 PGF 内部库都要快且准。
-```latex
-\directlua{
-    local eps = 1e-7
-    if math.abs(\Coneone) < eps then
-        -- 执行逻辑
-    end
-}
-```
-
-4. 调试小技巧
-为了看清到底发生了什么，可以在 `\tikzmath` 中利用 `\typeout` 打印出当前的真实数值：
-
-```latex
-\tikzmath{
-    \a = abs(\C{1,1});
-    print {\typeout{DEBUG: a is \a, eps is \eps}};
-}
-```
-如果在控制台（Log文件）里看到 `DEBUG: a is 0.00005, eps is 0.00000`，你就立刻明白为什么判断会失败了。
 
 ### 使用 `pgfkeys`
 

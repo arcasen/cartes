@@ -54,6 +54,7 @@ $$\det(\lambda C_1 + \mu C_2) = 0$$
 假设我们有一个退化二次曲线矩阵 $A \in \mathbb{R}^{3 \times 3}$。它实际上是一对直线 $g, h \in \mathbb{R}^3$。如果点 $x$ 在第一条直线上，则 $g^T x = 0$。$A$ 矩阵（在缩放意义下）必须等于对称化矩阵 $gh^T + hg^T$。
 
 从 $A$ 中提取 $g$ 和 $h$ 的具体步骤：
+
 1. 计算 $A$ 的伴随矩阵（cofactor matrix）$B \gets A^\triangle$。
 2. 找到 $B$ 对角线上一个非零元素的索引 $i$。
 3. 计算 $\beta \gets \sqrt{B(i,i)}$。

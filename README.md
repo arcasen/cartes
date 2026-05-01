@@ -204,9 +204,9 @@ The following code demonstrates Desargues's theorem.
 
 ![Desargues's theorem](gallery/desargues-theorem.png)
 
-### Conic Section on Four Points and One Line
+### Conics through Four Points and Tangent to a Line
 
-The following code demonstrates the construction of  conics passing through four points and tangent to a given straight line.
+The following code demonstrates the construction of conics passing through four points and tangent to a given straight line.
 
 ```latex
 \documentclass[tikz]{standalone}
@@ -319,7 +319,7 @@ The following code demonstrates the construction of  conics passing through four
 \end{document}
 ```
 
-![conic-of-4-points-1-tangent](gallery/conic-of-4-points-1-tangent.png)
+![conics-through-4-pts-and-tangent-to-1-line](gallery/conics-4P1T-a.png)
 
 ## References
 

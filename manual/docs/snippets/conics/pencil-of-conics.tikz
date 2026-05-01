@@ -22,14 +22,14 @@
   \segment[draw,clip=(-4:4,-4:4)] (\m);
 
   \foreach \x in {30,60,...,90}{
-    \tikzset{%color
+    \tikzset{
       mat/combine={\Ca,\Cb,3,3,\x/100,-0.75,\C},
     }
     \conic[draw=teal!\x] (\C);
   }
 
   \foreach \x in {30,60,...,90}{
-    \tikzset{%color
+    \tikzset{
       mat/combine={\Ca,\Cb,3,3,\x/100,0.75,\C},
     }
     \conic[draw=red!\x] (\C);

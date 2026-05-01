@@ -1,0 +1,118 @@
+\begin{tikzpicture}[scale=0.85]
+  \tikzmath{
+    % 由 5 点的齐次坐标
+    \Pa{1,1} = 1; \Pa{2,1} = 1; \Pa{3,1} = 1; 
+    \Pb{1,1} = 2; \Pb{2,1} = 4; \Pb{3,1} = 1; 
+    \Pc{1,1} = 0; \Pc{2,1} = 4; \Pc{3,1} = 1; 
+    \Pd{1,1} = -1; \Pd{2,1} = 3; \Pd{3,1} = 1; 
+    \Pe{1,1} = -1; \Pe{2,1} = 0; \Pe{3,1} = 1; 
+    % 用于构造对合的辅助圆及其一点
+    \radius = 2;
+    \Oc{1,1} = -0; \Oc{2,1} = -4; \Oc{3,1} = 1;
+    \Op{1,1} = \Oc{1,1}; 
+    \Op{2,1} = \Oc{2,1}-\radius; 
+    \Op{3,1} = 1;
+  }
+  \tikzset{
+    % 计算原始圆锥曲线及过点 Pe 的切线
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\A},
+    mat/product={\A,\Pe,3,3,1,\Le},
+    mat/stdout={\A,3,3},
+    % 构造完全四线形及与切线的交点, (Qa,Qb) (Qc,Qd) 是两对对合点
+    conics/cross={\Pa,\Pb,\Lab}, % 1-2
+    conics/cross={\Pc,\Pd,\Lcd}, % 3-4
+    conics/cross={\Pa,\Pc,\Lac}, % 1-3
+    conics/cross={\Pb,\Pd,\Lbd}, % 2-4
+    conics/cross={\Lab,\Le,\Qa},
+    conics/cross={\Lcd,\Le,\Qb},
+    conics/cross={\Lac,\Le,\Qc},
+    conics/cross={\Lbd,\Le,\Qd},
+    % 将 (Qa,Qb) (Qc,Qd) 投影到辅助圆上
+    % 注意 \Op 在是圆上的最低点, 所有的交点都位于其之上, 
+    % 调用 intersect cl 时第 1 个交点就是 \Op 本身
+    conics/define/circle={\Oc,2,\Circle},
+    conics/intersect cl={\Circle,\Op,\Qa,\Temp,\Ua},
+    conics/intersect cl={\Circle,\Op,\Qb,\Temp,\Ub},
+    conics/intersect cl={\Circle,\Op,\Qc,\Temp,\Uc},
+    conics/intersect cl={\Circle,\Op,\Qd,\Temp,\Ud},
+    conics/cross={\Ua,\Uc,\Mac},
+    conics/cross={\Ua,\Ud,\Mad},
+    conics/cross={\Ub,\Uc,\Mbc},
+    conics/cross={\Ub,\Ud,\Mbd},
+    % 构造对合轴
+    conics/cross={\Mac,\Mbd,\Va},
+    conics/cross={\Mad,\Mbc,\Vb},
+    conics/intersect cl={\Circle,\Va,\Vb,\Wa,\Wb},
+    % 投影回切线上: Ta Tb
+    conics/cross={\Op,\Wa,\Na},
+    conics/cross={\Op,\Wb,\Nb},
+    conics/cross={\Le,\Na,\Ta},
+    conics/cross={\Le,\Nb,\Tb},
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Ta,\Ca},
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Tb,\Cb},
+    % 去齐次化
+    conics/dehomogenize={\Qa,\QQa},
+    conics/dehomogenize={\Qb,\QQb},
+    conics/dehomogenize={\Qc,\QQc},
+    conics/dehomogenize={\Qd,\QQd},
+    conics/dehomogenize={\Ua,\UUa},
+    conics/dehomogenize={\Ub,\UUb},
+    conics/dehomogenize={\Uc,\UUc},
+    conics/dehomogenize={\Ud,\UUd},
+    conics/dehomogenize={\Va,\VVa},
+    conics/dehomogenize={\Vb,\VVb},
+    conics/dehomogenize={\Wa,\WWa},
+    conics/dehomogenize={\Wb,\WWb},
+    conics/dehomogenize={\Ta,\TTa},
+    conics/dehomogenize={\Tb,\TTb},
+  }
+
+  % \axes[grid] (-5:5,-5:5);
+  \conic[draw=teal,thick] (\Ca);
+  \conic[draw=violet,thick] (\Cb);
+  \conic[draw=violet,thick] (\Circle);
+  \segment[draw=red,thick,clip=(-8:8,-5:5)] (\Le);
+  \segment[draw=blue!80,clip=(-5:5,-1:5)] (\Lab);
+  \segment[draw=blue!80,clip=(-5:5,-5:5)] (\Lcd);
+  \segment[draw=green!60!red,clip=(-5:5,-1:5)] (\Lac);
+  \segment[draw=green!60!red,clip=(-8:5,-5:5)] (\Lbd);
+  \segment[draw=purple,clip=(-5:5,-2.5:-1)] (\Mac);
+  \segment[draw=purple,clip=(-5:5,-5:-1)] (\Mad);
+  \segment[draw=purple,clip=(-5:5,-4:-2)] (\Mbc);
+  \segment[draw=purple,clip=(-5:5,-5:-.5)] (\Mbd);
+  \segment[draw=teal,clip=(-5:5,-5:-1)] (\Va,\Vb);
+  \segment[draw=teal,clip=(-5:5,-6:1)] (\Op,\Qa);
+  \segment[draw=teal,clip=(-5:5,-6:1)] (\Op,\Qb);
+  \segment[draw=teal,clip=(-5:5,-6:1)] (\Op,\Qc);
+  \segment[draw=teal,clip=(-8:5,-6:1)] (\Op,\Qd);
+  \segment[draw=teal,clip=(-5:5,-6:1)] (\Op,\Ta);
+  \segment[draw=teal,clip=(-5:8,-6:1)] (\Op,\Tb);
+
+  \coordinate (P1) at (\Pa{1,1},\Pa{2,1});
+  \coordinate (P2) at (\Pb{1,1},\Pb{2,1});
+  \coordinate (P3) at (\Pc{1,1},\Pc{2,1});
+  \coordinate (P4) at (\Pd{1,1},\Pd{2,1});
+  % \coordinate (P5) at (\Pe{1,1},\Pe{2,1});
+  \coordinate (Q1) at (\QQa{1},\QQa{2});
+  \coordinate (Q2) at (\QQb{1},\QQb{2});
+  \coordinate (Q3) at (\QQc{1},\QQc{2});
+  \coordinate (Q4) at (\QQd{1},\QQd{2});
+  \coordinate (U1) at (\UUa{1},\UUa{2});
+  \coordinate (U2) at (\UUb{1},\UUb{2});
+  \coordinate (U3) at (\UUc{1},\UUc{2});
+  \coordinate (U4) at (\UUd{1},\UUd{2});
+  \coordinate (V1) at (\VVa{1},\VVa{2});
+  \coordinate (V2) at (\VVb{1},\VVb{2});
+  \coordinate (W1) at (\WWa{1},\WWa{2});
+  \coordinate (W2) at (\WWb{1},\WWb{2});
+  \coordinate (T1) at (\TTa{1},\TTa{2});
+  \coordinate (T2) at (\TTb{1},\TTb{2});
+
+  \foreach \p/\placement in {P1/above, P2/above, P3/above, P4/above, %P5/above,
+  Q1/above, Q2/above, Q3/above, Q4/above,
+  U1/above, U2/above, U3/above, U4/above,
+  W1/above, W2/above, V1/above, V2/above, T1/above, T2/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

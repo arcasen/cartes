@@ -1,4 +1,4 @@
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.85]
   \tikzmath{
     % Define 5 points in homogeneous coordinates (x, y, w) 
     % These serve as the basis for the initial conic construction.
