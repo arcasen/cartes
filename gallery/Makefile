@@ -40,7 +40,7 @@ tex: $(TEXS)
 %.png: %.pdf
 	# inkscape $< --export-type="png" --export-dpi=300 --export-area-page --export-background="white" --pdf-poppler -o $@
 	# transparent background
-	inkscape $< --export-type="png" --export-dpi=300 --export-area-page --pdf-poppler -o $@
+	inkscape $< --export-type="png" --export-dpi=150 --export-area-page --pdf-poppler -o $@
 
 %.pdf: %.tex
 	$(LATEXMK) $(LATEXMK_OPTIONS) $< -outdir=$(dir $<) -jobname=$(notdir $(basename $<))
