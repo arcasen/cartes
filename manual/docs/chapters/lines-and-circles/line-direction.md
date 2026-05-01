@@ -39,7 +39,7 @@ $$
 
 ::: {.messagebox title="Syntax"}
 - `plane/anchor={\a,\b,\c,\P}`: 计算原点在直线 $ax+by+c=0$ 上的投影 $P$
-- `plane/direct={\a,\b,\c,\v}`: 计算直线 $ax+by+c=0$ 的方向向量 $\bm{v}$ (注意单位化)
+- `plane/direct={\a,\b,\c,\v}`: 计算直线 $ax+by+c=0$ 的方向向量 $\bm{v}$ (注意未单位化)
 :::
 
 #### 示例

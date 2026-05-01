@@ -61,5 +61,5 @@ $$ x > 0, \quad y > 0, \quad z > 0 $$
 #### 语法形式
 
 ::: {.messagebox title="Syntax"}
-- `plane/barycenter={\A,\B,\C,\a,\b,\c,\H}`: 计算重心坐标 $(x:y:z)$ 对应的点 `\H`
+- `plane/barycenter={\A,\B,\C,\x,\y,\z,\H}`: 计算重心坐标 $(x:y:z)$ 对应的点 `\H`
 :::

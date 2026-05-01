@@ -83,10 +83,10 @@
 | 命令 | 描述 |
 | ------------ | ------------ |
 | `plane/anchor={\a,\b,\c,\P}` | 计算原点在直线 $ax+by+c=0$ 上的投影 $P$ |
-| `plane/direct={\a,\b,\c,\v}` | 计算直线 $ax+by+c=0$ 的方向向量 $\bm{v}$ (注意单位化) |
+| `plane/direct={\a,\b,\c,\v}` | 计算直线 $ax+by+c=0$ 的方向向量 $\bm{v}$ (注意未单位化) |
 | `plane/intersect ll={\A,\B,\C,\D,\P}` | 计算直线 $AB$ 与 $CD$ 的交点 $P$ |
 | `plane/intersect cl={\O,\r,\A,\B,\Pa,\Pb}` | 计算圆（圆心为 $O$，半径为 $r$）与直线 $AB$ 的交点 $P_a$ 和 $P_b$，交点的顺序是从 $A$ 至 $B$ |
-| `plane/intersect cn={\O,\r,\a,\b,\c,\Pa,\Pb}` | 计算圆（圆心为 $O$，半径为 $r$）与直线 $ax+by+c=0$ 的交点 $P_a$ 和 $P_b$，交点的顺序是直线 $ax+by+c=0$ 的正方向 |
+| `plane/intersect cn={\O,\r,\a,\b,\c,\Pa,\Pb}` | 计算圆（圆心为 $O$，半径为 $r$）与直线 $ax+by+c=0$ 的交点 $P_a$ 和 $P_b$，交点的顺序是直线的正方向 |
 | `plane/radical axis={\Oa,\ra,\Ob,\rb,\H,\U}` | 计算根轴的参数：根轴与连心线的交点 $H$ 和根轴的单位方向向量 $U$ |
 | `plane/intersect cc={\Oa,\ra,\Ob,\rb,\Pa,\Pb}` | 计算两圆的交点 $P_a$ 和 $P_b$，其顺序是根轴的正方向 |
 | `plane/tangents={\O,\r,\P,\Ta,\Tb}` | 计算过 $P$ 作圆 $O$ 的切线与圆的切点 $T_a$ 和 $T_b$，其顺序是圆 $O$ 与辅助圆的根轴的正方向 |

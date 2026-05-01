@@ -21,7 +21,7 @@ $$\bm{u} = \dfrac{\bm{v}}{|\bm{v}|}$$
 **第二步：计算圆心在直线上的投影点 $M$**
 
 先计算向量 $\overline{AO}$ 在向量 $\overline{AB}$ 上的投影 $\overline{AM}$，
-然后计算 $M=A+\overline{AM}$，见*[向量投影 (Vector Projection)]*。
+然后计算 $M=A+\overline{AM}$，见 *[向量投影]*。
 
 **第三步：判定相交关系**
 
@@ -47,11 +47,7 @@ $$P = M \pm h \cdot \bm{u}$$
 
 ::: {.messagebox title="Syntax"}
 - `plane/intersect cl={\O,\r,\A,\B,\Pa,\Pb}`: 计算圆（圆心为 $O$，半径为 $r$）与直线 $AB$ 的交点 $P_a$ 和 $P_b$，交点的顺序是从 $A$ 至 $B$
-- `plane/intersect cn={\O,\r,\a,\b,\c,\Pa,\Pb}`: 计算圆（圆心为 $O$，半径为 $r$）与直线 $ax+by+c=0$ 的交点 $P_a$ 和 $P_b$，交点的顺序是直线 $ax+by+c=0$ 的正方向
-:::
-
-::: note
- 或。
+- `plane/intersect cn={\O,\r,\a,\b,\c,\Pa,\Pb}`: 计算圆（圆心为 $O$，半径为 $r$）与直线 $ax+by+c=0$ 的交点 $P_a$ 和 $P_b$，交点的顺序是直线的正方向
 :::
 
 #### 示例

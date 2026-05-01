@@ -20,7 +20,7 @@
   \coordinate (C) at (\C{1},\C{2});
 
   \draw[thick] (B) -- (A) -- (C);
-  \pic [draw, latex-, "$\pgfmathprintnumber{\a}^\circ$", angle radius=1cm, angle eccentricity=1.5] {angle = B--A--C};
+  \pic [draw, -latex, "$\pgfmathprintnumber{\a}^\circ$", angle radius=1cm, angle eccentricity=1.5] {angle = B--A--C};
 
   \foreach \p/\placement in {A/below,B/below,C/above} {
     \fill[red] (\p) circle (2pt);

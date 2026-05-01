@@ -358,12 +358,10 @@ $$
 无穷远点无法去齐次化。
 :::
 
-#### 示例：齐次坐标下两直线的交点
-
-参考 *[示例：笛卡尔坐标下两直线的交点]* 。
+#### 示例：Desargues's Theorem
 
 ```latex
-![[ ../../snippets/conics/intersect-ll.tikz ]]
+![[ ../../../../gallery/desargues-theorem.tikz ]]
 ```
 
-![[ ../../snippets/conics/intersect-ll.tikz ]]
+![[ ../../../../gallery/desargues-theorem.tikz ]]

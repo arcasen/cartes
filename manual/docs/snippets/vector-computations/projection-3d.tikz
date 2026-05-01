@@ -1,6 +1,6 @@
-% 设置主视角：仰角 70 度，方位角 110 度
 \tdplotsetmaincoords{70}{110}
 \begin{tikzpicture}[tdplot_main_coords]
+  % 主视角：仰角 70 度，方位角 110 度
   \tikzmath{
     % 直线上 A 和 B
     \A{1}=4; \A{2}=0; \A{3}=0;
