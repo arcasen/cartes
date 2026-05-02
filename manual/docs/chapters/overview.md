@@ -15,6 +15,7 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
+| `plane/combine/origin={\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = m \overline{OA} + n \overline{OB}$ |
 | `plane/add/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} + \overline{OB}$ |
 | `plane/sub/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} - \overline{OB}$ |
 | `plane/scale/origin={\A,\k,\B}` | $\overline{OB} = k \overline{OA}$ |
@@ -30,6 +31,9 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
+| `plane/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
+| `plane/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
+| `plane/combine/origin={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
 | `plane/add ={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
 | `plane/sub={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
 | `plane/scale={\P,\A,\k,\B}` | $\overline{OB} = \overline{OP} + k \overline{PA}$ |
@@ -48,6 +52,7 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
+| `space/combine/origin={\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = m \overline{OA} + n \overline{OB}$ |
 | `space/add/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} + \overline{OB}$ |
 | `space/sub/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} - \overline{OB}$ |
 | `space/scale/origin={\A,\k,\B}` | $\overline{OB} = k \overline{OA}$ |
@@ -64,6 +69,9 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
+| `space/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
+| `space/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
+| `space/combine/origin={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
 | `space/add ={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
 | `space/sub={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
 | `space/scale={\P,\A,\k,\B}` | $\overline{OB} = \overline{OP} + k \overline{PA}$ |
@@ -112,6 +120,8 @@
 | 命令 | 描述 |
 | ------------ | ------------ |
 | `conics/homogenize={\P,\Q}` | 将二维笛卡尔坐标齐次化，`\P` 为笛卡尔坐标，`\Q` 为齐次坐标 |
+| `conics/equal={\A,\B,\ans}` | 判断两个齐次坐标是否相等 |
+| `conics/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的齐次坐标 |
 | `conics/dehomogenize={\P,\Q}` | 将齐次坐标去齐次化，`\P` 为齐次坐标，`\Q` 为笛卡尔坐标 |
 | `conicss/distance={\P,\Q,\d}` | 求齐次坐标下的两点 $P,Q$ 的距离 |
 | `conics/cross={\U,\V,\W}` | 向量叉乘，`\U,\V,\W` 为点或直线的齐次坐标 |
@@ -173,3 +183,50 @@
 
   $p$ 表示焦准距（焦点到准线的距离，$p > 0$）。
 :::
+
+#### 示例 1：三等分线段的几何作图
+
+```latex
+![[ ../../../gallery/segment-trisection.tikz ]]
+```
+
+![[ ../../../gallery/segment-trisection.tikz ]]
+
+#### 示例 2：圆锥曲线的包络线
+
+让我们考虑一个圆和圆外的一个点 $A$。由点 $A$ 与圆周上各点所定义的线段，其所有垂直平分线（中垂线）的集合，会根据点 $A$ 的位置创建出两种圆锥曲线（Olivier Reboux 图形）[^pst-eucl]：
+
+- 在圆内部： 一条双曲线；
+- 在圆外部： 一个椭圆。
+
+[^pst-eucl]: <https://www.sys.kth.se/docs/texlive/texmf-dist/doc/generic/pst-eucl/euclide_english.pdf>
+
+```latex
+![[ ../../../gallery/lines-and-circles-envelope/ellipse.tikz ]]
+```
+
+![[ ../../../gallery/lines-and-circles-envelope/ellipse.tikz ]]
+
+```latex
+![[ ../../../gallery/lines-and-circles-envelope/hyperbola.tikz ]]
+```
+
+![[ ../../../gallery/lines-and-circles-envelope/hyperbola.tikz ]]
+
+```latex
+![[ ../../../gallery/lines-and-circles-envelope/parabola.tikz ]]
+```
+
+![[ ../../../gallery/lines-and-circles-envelope/parabola.tikz ]]
+
+#### 示例 3：心形线（Cardioid）
+
+心形线是由圆心位于一个圆上且经过一个给定点的圆簇定义的[^pst-eucl]。
+绘制一簇圆，其共同特点是：圆心都在同一个基圆上，且都经过该基圆上的一个定点 $O’$
+在点 $O’$ 附近，线条会非常密集，形成一个尖点（Cusp）。在远离 $O’$ 的另一侧，圆的边缘会勾勒出一个类似“爱心”的轮廓。
+
+```latex
+![[ ../../../gallery/lines-and-circles-envelope/cardioid.tikz ]]
+```
+
+![[ ../../../gallery/lines-and-circles-envelope/cardioid.tikz ]]

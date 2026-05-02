@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+  % 双曲线，其两个焦点分别是圆的圆心 $O$ 和选定的定点 $A$
+  % figure of Olivier Reboux
+  \tikzmath{
+    % circle
+    \O{1} = 0; \O{2} = 0; \radius = 4;
+    % point inside circle
+    \A{1} = 5 * cos(120); \A{2} = 5 * sin(120);
+    for \ang in {0,5,...,360}{
+      % point on circle
+      \B{1} = \O{1} + \radius * cos(\ang); 
+      \B{2} = \O{2} + \radius * sin(\ang); 
+      % midpoint
+      \M{1} = (\A{1} + \B{1}) / 2;
+      \M{2} = (\A{2} + \B{2}) / 2;
+      % direction of perpendicular bisector
+      \D{1} = \A{2} - \B{2};
+      \D{2} = -(\A{1} - \B{1});
+      % anthor point on perpendicular bisector
+      \C{1} = \M{1} + \D{1};
+      \C{2} = \M{2} + \D{2};
+      % homogenize
+      \P{1,1} = \M{1}; \P{2,1} = \M{2}; \P{3,1} = 1;
+      \Q{1,1} = \C{1}; \Q{2,1} = \C{2}; \Q{3,1} = 1;
+      {\segment[draw=red,clip=(-6:6,-6:6)] (\P,\Q);};
+    };
+  }
+
+  \coordinate (O) at (\O{1},\O{2});
+  \coordinate (A) at (\A{1},\A{2});
+
+  \draw[teal,help lines] (O) circle (\radius);
+
+  \foreach \p/\placement in {O/above, A/above}{
+    \fill[red] (\p) circle (1pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

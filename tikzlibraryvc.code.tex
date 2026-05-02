@@ -18,6 +18,39 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% Space Vector Operations
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % select distinct coorindate
+  % space/select distinct={\A,\B,\C,\D}
+  % if A != C, result D = A
+  % if B != C, result D = B
+  % else throw pgferror
+  space/equal/.code args={#1,#2,#3}{
+    \tikzmath{
+      if abs((#1{1})-(#2{1})) < \EPSILON && 
+      abs((#1{2})-(#2{2})) < \EPSILON && 
+      abs((#1{3})-(#2{3})) < \EPSILON then {
+        #3 = 1;
+      } else {
+        #3 = 0;
+      };
+    }
+  },
+  space/select distinct/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      space/equal={#1,#3,\cs@aequal},
+      space/equal={#2,#3,\cs@bequal},
+    }
+    \tikzmath{
+      if \cs@aequal == 0 then {
+        #4{1} = #1{1}; #4{2} = #1{2}; #4{3} = #1{3};
+      } else {
+        if \cs@bequal == 0 then {
+          #4{1} = #2{1}; #4{2} = #2{2}; #4{3} = #2{3};
+        } else {
+          {\pgferror{Cannot select distinct coordinate}};
+        };
+      };
+    }
+  },
   % linear combination: w = a * u + b * v
   space/combine/origin/.code args={#1,#2,#3,#4,#5}{
     \tikzmath {
@@ -432,6 +465,42 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% Plane Vector Operations
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % select distinct coorindate
+  % plane/select distinct={\A,\B,\C,\D}
+  % if A != C, result D = A
+  % if B != C, result D = B
+  % else throw pgferror
+  plane/equal/.code args={#1,#2,#3}{
+    \tikzmath{
+      if abs((#1{1})-(#2{1})) < \EPSILON && 
+      abs((#1{2})-(#2{2})) < \EPSILON then {
+        #3 = 1;
+      } else {
+        #3 = 0;
+      };
+    }
+  },
+  plane/select distinct/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      plane/equal={#1,#3,\cs@aequal},
+      plane/equal={#2,#3,\cs@bequal},
+    }
+    \tikzmath{
+      if \cs@aequal == 0 then {
+        #4{1} = #1{1}; #4{2} = #1{2};
+      } else {
+        if \cs@bequal == 0 then {
+          #4{1} = #2{1}; #4{2} = #2{2};
+        } else {
+          {\pgferror{Cannot select distinct coordinate}};
+        };
+      };
+    }
+    % \message{A: (#1{1},#1{2})^^J}
+    % \message{B: (#2{1},#2{2})^^J}
+    % \message{C: (#3{1},#3{2})^^J}
+    % \message{ans: (#4{1},#4{2})^^J}
+  },
   % linear combination: w = a * u + b * v
   plane/combine/origin/.code args={#1,#2,#3,#4,#5}{
     % \message{===== Linear Combination =====^^J}

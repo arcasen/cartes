@@ -1,0 +1,42 @@
+\begin{tikzpicture}
+  % 抛物线，其焦点选定的定点 $F$，准线是选定的直线
+  \tikzmath{
+    % focus
+    \F{1} = 0; \F{2} = 0;
+    % directrix direction vector
+    \V{1} = 1; \V{2} = 1/5;
+    % one point on directrix
+    \A{1} = 0; \A{2} = -2;
+    for \t in {-10,-9.8,...,10}{
+      % directrix 
+      \B{1} = \A{1} + \V{1} * (\t); 
+      \B{2} = \A{2} + \V{2} * (\t); 
+      % midpoint
+      \M{1} = (\F{1} + \B{1}) / 2;
+      \M{2} = (\F{2} + \B{2}) / 2;
+      % direction of perpendicular bisector
+      \D{1} = \B{2} - \F{2};
+      \D{2} = -(\B{1} - \F{1});
+      % anthor point on perpendicular bisector
+      \C{1} = \M{1} + \D{1};
+      \C{2} = \M{2} + \D{2};
+      % homogenize
+      \P{1,1} = \M{1}; \P{2,1} = \M{2}; \P{3,1} = 1;
+      \Q{1,1} = \C{1}; \Q{2,1} = \C{2}; \Q{3,1} = 1;
+      {\segment[draw=red,clip=(-6:6,-4:6)] (\P,\Q);};   
+    };
+    % point on directrix
+    \X{1,1} = \A{1}; \X{2,1} = \A{2}; \X{3,1} = 1;
+    \Y{1,1} = \A{1} + \V{1};
+    \Y{2,1} = \A{2} + \V{2};
+    \Y{3,1} = 1;
+  }
+
+  \coordinate (O) at (\F{1},\F{2});
+  \segment[draw=teal,thick,clip=(-6:6,-4:6)] (\X,\Y);
+
+  \foreach \p/\placement in {O/above}{
+    \fill[red] (\p) circle (1pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

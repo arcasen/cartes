@@ -1,0 +1,46 @@
+\begin{tikzpicture}
+  \tikzmath{
+    % segment
+    \A{1} = -1; \A{2} = -1;
+    \B{1} = 1;  \B{2} = 0;
+  }
+
+  \tikzset{
+    plane/length={\A,\B,\length},
+    plane/intersect cc={\A,\length,\B,\length,\C,\D},
+    plane/intersect cc={\A,\length,\C,\length,\U,\V},
+    plane/select distinct={\U,\V,\A,\E},
+    plane/intersect cc={\B,\length,\C,\length,\U,\V},
+    plane/select distinct={\U,\V,\B,\F},
+    plane/intersect cl={\E,\length,\C,\E,\U,\V},
+    plane/select distinct={\U,\V,\C,\G},
+    plane/intersect ll={\A,\G,\B,\F,\H},
+    plane/intersect ll={\A,\B,\H,\E,\I},
+    plane/intersect ll={\A,\B,\H,\C,\J},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+  \coordinate (G) at (\G{1},\G{2});
+  \coordinate (H) at (\H{1},\H{2});
+  \coordinate (I) at (\I{1},\I{2});
+  \coordinate (J) at (\J{1},\J{2});
+
+  \draw (A) circle (\length);
+  \draw (B) circle (\length);
+  \draw (C) circle (\length);
+  \draw (E) circle (\length);
+
+  \draw[teal,thick] (A) -- (B);
+  \draw (H) -- (G) (H) -- (F) (H) -- (C) (H) -- (E);
+
+  \foreach \p/\placement in {A/left,B/above,C/below right,
+  D/above left,E/below left,F/right,G/below left,H/above left,I/below,J/below}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
