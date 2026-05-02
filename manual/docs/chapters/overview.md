@@ -15,6 +15,8 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
+| `plane/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
+| `plane/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
 | `plane/combine/origin={\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = m \overline{OA} + n \overline{OB}$ |
 | `plane/add/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} + \overline{OB}$ |
 | `plane/sub/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} - \overline{OB}$ |
@@ -31,9 +33,7 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
-| `plane/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
-| `plane/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
-| `plane/combine/origin={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
+| `plane/combine={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
 | `plane/add ={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
 | `plane/sub={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
 | `plane/scale={\P,\A,\k,\B}` | $\overline{OB} = \overline{OP} + k \overline{PA}$ |
@@ -52,6 +52,8 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
+| `space/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
+| `space/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
 | `space/combine/origin={\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = m \overline{OA} + n \overline{OB}$ |
 | `space/add/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} + \overline{OB}$ |
 | `space/sub/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} - \overline{OB}$ |
@@ -69,9 +71,7 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
-| `space/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
-| `space/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
-| `space/combine/origin={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
+| `space/combine={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
 | `space/add ={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
 | `space/sub={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
 | `space/scale={\P,\A,\k,\B}` | $\overline{OB} = \overline{OP} + k \overline{PA}$ |
