@@ -1,5 +1,5 @@
 # https://raw.githubusercontent.com/arcasen/tikz-cookbook/refs/heads/main/examples/Makefile
-# version: 20260228
+# version: 202600503
 
 # Package Required:
 # https://raw.githubusercontent.com/arcasen/latex-essentials/refs/heads/main/tikzplot.sty
@@ -51,7 +51,7 @@ tex: $(TEXS)
 # 第二层 (Shell 解析): Make 把处理后的字符串传给 Shell（如 bash），Shell 再处理一次转义。
 %.tex: %.tikz
 	@echo "Creating temporary TeX file ..."
-	@echo "\\\\documentclass[tikz]{standalone}\\n\\\\usepackage{tikzplot}\\n\\\\begin{document}\\n\\\\input{$<}\\n\\\\end{document}" > $@
+	@echo "\\\\documentclass[tikz]{standalone}\\n\\\\usepackage{ctex}\\n\\\\usepackage{tikzplot}\\n\\\\begin{document}\\n\\\\input{$<}\\n\\\\end{document}" > $@
 
 # 定义要删除的文件扩展名
 LATEX_EXTS = aux bbl blg idx ilg ind \

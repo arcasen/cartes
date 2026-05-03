@@ -1,13 +1,16 @@
 \begin{tikzpicture}
   \clip (-6,-6) rectangle (6,6); % 剪裁区域
   \tikzmath{
-    % focus
+    % focus of ellipse/hyperbola
     \Fa{1,1} = -2.0; \Fa{2,1} = -1.0; \Fa{3,1} = 1.0;
     \Fb{1,1} = 2.0; \Fb{2,1} = 1.0; \Fb{3,1} = 1.0;
+    % circle center
+    \O{1,1} = 0.0; \O{2,1} = 0.0; \O{3,1} = 1.0;
   }
   \tikzset{
-    conics/define/foci={\Fa,\Fb,3,\Ca},
-    conics/define/foci={\Fa,\Fb,1.5,\Cb},
+    conics/define/foci={\Fa,\Fb,3,\Ca},% ellipse
+    conics/define/foci={\Fa,\Fb,1.5,\Cb},% hyperbola
+    conics/define/foci={\O,\O,1.5,\Cc},% circle
   }
 
   \axes[grid] (-5:5,-5:5);
@@ -16,6 +19,7 @@
 
   \conic[draw=magenta,thick] (\Ca);
   \conic[draw=teal,thick,domain=-2:2] (\Cb);
+  \conic[draw=purple,thick] (\Cc);
 
   \foreach \p/\placement in {F1/left,F2/right}{
     \fill[red] (\p) circle (2pt);

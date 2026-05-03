@@ -1,0 +1,64 @@
+\begin{tikzpicture}
+  % 用直尺过圆周上一点作直径的垂线
+  \tikzmath{
+    % 圆
+    \O{1} = 0; \O{2} = 0; \radius = 3;
+    % 直径
+    \A{1} = \O{1} + \radius * cos(180);
+    \A{2} = \O{2} + \radius * sin(180);
+    \B{1} = \O{1} + \radius * cos(0);
+    \B{2} = \O{2} + \radius * sin(0);
+    % 圆周上一点
+    \M{1} = \O{1} + \radius * cos(35);
+    \M{2} = \O{2} + \radius * sin(35);
+    % 步骤 1: 在圆上取两点
+    \C{1} = \O{1} + \radius * cos(210);
+    \C{2} = \O{2} + \radius * sin(210);
+    \D{1} = \O{1} + \radius * cos(250);
+    \D{2} = \O{2} + \radius * sin(250);
+  }
+
+  \tikzset{
+    % 步骤 2: AC BD 交点, AD BC 交点,
+    plane/intersect ll={\A,\C,\B,\D,\E},
+    plane/intersect ll={\A,\D,\B,\C,\F},
+    % 步骤 3: 直线 EF 与 圆交点
+    plane/intersect cl={\O,\radius,\E,\F,\G,\H},
+    % 步骤 4: AB MG 交点
+    plane/intersect ll={\A,\B,\M,\G,\I},
+    % 步骤 5: 直线 HI 与 圆交点J, MJ 即所求
+    plane/intersect cl={\O,\radius,\H,\I,\U,\V},
+    plane/select distinct={\U,\V,\H,\J},
+  }
+
+  \coordinate (O) at (\O{1},\O{2});
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+  \coordinate (G) at (\G{1},\G{2});
+  \coordinate (H) at (\H{1},\H{2});
+  \coordinate (I) at (\I{1},\I{2});
+  \coordinate (J) at (\J{1},\J{2});
+  \coordinate (M) at (\M{1},\M{2});
+
+  \draw (O) circle (\radius);
+
+  \draw[teal,thick] (A) -- (B);
+  \draw (E) -- (A) (E) -- (B) (A) -- (D) 
+    (B) -- (C) (E) -- (H) (H) -- (J)
+    (M) -- (G);
+  \draw[magenta,thick] (M) -- (J);
+
+  \pic [draw,red,angle radius=6pt] {right angle=A--C--B};
+  \pic [draw,red,angle radius=6pt] {right angle=A--D--B};
+
+  \foreach \p/\placement in {A/left,B/right,C/left,
+  D/below,E/below left,F/above right,G/below right,
+  H/above left,I/below,J/below,M/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

@@ -13,7 +13,7 @@
 
   \axes[grid] (-5:5,-5:5);
   \conic[draw=teal] (\A);
-  \segment[draw=red,clip=(-4:4,-4:4)] (\l);
+  \segment[draw=red,clip=(-4:4,-4:2)] (\l);
 
   \coordinate (P) at (\PP{1},\PP{2});
   \coordinate (Q) at (\QQ{1},\QQ{2});

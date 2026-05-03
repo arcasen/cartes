@@ -39,18 +39,18 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 
 `\tikzmath` 中声明的变量的作用域是 \TeX 组（\TeX Group），也即 `\tikzmath` 命令所在的组。
 
-简单来说，TeX 组是宏包开发者用来防止“副作用”泄露的围墙。
+简单来说，\TeX 组是宏包开发者用来防止“副作用”泄露的围墙。
 
 在 \LaTeX 中，最常见的组形式就是大括号 `{ ... }`，或者是环境命令 `\begin{...} \end{...}`。
 
 ::: note
-TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope）环境。它遵循“进入时记忆，退出时还原”的原则。
+\TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope）环境。它遵循“进入时记忆，退出时还原”的原则。
 
-进入组： TeX 记录下当前所有变量、宏和寄存器的状态。
+进入组：\TeX 记录下当前所有变量、宏和寄存器的状态。
 
 组内操作： 你可以随意修改变量、重定义宏。
 
-退出组： TeX 丢弃组内做的所有非全局修改，将一切状态回滚到进入组之前。
+退出组： \TeX 丢弃组内做的所有非全局修改，将一切状态回滚到进入组之前。
 :::
 
 示例 1：
@@ -212,7 +212,7 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 
 * **`Missing character ... ignored` 或 `Paragraph ended before ...`**：90% 是因为**空行**或**缺少分号**。
 * **`Undefined control sequence`**：可能在 `tikzmath` 内部错误地使用了 `\` 开头定义变量（如 `\x = 1;` 应该是 `x = 1;`），或者在外部使用时忘了加 `\`。
-* **浮点数精度问题**：`tikzmath` 使用 TeX 的定点数运算或 FPU（浮点单元），对于极高精度的科学计算可能不如 Python 精确，但在绘图范围内足够。如果涉及极大/极小值，可能需要加载 `fpu` 库并在 math 环境中启用。
+* **浮点数精度问题**：`tikzmath` 使用 \TeX 的定点数运算或 FPU（浮点单元），对于极高精度的科学计算可能不如 Python 精确，但在绘图范围内足够。如果涉及极大/极小值，可能需要加载 `fpu` 库并在 math 环境中启用。
 
 
 ### `tikzmath` 的计算精度
@@ -289,7 +289,7 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 
 #### 使用 `xfp` 包
 
-对于需要极高精度的计算，可以使用 `xfp` 包，它提供了 LaTeX3 的浮点运算引擎。
+对于需要极高精度的计算，可以使用 `xfp` 包，它提供了 \LaTeX3 的浮点运算引擎。
 
 ```latex
 \documentclass{article}
@@ -404,14 +404,14 @@ TeX 组（Group）采用了沙盒机制，是一个局部作用域（Local Scope
 
 这是 `pgfkeys` 最强大的地方。处理器是附加在键名后面的特殊标记（以 `.` 开头），用于改变键的行为。常见的处理器包括：
 
-- **`.store in`**: 将值存储到一个 TeX 宏中。
+- **`.store in`**: 将值存储到一个 \TeX 宏中。
   ```latex
   \pgfkeys{/mymacro/name/.store in=\myname}
   \pgfkeys{/mymacro/name=Bob} 
   % 现在 \myname 的内容是 "Bob"
   ```
 
-- **`.code`**: 当键被设置时，直接执行一段 TeX 代码。
+- **`.code`**: 当键被设置时，直接执行一段 \TeX 代码。
   ```latex
   \pgfkeys{/action/print/.code={\typeout{Hello World!}}}
   \pgfkeys{/action/print} % 输出 Hello World!

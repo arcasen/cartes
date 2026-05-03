@@ -184,20 +184,30 @@
   $p$ 表示焦准距（焦点到准线的距离，$p > 0$）。
 :::
 
-#### 示例 1：三等分线段的几何作图
+### 简单示例
+
+#### 几何作图-三等分线段
 
 ```latex
-![[ ../../../gallery/segment-trisection.tikz ]]
+![[ ../../../gallery/euclidean-constructions/线段三等分-segment-trisection.tikz ]]
 ```
 
-![[ ../../../gallery/segment-trisection.tikz ]]
+![[ ../../../gallery/euclidean-constructions/线段三等分-segment-trisection.tikz ]]
 
-#### 示例 2：圆锥曲线的包络线
+#### 几何作图-过两点与一直线相切的圆
+
+```latex
+![[ ../../../gallery/euclidean-constructions/maximal-angle-problem.tikz ]]
+```
+
+![[ ../../../gallery/euclidean-constructions/maximal-angle-problem.tikz ]]
+
+#### 圆锥曲线的包络线
 
 让我们考虑一个圆和圆外的一个点 $A$。由点 $A$ 与圆周上各点所定义的线段，其所有垂直平分线（中垂线）的集合，会根据点 $A$ 的位置创建出两种圆锥曲线（Olivier Reboux 图形）[^pst-eucl]：
 
-- 在圆内部： 一条双曲线；
-- 在圆外部： 一个椭圆。
+- 在圆内部：椭圆；
+- 在圆外部：双曲线。
 
 [^pst-eucl]: <https://www.sys.kth.se/docs/texlive/texmf-dist/doc/generic/pst-eucl/euclide_english.pdf>
 
@@ -219,7 +229,7 @@
 
 ![[ ../../../gallery/lines-and-circles-envelope/parabola.tikz ]]
 
-#### 示例 3：心形线（Cardioid）
+#### 心形线（Cardioid）
 
 心形线是由圆心位于一个圆上且经过一个给定点的圆簇定义的[^pst-eucl]。
 绘制一簇圆，其共同特点是：圆心都在同一个基圆上，且都经过该基圆上的一个定点 $O’$

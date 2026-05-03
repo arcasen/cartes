@@ -28,4 +28,4 @@
 
 ![[ conics/intersect-cc.md ]]
 
-![[ conics/conics-through-4-pts-and-tangent-to-1-line.md ]]
+![[ conics/desargues-involution-theorem.md ]]

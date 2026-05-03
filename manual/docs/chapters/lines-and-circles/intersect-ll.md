@@ -19,7 +19,7 @@ $$
 - `plane/intersect ll={\A,\B,\C,\D,\P}`: 计算直线 $AB$ 与 $CD$ 的交点 $P$
 :::
 
-#### 示例：笛卡尔坐标下两直线的交点
+#### 示例：求两直线的交点
 
 ```latex
 ![[ ../../snippets/lines-and-circles/intersect-ll.tikz ]]

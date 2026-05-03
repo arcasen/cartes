@@ -1,0 +1,55 @@
+\begin{tikzpicture}
+  % 线段二等分
+  % 先构造过一点与已知直线平行的直线
+  \tikzmath{
+    % 直线上的两点 A, B
+    \A{1} = -2; \A{2} = 0;
+    \B{1} = 2; \B{2} = 1;
+    % 直线外一点 C
+    \C{1} = -1; \C{2} = 3;
+    % 辅助圆半径
+    \radius = 1;
+  }
+
+  \tikzset{
+    % 步骤 1: 直线 AB 与圆 (以 A 为圆心 \radius 为半径) 的交点
+    plane/intersect cl={\A,\radius,\A,\B,\D,\E},
+    % 步骤 2: 直线 CD 上取一点 F = a D + (1-a) C
+    plane/combine/origin={\D,\C,-0.5,1.5,\F},
+    % 步骤 3: AF CE 交点
+    plane/intersect ll={\A,\F,\C,\E,\G},
+    % 步骤 4: EF DG 交点 H, CH // AB 
+    plane/intersect ll={\E,\F,\D,\G,\H},
+    % 步骤 5: AC BH 交点 I, CH AF 交点 J
+    plane/intersect ll={\A,\C,\B,\H,\I},
+    plane/intersect ll={\C,\H,\A,\F,\J},
+    % 步骤 6: IJ AB 交点 M 为所求
+    plane/intersect ll={\A,\B,\I,\J,\M},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+  \coordinate (G) at (\G{1},\G{2});
+  \coordinate (H) at (\H{1},\H{2});
+  \coordinate (I) at (\I{1},\I{2});
+  \coordinate (J) at (\J{1},\J{2});
+  \coordinate (M) at (\M{1},\M{2});
+
+  \draw (A) circle (\radius);
+
+  \draw[teal,thick] (A) -- (B);
+  \draw (D) -- (F) (E) -- (F) (D) -- (H) (E) -- (C) (A) -- (F);
+  \draw[blue] (A) -- (I) (B) -- (I) (I) -- (M);
+  \draw[magenta,thick] (C) -- (H);
+
+  \foreach \p/\placement in {A/left,B/right,C/left,
+  D/below,E/below left,F/above right,G/below right,
+  H/right,I/above,J/below,M/below}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

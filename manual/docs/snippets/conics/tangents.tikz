@@ -22,7 +22,7 @@
   \coordinate (P) at (\PP{1},\PP{2});
   \coordinate (Q) at (\QQ{1},\QQ{2});
 
-  \foreach \p/\placement in {P/above, Q/above, U/above}{
+  \foreach \p/\placement in {P/below, Q/below left, U/above}{
     \fill[red] (\p) circle (2pt);
     \draw (\p) node[\placement] {$\p$};
   }

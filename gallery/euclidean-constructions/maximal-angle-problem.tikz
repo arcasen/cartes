@@ -1,0 +1,64 @@
+\begin{tikzpicture}
+  % Regiomontanus' angle maximization problem
+  % 过两点与一直线相切的圆
+  % https://userpages.umbc.edu/~rostamia/Geometry/max-angle.html
+  % https://en.wikipedia.org/wiki/Regiomontanus%27_angle_maximization_problem
+  
+  \tikzmath{
+    % define two points
+    \A{1} = -2; \A{2} = 4;
+    \B{1} = 1; \B{2} = 1;
+    % define a line (x-axis) with two points
+    \U{1} = -1; \U{2} = 0;
+    \V{1} = 1; \V{2} = 0;
+  }
+
+  \tikzset{
+    plane/intersect ll={\A,\B,\U,\V,\C},
+    plane/combine/origin={\C,\B,2,-1,\D},
+    plane/combine/origin={\A,\D,0.5,0.5,\E},%midpoint
+    plane/length={\A,\D,\da},%diameter
+    % CF perpendicular to AB
+    plane/rotate={\C,\B,90,\F},
+    plane/intersect cl={\E,0.5*\da,\C,\F,\G,\H},
+    plane/length={\C,\H,\rb},%radius
+    plane/intersect cl={\C,\rb,\U,\V,\I,\J},
+    plane/circumcenter={\A,\B,\I,\Ca},% circle 1 center 
+    plane/length={\Ca,\I,\rc},%radius
+    plane/circumcenter={\A,\B,\J,\Cb},% circle 2 center 
+    plane/length={\Cb,\J,\rd},%radius
+  }
+
+  \clip (-5,-5) rectangle (11,11);
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  %\coordinate (F) at (\F{1},\F{2});
+  \coordinate (G) at (\G{1},\G{2});
+  \coordinate (H) at (\H{1},\H{2});
+  \coordinate (I) at (\I{1},\I{2});
+  \coordinate (J) at (\J{1},\J{2});
+  \coordinate (Ca) at (\Ca{1},\Ca{2});
+  \coordinate (Cb) at (\Cb{1},\Cb{2});
+
+  \axes[grid] (-4:10,-4:10);
+  \draw[red] (E) circle (0.5*\da);
+  \draw[teal,thick] (Ca) circle (\rc);
+  \draw[violet,thick] (Cb) circle (\rd);
+  \draw[orange] (C) circle (\rb);
+  \draw (A) -- (D) (G) -- (H);
+
+  \path (B) -- (C) node[midway,sloped] {$||$};
+  \path (C) -- (D) node[midway,sloped] {$||$};
+
+  \pic [draw,red,angle radius=6pt] {right angle=G--C--D};
+
+  \foreach \p/\placement in {A/left,B/above right,C/below,
+  D/below right,G/above right,
+  H/below left,I/below left,J/below right,Ca/below,Cb/above}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
