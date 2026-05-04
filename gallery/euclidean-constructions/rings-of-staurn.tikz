@@ -1,0 +1,45 @@
+\begin{tikzpicture}
+  % https://userpages.umbc.edu/~rostamia/Geometry/rings-of-saturn.html
+  % Problem: Consider a circle C centered at a point O, and the points A
+  % and B outside of it, such that O, A, B
+  % are colinear; see the diagram above. Find the point P
+  % on the circle so that the angle APB is as large as possible.
+  \tikzmath{
+    \Oa{1} = 0; \Oa{2} = 0; \ra = 3;
+    \U{1} = \Oa{1} - \ra; \U{2} = 0;
+    \V{1} = \Oa{1} + \ra; \V{2} = 0;
+    \A{1} = 4; \A{2} = 0; \rb = 2;
+    \B{1} = \A{1} + \rb; \B{2} = 0;
+  }
+  \tikzset{
+    plane/inverse={\B,\rb,\U,\C},
+    plane/inverse={\B,\rb,\V,\D},
+    plane/length={\C,\D,\dc},
+    plane/combine/origin={\C,\D,0.5,0.5,\Oc},
+    plane/tangents={\Oc,0.5*\dc,\A,\P,\Q},
+    plane/intersect cl={\B,\rb,\A,\Q,\M,\N},
+    plane/circumcenter={\A,\B,\N,\Od},
+    plane/length={\Od,\A,\rd},
+  }
+
+  \coordinate (Oa) at (\Oa{1},\Oa{2});
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (P) at (\P{1},\P{2});
+  \coordinate (N) at (\N{1},\N{2});
+  \coordinate (Oc) at (\Oc{1},\Oc{2});
+  \coordinate (Od) at (\Od{1},\Od{2});
+
+  \axes[grid] (-5:10,-5:10);
+  \draw[teal] (Oa) circle (\ra);
+  \draw[teal] (B) circle (\rb);
+  \draw[teal] (Oc) circle (0.5*\dc);
+  \draw[teal] (Od) circle (\rd);
+  
+  \foreach \p/\placement in {A/left,B/right,C/left,P/below,
+  N/below}{
+    \fill[red] (\p) circle (2pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}

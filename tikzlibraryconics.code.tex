@@ -172,6 +172,75 @@
       #2{3,1} = #1{4} / 2; #2{3,2} = #1{5} / 2; #2{3,3} = #1{6};
     }
   },
+  % define circle
+  % conics/define/circle={\Center,\radius,\C}
+  conics/define/circle/@center-radius/.code args={#1,#2,#3}{
+    \tikzmath{
+      if abs(#1{3,1}) < \EPSILON then {
+        {\pgferror{Circle center cannot be ideal point}};
+      };
+      if #2 < \EPSILON then {
+        {\pgferror{Circle radius cannot be negative}};
+      };
+      \cs@xc = \fpeval{#1{1,1}/#1{3,1}};
+      \cs@yc = \fpeval{#1{2,1}/#1{3,1}};
+      #3{1,1} = 1.0;     #3{1,2} = 0.0;     #3{1,3} = -\cs@xc;
+      #3{2,1} = 0.0;     #3{2,2} = 1.0;     #3{2,3} = -\cs@yc;
+      #3{3,1} = -\cs@xc; #3{3,2} = -\cs@yc; #3{3,3} = \fpeval{(\cs@xc)^2 + (\cs@yc)^2 -(#2)^2};
+    }
+  },
+  % conics/define/circle/@center-point/.code args={#1,#2,#3}{
+  %   \tikzset{
+  %     conics/distance={#1,#2,\cs@radius},
+  %     conics/define/circle/@center-radius={#1,\cs@radius,#3},
+  %   }
+  % },
+  % conics/define/circle={\A,\B,\C,\Circle}
+  conics/define/circle/@through/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \cs@j;
+      for \cs@j in {1,2,3}{
+        \cs@A{1,\cs@j} = \fpeval{#1{\cs@j,1} * #1{3,1}};
+        \cs@A{2,\cs@j} = \fpeval{#2{\cs@j,1} * #2{3,1}};
+        \cs@A{3,\cs@j} = \fpeval{#3{\cs@j,1} * #3{3,1}};
+        % {\message{\cs@A{1,\cs@j}}};
+      };
+      \cs@B{1,1} = \fpeval{-((#1{1,1})^2+(#1{2,1})^2)};
+      \cs@B{2,1} = \fpeval{-((#2{1,1})^2+(#2{2,1})^2)};
+      \cs@B{3,1} = \fpeval{-((#3{1,1})^2+(#3{2,1})^2)};
+    }
+    \tikzset{
+      mat/solve={\cs@A,\cs@B,3,1,\cs@C},
+      % mat/stdout={\cs@A,3,3},
+      % mat/stdout={\cs@B,3,1},
+      % mat/stdout={\cs@C,3,1},
+    }
+    \tikzmath{
+      \cs@coef{1} = 1; \cs@coef{2} = 0; \cs@coef{3} = 1;
+      \cs@coef{4} = \cs@C{1,1};
+      \cs@coef{5} = \cs@C{2,1};
+      \cs@coef{6} = \cs@C{3,1};
+    }
+    \tikzset{
+      conics/define/quadratic={\cs@coef, #4},
+    }
+  },
+  conics/define/circle/@argn/.initial=0,
+  conics/define/circle/.code={% dispatcher
+    % compute the number of arguments
+    \pgfkeyssetvalue{/tikz/conics/define/circle/@argn}{0} % 重置计数器
+    \pgfutil@for\arg:=#1\do{
+      \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/conics/define/circle/@argn},1))}
+      \pgfkeysalso{/tikz/conics/define/circle/@argn = \pgfmathresult}
+    }
+    \ifnum \pgfkeysvalueof{/tikz/conics/define/circle/@argn} = 3
+      \tikzset{conics/define/circle/@center-radius = {#1}}
+    \else\ifnum \pgfkeysvalueof{/tikz/conics/define/circle/@argn} = 4
+      \tikzset{conics/define/circle/@through = {#1}}
+    \else
+      \pgferror{Incorrect number of arguments for 'conics/circle'}
+    \fi\fi
+  },
   % focus-directrix definition of conics
   % conics/define/focus-directrix={\F,\D,\e,\C}
   % \F - focus \D - directrix, homogeneous coordinates
@@ -223,11 +292,7 @@
         {\pgferror{Error in conic definition: c == a}};
       } else {
         if abs(\cs@c) <= \EPSILON then {% circle
-          \cs@xc = \fpeval{\cs@center{1,1}/\cs@center{3,1}};
-          \cs@yc = \fpeval{\cs@center{2,1}/\cs@center{3,1}};
-          #4{1,1} = 1.0;     #4{1,2} = 0.0;     #4{1,3} = -\cs@xc;
-          #4{2,1} = 0.0;     #4{2,2} = 1.0;     #4{2,3} = -\cs@yc;
-          #4{3,1} = -\cs@xc; #4{3,2} = -\cs@yc; #4{3,3} = \fpeval{(\cs@xc)^2 + (\cs@yc)^2 -(\cs@a)^2};
+          % see below
         } else {% ellipse or hyperbola
           \cs@e = \cs@c / \cs@a;% 离心率 Eccentricity
         };
@@ -266,6 +331,10 @@
         conics/cross={\cs@P,\cs@Q,\cs@directrix},
         conics/define/focus-directrix={#1,\cs@directrix,\cs@e,#4},
       }
+    \else%circle
+      \tikzset{
+        conics/define/circle/@center-radius={#1,#3,#4},
+      }
     \fi
   },
   % conics/define/ellipse/foci-point={\Fa,\Fb,\P,\C}
@@ -282,59 +351,6 @@
       conics/distance={#3,#2,\cs@db},
       conics/define/foci={#1,#2,\fpeval{0.5*abs(\cs@da-\cs@db)},#4},
     }
-  },
-  % define circle
-  % conics/define/circle={\Center,\radius,\C}
-  conics/define/circle/@center-radius/.code args={#1,#2,#3}{
-    \tikzset{
-      conics/define/foci={#1,#1,#2,#3},
-    }
-  },
-  % conics/define/circle={\A,\B,\C,\Circle}
-  conics/define/circle/@through/.code args={#1,#2,#3,#4}{
-    \tikzmath{
-      int \cs@j;
-      for \cs@j in {1,2,3}{
-        \cs@A{1,\cs@j} = \fpeval{#1{\cs@j,1} * #1{3,1}}; 
-        \cs@A{2,\cs@j} = \fpeval{#2{\cs@j,1} * #2{3,1}}; 
-        \cs@A{3,\cs@j} = \fpeval{#3{\cs@j,1} * #3{3,1}}; 
-        % {\message{\cs@A{1,\cs@j}}};
-      };
-      \cs@B{1,1} = \fpeval{-((#1{1,1})^2+(#1{2,1})^2)};
-      \cs@B{2,1} = \fpeval{-((#2{1,1})^2+(#2{2,1})^2)};
-      \cs@B{3,1} = \fpeval{-((#3{1,1})^2+(#3{2,1})^2)};
-    }
-    \tikzset{
-      mat/solve={\cs@A,\cs@B,3,1,\cs@C},
-      % mat/stdout={\cs@A,3,3},
-      % mat/stdout={\cs@B,3,1},
-      % mat/stdout={\cs@C,3,1},
-    }
-    \tikzmath{
-      \cs@coef{1} = 1; \cs@coef{2} = 0; \cs@coef{3} = 1;
-      \cs@coef{4} = \cs@C{1,1}; 
-      \cs@coef{5} = \cs@C{2,1}; 
-      \cs@coef{6} = \cs@C{3,1};
-    }
-    \tikzset{
-      conics/define/quadratic={\cs@coef, #4},
-    }
-  },
-  conics/define/circle/@argn/.initial=0,
-  conics/define/circle/.code={% dispatcher
-    % compute the number of arguments
-    \pgfkeyssetvalue{/tikz/conics/define/circle/@argn}{0} % 重置计数器
-    \pgfutil@for\arg:=#1\do{
-      \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/conics/define/circle/@argn},1))}
-      \pgfkeysalso{/tikz/conics/define/circle/@argn = \pgfmathresult}
-    }
-    \ifnum \pgfkeysvalueof{/tikz/conics/define/circle/@argn} = 3
-      \tikzset{conics/define/circle/@center-radius = {#1}}
-    \else\ifnum \pgfkeysvalueof{/tikz/conics/define/circle/@argn} = 4
-      \tikzset{conics/define/circle/@through = {#1}}
-    \else
-      \pgferror{Incorrect number of arguments for 'conics/circle'}
-    \fi\fi
   },
   % Richter-Gebert. Perspective on Projective Geometry. Springer,2011.
   % find a conic section through five points
