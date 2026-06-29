@@ -1,0 +1,88 @@
+\documentclass{standalone}
+\usepackage{ctex}
+\usepackage{tikzplot}
+
+% Styles
+\tikzstyle{axes}=[]
+\tikzstyle{important line}=[very thick]
+\tikzstyle{information text}=[rounded corners,fill=red!10,inner sep=1ex]
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    % 5 点的齐次坐标
+    \Pa{1,1} = 0; \Pa{2,1} = 5; \Pa{3,1} = 1; 
+    \Pb{1,1} = -2; \Pb{2,1} = -2; \Pb{3,1} = 1; 
+    \Pc{1,1} = 3; \Pc{2,1} = 3; \Pc{3,1} = 1; 
+    \Pd{1,1} = -3; \Pd{2,1} = 3; \Pd{3,1} = 1; 
+    \Pe{1,1} = 4; \Pe{2,1} = -2; \Pe{3,1} = 1; 
+    \Qa{1,1} = 0; \Qa{2,1} = 3; \Qa{3,1} = 1; 
+    \Qb{1,1} = -1; \Qb{2,1} = 2; \Qb{3,1} = 1; 
+    \Qc{1,1} = 0; \Qc{2,1} = 0; \Qc{3,1} = 1; 
+    \Qd{1,1} = 1; \Qd{2,1} = 0; \Qd{3,1} = 1; 
+    \Qe{1,1} = 1.5; \Qe{2,1} = 1; \Qe{3,1} = 1; 
+  }
+  \tikzset{
+    conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\CCa},
+    conics/define/five points={\Qa,\Qb,\Qc,\Qd,\Qe,\CCb},
+    mat/normalize={\CCa,3,3,\Ca},
+    mat/normalize={\CCb,3,3,\Cb},
+    mat/stdout={\Ca,3,3},
+    mat/stdout={\Cb,3,3},
+  }
+
+  \tikzmath{
+    % 起始点, 每次都修改, 用于排除已找到顶点
+    \PUprev = \Pe{1,1};
+    \PVprev = \Pe{2,1};
+    \PWprev = \Pe{3,1};
+    % 多边形与内切圆的切点, 每次都修改, 用于排除已找到的边
+    \TUprev = 0;
+    \TVprev = 0;
+    \TWprev = 1;
+  }
+
+  % \clip (-6,-6) rectangle (6,6);
+  \axes[grid] (-5:5,-5:5);
+  \conic[thick,draw=teal] (\Ca);
+  \conic[thick,draw=navy] (\Cb);
+
+  \foreach \i in {1,...,50}{%sandbox
+    \tikzmath{
+      % 当前的顶点和切点
+      \Pcurr{1,1}=\PUprev; \Pcurr{2,1}=\PVprev; \Pcurr{3,1}=\PWprev;
+      \Tcurr{1,1}=\TUprev; \Tcurr{2,1}=\TVprev; \Tcurr{3,1}=\TWprev;
+    }
+    
+    \tikzset{
+      mat/stdout={\Pcurr,3,1},
+      mat/stdout={\Tcurr,3,1},
+      conics/tangents={\Cb,\Pcurr,\Ta,\Tb},
+      conics/dehomogenize={\Pcurr,\PPa},
+      conics/exclude={\Ta,\Tb,\Tcurr,\Tnext},
+      conics/intersect cl={\Ca,\Pcurr,\Tnext,\P,\Q},
+      conics/exclude={\P,\Q,\Pcurr,\Pnext},
+      conics/dehomogenize={\Pnext,\PPn},
+      conics/dehomogenize={\Tnext,\TTn},
+    }
+    % % 导出下一个顶点和切点
+    \xdef\PUprev{\Pnext{1,1}}
+    \xdef\PVprev{\Pnext{2,1}}
+    \xdef\PWprev{\Pnext{3,1}}
+    \xdef\TUprev{\Tnext{1,1}}
+    \xdef\TVprev{\Tnext{2,1}}
+    \xdef\TWprev{\Tnext{3,1}}
+ 
+    \coordinate (P) at (\PPa{1},\PPa{2});
+    \coordinate (Q) at (\PPn{1},\PPn{2});
+    \coordinate (T) at (\TTn{1},\TTn{2});
+    \draw[red!\i!blue] (P) -- (Q);
+    % \foreach \p/\placement in {P/above,T/above}{
+    %   \fill[red] (\p) circle (1.5pt);
+    %  \draw (\p) node[\placement] {$\p\i$};
+    % }
+  }
+\end{tikzpicture}
+
+\end{document}

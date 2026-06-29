@@ -22,12 +22,12 @@
 * **坐标规律**：它将连心线段按半径之比 $r_1 : r_2$ 进行**外分**。
 
 外位似中心位于 $O_1O_2$ 的延长线上（假设 $r_2 > r_1$ 时在 $O_1$ 左侧， $r_1 > r_2$ 时在 $O_2$ 右侧）。其通项公式为：
-$$\overline{P_{ex}} = \overline{O_1} + \dfrac{r_1}{r_1 - r_2} \overline{O_1O_2}$$
+$$\overline{P_{ex}} = \overline{O_1} + \cfrac{r_1}{r_1 - r_2} \overline{O_1O_2}$$
 
 **符号分析**：
  
-* 如果 $r_1 > r_2$，系数 $\dfrac{r_1}{r_1 - r_2} > 1$，说明 $P_{ex}$ 在 $O_2$ 的右侧。
-* 如果 $r_1 < r_2$，系数 $\dfrac{r_1}{r_1 - r_2} < 0$，说明 $P_{ex}$ 在 $O_1$ 的左侧（反方向）。
+* 如果 $r_1 > r_2$，系数 $\cfrac{r_1}{r_1 - r_2} > 1$，说明 $P_{ex}$ 在 $O_2$ 的右侧。
+* 如果 $r_1 < r_2$，系数 $\cfrac{r_1}{r_1 - r_2} < 0$，说明 $P_{ex}$ 在 $O_1$ 的左侧（反方向）。
 * 如果 $r_1 = r_2$，分母为 $0$，向量无解，验证了平移圆无有限位似中心。
 
 
@@ -40,7 +40,7 @@ $$\overline{P_{ex}} = \overline{O_1} + \dfrac{r_1}{r_1 - r_2} \overline{O_1O_2}$
 * **坐标规律**：它将连心线段按半径之比 $r_1 : r_2$ 进行**内分**。
 
 根据分点公式的向量变形：
-$$\overline{P_{in}} = \overline{O_1} + \dfrac{r_1}{r_1 + r_2} \overline{O_1O_2}$$
+$$\overline{P_{in}} = \overline{O_1} + \cfrac{r_1}{r_1 + r_2} \overline{O_1O_2}$$
 
 | 情况                | 位似中心的状态                                                 |
 | -------- | ------------------------  |
@@ -81,9 +81,11 @@ $$\overline{P_{in}} = \overline{O_1} + \dfrac{r_1}{r_1 + r_2} \overline{O_1O_2}$
 
 蒙日定理（Monge's Theorem）指出，对于平面上的三个圆（半径互不相等，且没有一个圆包含在另一个圆内），每两个圆的两条外公切线的交点（即外位似中心）共有三个，这三个点共线。
 
+examples/circles/monge-theorem
+
 ```latex
-![[ ../../snippets/lines-and-circles/monge-theorem.tikz ]]
+![[ ../../../../examples/circles/monge-theorem.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/monge-theorem.tikz ]]
+![[ ../../../../examples/circles/monge-theorem.tikz ]]
 

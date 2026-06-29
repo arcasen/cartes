@@ -1,0 +1,43 @@
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+\begin{document}
+
+% begin_snippet
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = -2; \A{2} = 0;
+    \B{1} = 4; \B{2} = 0;
+    \C{1} = -1; \C{2} = 4;
+  }
+
+  \tikzset{
+    plane/orthocenter={\A,\B,\C,\H},
+    plane/project={\B,\A,\C,\D},
+    plane/project={\C,\B,\A,\E},
+    plane/project={\A,\C,\B,\F},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+  \coordinate (F) at (\F{1},\F{2});
+  \coordinate (H) at (\H{1},\H{2});
+
+  \draw[thick] (A) -- (B) -- (C) -- cycle;
+  \draw[purple] (A) -- (D) (B) -- (E) (C) -- (F);
+
+  \pic [draw,red,angle radius=6pt] {right angle=H--D--C};
+  \pic [draw,red,angle radius=6pt] {right angle=H--E--A};
+  \pic [draw,red,angle radius=6pt] {right angle=H--F--B};
+
+  \foreach \p/\placement in {A/left,B/right,C/above,H/below right} {
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+% end_snippet
+
+\end{document}

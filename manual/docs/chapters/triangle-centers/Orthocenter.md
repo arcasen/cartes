@@ -35,8 +35,10 @@ $$
 
 #### 示例
 
+examples/triangles/orthocenter
+
 ```latex
-![[ ../../snippets/triangle-centers/orthocenter.tikz ]]
+![[ ../../../../examples/triangles/orthocenter.tikz ]]
 ```
 
-![[ ../../snippets/triangle-centers/orthocenter.tikz ]]
+![[ ../../../../examples/triangles/orthocenter.tikz ]]

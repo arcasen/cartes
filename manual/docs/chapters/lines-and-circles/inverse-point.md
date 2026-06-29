@@ -44,15 +44,15 @@ $$B'D' = B'C' + C'D'$$
 
 这就是托勒密定理证明中最关键的一步。接下来，只需要利用反演的距离公式
 
-$$X'Y' = \dfrac{r^2 \cdot XY}{AX \cdot AY}$$
+$$X'Y' = \cfrac{r^2 \cdot XY}{AX \cdot AY}$$
 
 把 $B'D'$、$B'C'$、$C'D'$ 还原回原来的弦长，代入上面的简单加法等式，整理后就能直接得到托勒密定理的公式。
 
 ```latex
-![[ ../../../../gallery/ptolemy-theorem.tikz ]]
+![[ ../../../../examples/inversion/ptolemy-theorem.tikz ]]
 ```
 
-![[ ../../../../gallery/ptolemy-theorem.tikz ]]
+![[ ../../../../examples/inversion/ptolemy-theorem.tikz ]]
 
 
 #### 示例 2：Pappus Chain
@@ -64,13 +64,13 @@ $$X'Y' = \dfrac{r^2 \cdot XY}{AX \cdot AY}$$
 :::
 
 ```latex
-![[ ../../../../gallery/pappus-chain-1.tikz ]]
+![[ ../../../../examples/inversion/pappus-chain-1.tikz ]]
 ```
 
-![[ ../../../../gallery/pappus-chain-1.tikz ]]
+![[ ../../../../examples/inversion/pappus-chain-1.tikz ]]
 
 ```latex
-![[ ../../../../gallery/pappus-chain-2.tikz ]]
+![[ ../../../../examples/inversion/pappus-chain-2.tikz ]]
 ```
 
-![[ ../../../../gallery/pappus-chain-2.tikz ]]
+![[ ../../../../examples/inversion/pappus-chain-2.tikz ]]

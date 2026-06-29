@@ -46,7 +46,8 @@ $$
 - `conics/define/circle={\A,\B,\C,\Circle}`: 求过 $A,B,C$ 三点的圆的系数矩阵
   - `\A,\B,\C`: 三点的齐次坐标（列向量 $3 \times 1$）
   - `\Circle`: 圆的系数矩阵
-- `conics/define/circle={\O,\r,\Circle}`: 求以 $O$ 为圆心，$r$ 为半径的圆的系数矩阵
+- `conics/define/circle={\O,\P,\Circle}`: 求以 $O$ 为圆心和圆上一点 $P$ 的圆的系数矩阵
+- `conics/define/circle/center-radius={\O,\r,\Circle}`: 求以 $O$ 为圆心，$r$ 为半径的圆的系数矩阵
   - `\O`: 圆心的齐次坐标（列向量 $3 \times 1$）
   - `\r`: 半径
   - `\Circle`: 圆的系数矩阵
@@ -58,8 +59,10 @@ $$
 
 #### 示例：圆的定义
 
+examples/definition-of-conics/circles
+
 ```latex
-![[ ../../snippets/conics/definition-4-circle.tikz ]]
+![[ ../../../../examples/definition-of-conics/circles.tikz ]]
 ```
 
-![[ ../../snippets/conics/definition-4-circle.tikz ]]
+![[ ../../../../examples/definition-of-conics/circles.tikz ]]

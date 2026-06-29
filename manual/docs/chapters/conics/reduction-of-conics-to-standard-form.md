@@ -105,7 +105,7 @@ $$C' = T^T C T$$
 
 设 $A$ 是 矩阵 $C$ 的代数余子式, 如果 $A_{33} = 0$, 则曲线是抛物线,
 其中心在无穷远处;
-否则曲线的中心是$\left(\dfrac{A_{31}}{A_{33}}, \dfrac{A_{32}}{A_{33}}\right)$。
+否则曲线的中心是$\left(\cfrac{A_{31}}{A_{33}}, \cfrac{A_{32}}{A_{33}}\right)$。
 
 因为抛物线是没有中心的, 对于任意圆锥曲线, 可以先进行旋转, 消除交叉项 $\bm{x}y$, 然后再处理。
 
@@ -116,7 +116,7 @@ $$C' = T^T C T$$
 首先是旋转, 消除交叉项 $xy$, 旋转角度为
 $\theta(-\pi/4 \leq \theta \leq \pi/4)$, 且:
 
-$$\cot2\theta = \dfrac{1-\tan^2\theta}{2\tan\theta} = \dfrac{a-c}{b}$$
+$$\cot2\theta = \cfrac{1-\tan^2\theta}{2\tan\theta} = \cfrac{a-c}{b}$$
 
 令 $\tau = \cot2\theta$, 则:
 
@@ -125,22 +125,22 @@ $$\tan^2\theta + 2\tau \tan\theta -1 = 0$$
 求解 $t = \tan\theta$，我们需要解 $t^2 + 2\tau t - 1 = 0$。为了保证数值稳定性（避免相近数相减导致精度丢失），我们选择绝对值较小的那个根：
 
 $$
-t = \dfrac{\text{sgn}(\tau)}{|\tau| + \sqrt{1 + \tau^2}}
+t = \cfrac{\text{sgn}(\tau)}{|\tau| + \sqrt{1 + \tau^2}}
 $$
 
 或者写作更常见的形式（若 $\tau \ge 0$，取负根；若 $\tau < 0$，取正根，以确保 $|\theta| \le \pi/4$）：
 
 $$
 t = \begin{cases} 
-\dfrac{1}{\tau + \sqrt{1+\tau^2}} & \text{if } \tau \ge 0 \\
-\dfrac{-1}{-\tau + \sqrt{1+\tau^2}} & \text{if } \tau < 0 
+\cfrac{1}{\tau + \sqrt{1+\tau^2}} & \text{if } \tau \ge 0 \\
+\cfrac{-1}{-\tau + \sqrt{1+\tau^2}} & \text{if } \tau < 0 
 \end{cases}
 $$
 
 这可以统一写为：
 
 $$
-t = \dfrac{1}{\tau + \text{sgn}(\tau)\sqrt{1+\tau^2}}
+t = \cfrac{1}{\tau + \text{sgn}(\tau)\sqrt{1+\tau^2}}
 $$
 
 ::: note
@@ -149,7 +149,7 @@ $$
 
 $$\begin{gathered}
   t = \tan\theta\\
-  c = \cos\theta = \dfrac{1}{\sqrt{t^2+1}}\\
+  c = \cos\theta = \cfrac{1}{\sqrt{t^2+1}}\\
   s = \sin\theta = \tan\theta \cos\theta = tc
 \end{gathered}$$
 
@@ -185,10 +185,10 @@ $$\begin{gathered}
   f = C'_{33}
 \end{gathered}$$
 
-则抛物线的顶点为: $\left(-\dfrac{e}{2c},\dfrac{e^2-4cf}{4cd}\right)$。
+则抛物线的顶点为: $\left(-\cfrac{e}{2c},\cfrac{e^2-4cf}{4cd}\right)$。
 
 对于椭圆和双曲线, 计算其代数余子式 $A$, 中心为:
-$\left(\dfrac{A_{31}}{A_{33}},\dfrac{A_{32}}{A_{33}}\right)$。
+$\left(\cfrac{A_{31}}{A_{33}},\cfrac{A_{32}}{A_{33}}\right)$。
 
 构造平移矩阵:
 
@@ -202,8 +202,8 @@ $$T =
 其中
 
 $$\begin{gathered}
-  t_x = \dfrac{A_{31}}{A_{33}}\\
-  t_y = \dfrac{A_{32}}{A_{33}}
+  t_x = \cfrac{A_{31}}{A_{33}}\\
+  t_y = \cfrac{A_{32}}{A_{33}}
 \end{gathered}$$
 
 计算 $C''=T^TC'T$ 就得到化为标准形式的系数矩阵。

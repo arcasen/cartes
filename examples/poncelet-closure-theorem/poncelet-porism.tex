@@ -1,0 +1,106 @@
+% \foreach 的局部作用域问题是 TeX “组”（Group）机制的直接体现，
+% 而非现代编程语言中的“沙盒”概念。每次循环迭代都相当于进入了一个
+% 临时的 TeX 组，组内的宏定义和变量修改在组结束（即本次迭代结束）
+% 时会被自动还原。针对在循环中计算出某个值（例如动态生成的节点名、
+% 坐标或数组元素），并希望在循环结束后继续使用它的需求，使用 \xdef
+% （或 \global\edef，或 \global\let）进行全局赋值是最经典且
+% 有效的解决方案。
+
+% 方法：将正多边形投影到任意平面上
+
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    % 正 n 边形的边数
+    \size = 5;
+    % 外接圆和内切圆的圆心
+    \O{1,1} = 0; \O{2,1} = 0; \O{3,1} = 1; 
+    \P{1,1} = 1;
+    \P{2,1} = 1/4;
+    \P{3,1} = 1;
+    % 外接圆的半径
+    \ra = 2;
+    % 对角线形成的正 n 边形内切圆的半径
+    \rb = \ra * cos(360/\size);
+    % center of projection
+    \Center{1} = 0; \Center{2} = 0; \Center{3} = 6;
+    % source plane
+    \S{1} = 0; \S{2} = 0; \S{3} = 0;
+    \m{1} = 0; \m{2} = 0; \m{3} = 1;
+    % target plane
+    \T{1} = 0; \T{2} = 0; \T{3} = 0;
+    \n{1} = -1; \n{2} = -3/8; \n{3} = 1/2; 
+  }
+  
+  \tikzset{
+    % 以 O 为圆心 radius 为半径的圆
+    conics/define/circle/center-radius={\O,\ra,\Circlea},
+    conics/define/circle/center-radius={\O,\rb,\Circleb},
+    space/perspective transform={\Center,\S,\m,\T,\n,\H},
+    mat/inverse={\H,3,\Hi},
+    mat/congruence={\Circlea,\Hi,3,\CCa},
+    mat/congruence={\Circleb,\Hi,3,\CCb},
+    mat/normalize={\CCa,3,3,\Ca},
+    mat/normalize={\CCb,3,3,\Cb},
+    conics/intersect cl={\Ca,\O,\P,\Qa,\Qb},
+    conics/dehomogenize={\Qa,\QQa},
+  }
+
+  \tikzmath{
+    % 正 n 边的起始点, 每次都修改, 用于排除已找到顶点
+    \PUprev = \Qa{1,1};
+    \PVprev = \Qa{2,1};
+    \PWprev = \Qa{3,1};
+    % 正 n 边与内切圆的切点, 每次都修改, 用于排除已找到的边
+    \TUprev = 0;
+    \TVprev = 0;
+    \TWprev = 1;
+  }
+  
+  \axes[grid] (-5:5,-5:5);
+  % \conic[draw=magenta] (\Circlea);
+  % \conic[draw=magenta] (\Circleb);
+  \conic[thick,draw=teal] (\Ca);
+  \conic[thick,draw=navy] (\Cb);
+
+  \foreach \i in {1,...,\size}{%sandbox
+    \tikzmath{
+      % 当前的顶点和切点
+      \Pcurr{1,1}=\PUprev; \Pcurr{2,1}=\PVprev; \Pcurr{3,1}=\PWprev;
+      \Tcurr{1,1}=\TUprev; \Tcurr{2,1}=\TVprev; \Tcurr{3,1}=\TWprev;
+    }
+    
+    \tikzset{
+      mat/stdout={\Pcurr,3,1},
+      mat/stdout={\Tcurr,3,1},
+      conics/tangents={\Cb,\Pcurr,\Ta,\Tb},
+      conics/dehomogenize={\Pcurr,\PPa},
+      conics/exclude={\Ta,\Tb,\Tcurr,\next},
+      conics/intersect cl={\Ca,\Pcurr,\next,\P,\Q},
+      conics/exclude={\P,\Q,\Pcurr,\Pnext},
+      conics/dehomogenize={\Pnext,\PPn},
+      conics/dehomogenize={\next,\TTn},
+    }
+    % 导出下一个顶点和切点
+    \xdef\PUprev{\Pnext{1,1}}
+    \xdef\PVprev{\Pnext{2,1}}
+    \xdef\PWprev{\Pnext{3,1}}
+    \xdef\TUprev{\next{1,1}}
+    \xdef\TVprev{\next{2,1}}
+    \xdef\TWprev{\next{3,1}}
+ 
+    \coordinate (P) at (\PPa{1},\PPa{2});
+    \coordinate (Q) at (\PPn{1},\PPn{2});
+    \draw[red] (P) -- (Q);
+    \foreach \p/\placement in {P/above}{
+      \fill[red] (\p) circle (1.5pt);
+     \draw (\p) node[\placement] {$\p\i$};
+    }
+  }
+\end{tikzpicture}
+
+\end{document}

@@ -288,3 +288,5 @@ svg-inkscape/
 troubleshooting/
 
 dist/
+
+*.tikz

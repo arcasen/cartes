@@ -11,3 +11,5 @@
 ![[ vector-computations/向量投影.md ]]
 
 ![[ vector-computations/向量旋转.md ]]
+
+![[ vector-computations/gram-schmidt-othogonalization.md ]]

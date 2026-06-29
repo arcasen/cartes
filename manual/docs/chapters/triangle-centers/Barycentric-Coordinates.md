@@ -17,7 +17,7 @@ $$ x > 0, \quad y > 0, \quad z > 0 $$
 
 这里的 $x, y, z$ 称为点 $P$ 关于 $\triangle ABC$ 的**重心坐标（Barycentric Coordinates）**。
 
-这些系数的具体物理意义是：$x = \dfrac{S_{\triangle PBC}}{S_{\triangle ABC}}$，$y = \dfrac{S_{\triangle PAC}}{S_{\triangle ABC}}$，$z = \dfrac{S_{\triangle PAB}}{S_{\triangle ABC}}$。即系数代表了对侧小三角形面积与总面积的比值。
+这些系数的具体物理意义是：$x = \cfrac{S_{\triangle PBC}}{S_{\triangle ABC}}$，$y = \cfrac{S_{\triangle PAC}}{S_{\triangle ABC}}$，$z = \cfrac{S_{\triangle PAB}}{S_{\triangle ABC}}$。即系数代表了对侧小三角形面积与总面积的比值。
 
 主要包含两个部分：
 

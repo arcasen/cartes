@@ -1,4 +1,4 @@
-\ProvidesFile{tikzlibrarymc.code.tex}[2025/05/01 v1.3.0 A tikz library for matrix computations and linear algebra]
+\ProvidesFile{tikzlibrarymc.code.tex}[2026/06/28 v1.3.2 A tikz library for matrix computations and linear algebra]
 
 % 提高数值计算精度
 % https://tex.stackexchange.com/questions/521857/tikz-fpu-seems-to-be-inaccurate
@@ -18,77 +18,20 @@
     assume math mode=true % 自动使用数学字体（省去 $$）
 }
 
-% ===============================================
-% Caveats
-% ===============================================
-% 1. Tikzmath is mainly used for handling numerical computations and variable 
-% assignments, supporting basic mathematical operations and conditional 
-% statements, but it does not support arrays or lists as function parameters.
-% 2. Tikzmath internally requires semicolons for separation, allows comments, 
-% but cannot have blank lines.
-% 3. The for statement does not have loop interruption commands like 'break' or 'continue'.
-% 4. The first iteration of a for loop is always executed without evaluating the 
-% loop variable; to restrict the range of the loop variable, it must be 
-% explicitly limited.
-% 5. Integer "subscripts" (not true subscripts) must be defined as int; otherwise, 
-% they default to floating-point numbers, and defined macros cannot be found.
-% 6. Changes to variables inside a function do not propagate to the outside.
-% 7. When defining functions, there should be no spaces between parameters.
-% 8. The return statement does not interrupt the execution of subsequent 
-% statements within the function.
-% 9. The maximum number of function parameters is 9.
-% 10.Function parameters cannot directly use arrays.
-% 11.Extremely difficult to debug.
-% 12.Given the limitations of tikzmath’s function, you can use tikzset 
-% with handlers(.code) to execute some code.
-% 13.Call tikzmath within the code, but note that this may generate 
-% some global variables; to avoid conflicts with user-defined variables, 
-% add the prefix mc@.
-% 14.Modifications of variables inside a foreach statement will vanish outside.
-% 15.Special attention should be paid to variables in tikzmath, as these 
-% variables are global. If they are used directly without declaration, 
-% it may pose risks. For example, \mc@c might be declared as an int in one 
-% place, but if it is assigned a floating-point number elsewhere without 
-% declaration, it will automatically be converted to an integer.
-%
-% 1. tikzmath 主要用于处理数值计算和变量赋值, 支持基本的数学运算和条件语句,
-% 但不支持数组或列表作为函数参数.
-% 2. tikzmath 内部要以分号分隔, 可以有注释, 但不能有空行.
-% 3. for 语句没有类似 break, continue 之类的中断循环的语句.
-% 4. for 的第一次总是执行的, 不对循环变量作判断, 要限制循环变量的范围.
-% 5. 整数"下标"(非真正下标), 必须定义为 int, 否则默认为浮点数, 无法找到定义的宏.
-% 6. 函数内部对变量的修改不会传导至外部.
-% 7. 函数定义时, 参数之间不要有空格.
-% 8. return 语句不会中断函数内部下面语句的执行.
-% 9. 函数参数个数最大为 9.
-% 10.函数参数不能直接使用数组.
-% 11.极难调试.
-% 12.鉴于 tikzmath 的 function 存在一些缺陷, 可以使用 
-% tikzset 的 /.code 来执行一些代码
-% 13.在代码中调用 tikzmath, 但是注意这里会产生一些全局的变量, 
-% 为了避免与用户的变量冲突, 添加前缀 mc@
-% 14.foreach 中的修改在循环外面是失效的
-% https://tex.stackexchange.com/questions/196065/pgfkeys-computed-i-e-dynamically-defined-key
-% 15.要特别注意 tikzmath 中的变量, 这些变量是全局的, 如果不加声明就直接使用
-% 可能会带来风险, 如 \mc@c 可能在某处被声明为 int, 在另一处不声明就赋值浮点数时则会
-% 自动转换为整数, 
-% 16.此外重名可能导致一些计算结果被误修改
-% 17.当.code args 或 .style args 中的参数本身是一个算式时, 必须加括号以保证计算的正确性.
-
 \makeatletter
 
 \tikzmath {
   % Maximum Iterations for Power Method
   \PowerMaxIter = 50;
   % threshold, numbers not more than epsilon will be treated as zero.
-  \EPSILON = 0.00005;
+  \EPSILON = 0.0001;
   % Jacobi maximum number of iterations, default: 3*(n-1)^2
   % wherein, n is size of the symetric matrix, 
   % User can override it with a positive integer
   % -1 means using the default value
   \JacobiMaxIter = -1; 
   % Jacobi precision, too small a value can cause iteration oscillation
-  \JacobiEpsilon = 0.00005;
+  \JacobiEpsilon = 0.0001;
   % status of solving linear systems, inversing matrices, and
   % Jacobi eigenvalue algorithm
   % 1 for success and 0 for failure
@@ -98,7 +41,7 @@
   % \mc@mat, and then call this function. This function is reused in 
   % calcuating minors of a matrix.
   function det(\n) {
-    \result = 1.0;
+    \result = 1;
     int \i, \j, \k;
     int \stop;
     \stop = 0;
@@ -115,7 +58,7 @@
         };
         if \pivot < \EPSILON then { 
           \stop = 1;
-          \result = 0.0;
+          \result = 0;
         };
         if \stop == 0 then {
           % swap
@@ -129,16 +72,16 @@
           };
           % eliminate
           for \i in {\k+1,...,\n}{
-            \factor = \fpeval{\mc@mat{\i,\k} / \mc@mat{\k,\k}};
+            \factor = \fpeval{\mc@mat{\i,\k}/\mc@mat{\k,\k}};
             for \j in {\k,...,\n}{
-              \mc@mat{\i,\j} = \fpeval{\mc@mat{\i,\j} - \factor * \mc@mat{\k,\j}};
+              \mc@mat{\i,\j} = \fpeval{\mc@mat{\i,\j}-\factor*\mc@mat{\k,\j}};
             };
           };
-          \result = \fpeval{\result * \mc@mat{\k,\k}};
+          \result = \fpeval{\result*\mc@mat{\k,\k}};
         };% stop
       };% stop
     };
-    \result = \fpeval{\result * \mc@mat{\n,\n}};
+    \result = \fpeval{\result*\mc@mat{\n,\n}};
     return \result;
   };
 }
@@ -152,8 +95,7 @@
       for \mc@i in {1,...,(#2)}{
         for \mc@j in {1,...,(#3)}{
           % print{[\mc@i,\mc@j]:\ #1{\mc@i,\mc@j}, \ \ };
-          \mc@temp = #1{\mc@i,\mc@j};
-          print{[\mc@i,\mc@j]:\ \pgfmathprintnumber{\mc@temp}, \ \ };
+          print{[\mc@i,\mc@j]:\ \pgfmathprintnumber{#1{\mc@i,\mc@j}}, \ \ };
         };
         print{\\};
       };
@@ -171,13 +113,13 @@
     }
   },
   % scalar multiplication: show={\a,m,n,k,\b}
-  % b = k * a
+  % b = k*a
   mat/scale/.code args={#1,#2,#3,#4,#5}{
     \tikzmath{
       int \mc@i, \mc@j;
       for \mc@i in {1,...,(#2)}{
         for \mc@j in {1,...,(#3)}{
-          #5{\mc@i,\mc@j} = (#4)*(#1{\mc@i,\mc@j});
+          #5{\mc@i,\mc@j} = \fpeval{(#4)*(#1{\mc@i,\mc@j})};
         };
       };
     }%tikzmath
@@ -204,15 +146,14 @@
       };
     }%tikzmath
   },
-  % linear combination: C = a A + b B
+  % linear combination: C = a A+b B
   % mat/combine={\A,\B,\m,\n,\a,\b,\C}
   mat/combine/.code args={#1,#2,#3,#4,#5,#6,#7}{
     \tikzmath{
       int \mc@i, \mc@j;
       for \mc@i in {1,...,(#3)}{
         for \mc@j in {1,...,(#4)}{
-          % #7{\mc@i,\mc@j} = (#5) * #1{\mc@i,\mc@j} + (#6) * #2{\mc@i,\mc@j};
-          #7{\mc@i,\mc@j} = \fpeval{(#5) * (#1{\mc@i,\mc@j}) + (#6) * (#2{\mc@i,\mc@j})};
+          #7{\mc@i,\mc@j} = \fpeval{(#5)*(#1{\mc@i,\mc@j})+(#6)*(#2{\mc@i,\mc@j})};
         };
       };
     }
@@ -223,7 +164,7 @@
       int \mc@i, \mc@j;
       for \mc@i in {1,...,(#3)}{
         for \mc@j in {1,...,(#4)}{
-          #5{\mc@i,\mc@j} = \fpeval{#1{\mc@i,\mc@j} + #2{\mc@i,\mc@j}};
+          #5{\mc@i,\mc@j} = \fpeval{#1{\mc@i,\mc@j}+#2{\mc@i,\mc@j}};
         };
       };
     }
@@ -234,13 +175,13 @@
       int \mc@i, \mc@j;
       for \mc@i in {1,...,(#3)}{
         for \mc@j in {1,...,(#4)}{
-          #5{\mc@i,\mc@j} = \fpeval{#1{\mc@i,\mc@j} - #2{\mc@i,\mc@j}};
+          #5{\mc@i,\mc@j} = \fpeval{#1{\mc@i,\mc@j}-#2{\mc@i,\mc@j}};
         };
       };
     }
   },
   % matrix multiplication: product={\a,\b,row1,col1,col2,\c}
-  % returns the matrix product of two matrices: c = a * b
+  % returns the matrix product of two matrices: c = a*b
   % size(a) = row1 x col1, size(b) = row2 x col2
   % col1 = row2
   mat/product/.code args={#1,#2,#3,#4,#5,#6}{
@@ -248,15 +189,42 @@
       int \mc@i, \mc@j, \mc@k;
       for \mc@i in {1,...,(#3)}{
         for \mc@j in {1,...,(#5)}{
-          #6{\mc@i,\mc@j} = 0.0;
+          #6{\mc@i,\mc@j} = 0;
           for \mc@k in {1,...,(#4)}{
-            #6{\mc@i,\mc@j} = \fpeval{#6{\mc@i,\mc@j} + 
-                              #1{\mc@i,\mc@k} * #2{\mc@k,\mc@j}};
+            #6{\mc@i,\mc@j} = \fpeval{#6{\mc@i,\mc@j}+
+                              #1{\mc@i,\mc@k}*#2{\mc@k,\mc@j}};
           };
         };
       };
     }%tikzmath
   },
+  % outer product of two column vectors
+  % mat/outer product={\u,\v,\n,\A}
+  % return A = u · transpose(v), size: n x n
+  mat/outer product/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \mc@i, \mc@j, \mc@k;
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#3)}{
+          #4{\mc@i,\mc@j} = \fpeval{#1{\mc@i,1}*#2{\mc@j,1}};
+        };
+      };
+    }%tikzmath
+  },
+  % inner product of two column vectors
+  % mat/inner product={\u,\v,\n,\ans}
+  mat/inner product/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      int \mc@i, \mc@j, \mc@k;
+      #4 = 0;
+      for \mc@i in {1,...,(#3)}{
+        for \mc@j in {1,...,(#3)}{
+          #4 = \fpeval{#4+#1{\mc@i,1}*#2{\mc@j,1}};
+        };
+      };
+    }%tikzmath
+  },
+  % inner product of two column vectors
   % Determinant calculation using Gaussian elimination with partial pivoting
   % det={\a,n,d}
   % the result is stored in d, the original matrix is not modified.
@@ -275,7 +243,7 @@
   % The (i, j) minor is the det of the submatrix formed 
   % by deleting the i-th row and j-th column. 
   % The (i, j) cofactor is obtained by multiplying 
-  % the minor by (−1)^(i + j).
+  % the minor by (−1)^(i+j).
   % minors={\a,\n,\b}
   % the result is stored in \minor, 
   % the original matrix is not modified.
@@ -294,12 +262,12 @@
                 if \mc@i < \mc@r then {
                   \mc@nexti = \mc@i;
                 } else {
-                  \mc@nexti = \mc@i - 1;
+                  \mc@nexti = \mc@i-1;
                 };
                 if \mc@j < \mc@c then {
                   \mc@nextj = \mc@j;
                 } else {
-                  \mc@nextj = \mc@j - 1;
+                  \mc@nextj = \mc@j-1;
                 };
                 \mc@mat{\mc@nexti,\mc@nextj} = #1{\mc@i,\mc@j};
               };%if
@@ -308,7 +276,7 @@
           % calculate det, we cannot directly use \mc@n-1 as bellow
           % #2{\mc@r,\mc@c} = det(\mc@n-1);
           int \mc@dim;
-          \mc@dim = \mc@n - 1;
+          \mc@dim = \mc@n-1;
           #3{\mc@r,\mc@c} = det(\mc@dim);
         };
       };
@@ -323,7 +291,7 @@
       \mc@n = #2;
       for \mc@r in {1,...,\mc@n}{
         for \mc@c in {1,...,\mc@n}{
-          #3{\mc@r,\mc@c} = \fpeval{(-1)^(\mc@r+\mc@c) * #3{\mc@r,\mc@c}};
+          #3{\mc@r,\mc@c} = \fpeval{(-1)^(\mc@r+\mc@c)*#3{\mc@r,\mc@c}};
         };
       };
     }%tikzmath
@@ -392,7 +360,7 @@
             int \mc@next;
             for \mc@next in {0,...,\mc@row1-1}{
               %先处理第 k 行(i.e. \mc@next=0), 将主元归一化, 然后消去其它行
-              \mc@i =int(mod(\mc@k + \mc@next, \mc@row1)) ;
+              \mc@i =int(mod(\mc@k+\mc@next, \mc@row1)) ;
               if \mc@i == 0 then {
                 \mc@i = \mc@row1;
               };
@@ -400,19 +368,21 @@
               % eliminate A
               for \mc@j in {\mc@k,...,\mc@row1}{
                 if \mc@i == \mc@k then {
-                  \mc@a{\mc@i,\mc@j} = \fpeval{\mc@a{\mc@i,\mc@j} / \mc@temp};
+                  \mc@a{\mc@i,\mc@j} = \fpeval{\mc@a{\mc@i,\mc@j}/\mc@temp};
                 } else {%注意不能少else
-                  \mc@a{\mc@i,\mc@j} = \fpeval{\mc@a{\mc@i,\mc@j} 
-                                       - \mc@temp * \mc@a{\mc@k,\mc@j}};
+                  \mc@a{\mc@i,\mc@j} = \fpeval{
+                    \mc@a{\mc@i,\mc@j}-\mc@temp*\mc@a{\mc@k,\mc@j}
+                  };
                 };
               };
               % eliminate B
               for \mc@j in {1,...,\mc@col2}{
                 if \mc@i == \mc@k then {
-                  #5{\mc@i,\mc@j} = \fpeval{#5{\mc@i,\mc@j} / \mc@temp};
+                  #5{\mc@i,\mc@j} = \fpeval{#5{\mc@i,\mc@j}/\mc@temp};
                 } else {%注意不能少else
-                #5{\mc@i,\mc@j} = \fpeval{#5{\mc@i,\mc@j} 
-                                  - \mc@temp * #5{\mc@k,\mc@j}};
+                  #5{\mc@i,\mc@j} = \fpeval{
+                    #5{\mc@i,\mc@j}-\mc@temp*#5{\mc@k,\mc@j}
+                  };
                 };
               };
             };
@@ -429,9 +399,9 @@
       for \mc@i in {1,...,#2}{
         for \mc@j in {1,...,#2}{
           if \mc@i == \mc@j then {
-            #1{\mc@i,\mc@j} = 1.0;
+            #1{\mc@i,\mc@j} = 1;
           } else {
-            #1{\mc@i,\mc@j} = 0.0;
+            #1{\mc@i,\mc@j} = 0;
           };
         };
       };
@@ -461,16 +431,16 @@
       % max iterations
       int \JacobiMaxIter;
       if \JacobiMaxIter < 0 then {% not overriden by user
-        \JacobiMaxIter = 3 * (\mc@n-1)^2;
+        \JacobiMaxIter = 3*(\mc@n-1)^2;
       };
       % Initialize eigenvector matrix as identity
       for \mc@i in {1,...,\mc@n}{
         for \mc@j in {1,...,\mc@n}{
           #3{\mc@i,\mc@j} = #1{\mc@i,\mc@j};
           if \mc@i == \mc@j then {
-            #4{\mc@i,\mc@j} = 1.0;
+            #4{\mc@i,\mc@j} = 1;
           } else {
-            #4{\mc@i,\mc@j} = 0.0;
+            #4{\mc@i,\mc@j} = 0;
           };
         };
       };
@@ -483,7 +453,7 @@
           % find the maximum off-diagnoal element
           int \mc@p, \mc@q; % position p < q
           real \mc@temp;
-          \mc@p = 1; \mc@q = 2; \mc@temp = 0.0;
+          \mc@p = 1; \mc@q = 2; \mc@temp = 0;
           for \mc@i in {1,...,\mc@n-1}{
             for \mc@j in {\mc@i+1,...,\mc@n}{
               % print{[\mc@i,\mc@j]:\ #2{\mc@i,\mc@j}\\};
@@ -504,7 +474,7 @@
             % assuming tan(θ) = t, sin(θ) = s, cos(θ) = c
             % tau = (a[pp]-a[qq])/(2a[pq]) = cot(2θ) = (1-tan(θ)^2)/2tan(θ)
             % then t satisfies the quadratic equation:
-            % t^2 + 2 tau t - 1 = 0
+            % t^2+2 tau t-1 = 0
             % Choosing the root that is smaller in absolute value,
             % we can compute all relevant quantities without 
             % using trigonometric functions,
@@ -513,12 +483,12 @@
             real \mc@c, \mc@s, \mc@t, \mc@tau;
             \mc@tau = \fpeval{(#3{\mc@p,\mc@p}-#3{\mc@q,\mc@q})/(2*#3{\mc@p,\mc@q})};
             if \mc@tau >= 0 then {
-              \mc@t = \fpeval{1.0 / (\mc@tau + sqrt(1+(\mc@tau)^2))};
+              \mc@t = \fpeval{1.0/(\mc@tau+sqrt(1+(\mc@tau)^2))};
             } else {
-              \mc@t = \fpeval{-1.0 / (- \mc@tau + sqrt(1+(\mc@tau)^2))};
+              \mc@t = \fpeval{-1.0/(- \mc@tau+sqrt(1+(\mc@tau)^2))};
             };
-            \mc@c = \fpeval{1 / sqrt(1+(\mc@t)^2)};
-            \mc@s = \fpeval{\mc@t * \mc@c};
+            \mc@c = \fpeval{1/sqrt(1+(\mc@t)^2)};
+            \mc@s = \fpeval{\mc@t*\mc@c};
             % print{$\tau:\mc@tau,\\ \tan\theta:\mc@t,\\ \cos\theta:\mc@c,\\ sin\theta:\mc@s$\\};
             % rotation matrix:
             % R = [
@@ -529,17 +499,23 @@
             % ], 
             % perform Jacobi rotation
             for \mc@i in {1,...,\mc@n}{
-              \mc@ap{\mc@i} = \fpeval{  #3{\mc@i,\mc@p} * \mc@c + #3{\mc@i,\mc@q} * \mc@s};
-              \mc@aq{\mc@i} = \fpeval{- #3{\mc@i,\mc@p} * \mc@s + #3{\mc@i,\mc@q} * \mc@c};
-              \mc@vp{\mc@i} = \fpeval{  #4{\mc@i,\mc@p} * \mc@c + #4{\mc@i,\mc@q} * \mc@s};
-              \mc@vq{\mc@i} = \fpeval{- #4{\mc@i,\mc@p} * \mc@s + #4{\mc@i,\mc@q} * \mc@c};
+              \mc@ap{\mc@i} = \fpeval{  #3{\mc@i,\mc@p}*\mc@c+#3{\mc@i,\mc@q}*\mc@s};
+              \mc@aq{\mc@i} = \fpeval{- #3{\mc@i,\mc@p}*\mc@s+#3{\mc@i,\mc@q}*\mc@c};
+              \mc@vp{\mc@i} = \fpeval{  #4{\mc@i,\mc@p}*\mc@c+#4{\mc@i,\mc@q}*\mc@s};
+              \mc@vq{\mc@i} = \fpeval{- #4{\mc@i,\mc@p}*\mc@s+#4{\mc@i,\mc@q}*\mc@c};
             };
-            \mc@ap{\mc@p} = \fpeval{#3{\mc@p,\mc@p}*(\mc@c)^2 + 
-                            #3{\mc@q,\mc@q}*(\mc@s)^2 + 2*#3{\mc@p,\mc@q}*\mc@s*\mc@c};
-            \mc@aq{\mc@q} = \fpeval{#3{\mc@p,\mc@p}*(\mc@s)^2 + 
-                            #3{\mc@q,\mc@q}*(\mc@c)^2 - 2*#3{\mc@p,\mc@q}*\mc@s*\mc@c};
-            \mc@ap{\mc@q} = 0.0;
-            \mc@aq{\mc@p} = 0.0;
+            \mc@ap{\mc@p} = \fpeval{
+              #3{\mc@p,\mc@p}*(\mc@c)^2+
+              #3{\mc@q,\mc@q}*(\mc@s)^2+
+              2*#3{\mc@p,\mc@q}*\mc@s*\mc@c
+            };
+            \mc@aq{\mc@q} = \fpeval{
+              #3{\mc@p,\mc@p}*(\mc@s)^2+
+              #3{\mc@q,\mc@q}*(\mc@c)^2-
+              2*#3{\mc@p,\mc@q}*\mc@s*\mc@c
+            };
+            \mc@ap{\mc@q} = 0;
+            \mc@aq{\mc@p} = 0;
             for \mc@i in {1,...,\mc@n}{
               % Update matrix
               #3{\mc@i,\mc@p} = \mc@ap{\mc@i};
@@ -550,7 +526,7 @@
               #4{\mc@i,\mc@p} = \mc@vp{\mc@i};
               #4{\mc@i,\mc@q} = \mc@vq{\mc@i};
             };
-            #3{\mc@q,\mc@p} = 0.0;
+            #3{\mc@q,\mc@p} = 0;
             % for \mc@i in {1,...,\mc@n}{
             %   for \mc@j in {1,...,\mc@n}{
             %     print{[\mc@i,\mc@j]:\ #2{\mc@i,\mc@j}, \ };
@@ -571,7 +547,7 @@
   mat/maxabs/.code args = {#1,#2,#3,#4}{
     \tikzmath {  
       int \mc@i, \mc@j;
-      \mc@max = 0.0;
+      \mc@max = 0;
       for \mc@i in {1,...,(#2)}{
         for \mc@j in {1,...,(#3)}{
           if \mc@max < abs(#1{\mc@i,\mc@j}) then {
@@ -588,8 +564,8 @@
     \tikzmath{
       int \mc@i, \mc@j;
       if \mc@max <= \EPSILON then {
-        {\pgferror{Zero matrix detected}};
-        \mc@max = 1.0;
+        {\pgfwarning{Zero matrix detected}};
+        \mc@max = 1;
       };
       for \mc@i in {1,...,(#2)}{
         for \mc@j in {1,...,(#3)}{
@@ -599,39 +575,40 @@
     }%tikzmath
   },
   % Power Method for Approximating Eigenvalues
+  % mat/power method={\A,\n,\eigenvalue,\eigenvector}
   mat/power method/.code args={#1,#2,#3,#4}{
     \tikzmath{
       int \mc@i, \mc@j, \mc@k;
       % initialize vector
       for \mc@i in {1,...,#2}{
-        \mc@u{\mc@i,1} = 1.0;
+        \mc@u{\mc@i,1} = 1;
       };%for
       % power method iteration
       int \mc@stop;
       \mc@stop = 0;
       for \mc@k in {1,...,\PowerMaxIter}{
         if \mc@stop == 0 then {
-          % matrix production: v = A * u
+          % matrix production: v = A*u
           for \mc@i in {1,...,(#2)}{
-            \mc@sum = 0.0;
+            \mc@sum = 0;
             for \mc@j in {1,...,(#2)}{
-              \mc@sum = \fpeval{\mc@sum + #1{\mc@i,\mc@j} * \mc@u{\mc@j,1}};
+              \mc@sum = \fpeval{\mc@sum+#1{\mc@i,\mc@j}*\mc@u{\mc@j,1}};
             };%for
             \mc@v{\mc@i,1} = \mc@sum;
           };%for
           % infinity norm (max abs) 
-          \mc@max = 0.0;
+          \mc@max = 0;
           for \mc@i in {1,...,(#2)}{
             if abs(\mc@v{\mc@i,1}) > \mc@max then {
               \mc@max = abs(\mc@v{\mc@i,1});
             };%if
           };%for
           % normalize and determine whether it converges.
-          \mc@diff = 0.0;
+          \mc@diff = 0;
           for \mc@i in {1,...,(#2)}{
-            \mc@temp{\mc@i,1} = \fpeval{\mc@v{\mc@i,1} / \mc@max};
-            if abs(\mc@u{\mc@i,1} - \mc@temp{\mc@i,1}) > \mc@diff then {
-              \mc@diff = abs(\mc@u{\mc@i,1} - \mc@temp{\mc@i,1});
+            \mc@temp{\mc@i,1} = \fpeval{\mc@v{\mc@i,1}/\mc@max};
+            if abs(\mc@u{\mc@i,1}-\mc@temp{\mc@i,1}) > \mc@diff then {
+              \mc@diff = abs(\mc@u{\mc@i,1}-\mc@temp{\mc@i,1});
             };
           };%for
           if \mc@diff > \EPSILON then {
@@ -642,14 +619,14 @@
             \mc@stop = 1;
             \status = 1;
             % eigen value and vector
-            \mc@suma = 0.0;
-            \mc@sumb = 0.0;
+            \mc@suma = 0;
+            \mc@sumb = 0;
             for \mc@i in {1,...,(#2)}{
-              \mc@suma = \fpeval{\mc@suma + \mc@u{\mc@i,1} * \mc@v{\mc@i,1}};
-              \mc@sumb = \fpeval{\mc@sumb + \mc@u{\mc@i,1} * \mc@u{\mc@i,1}};
+              \mc@suma = \fpeval{\mc@suma+\mc@u{\mc@i,1}*\mc@v{\mc@i,1}};
+              \mc@sumb = \fpeval{\mc@sumb+\mc@u{\mc@i,1}*\mc@u{\mc@i,1}};
               #4{\mc@i,1} = \mc@temp{\mc@i,1};
             };
-            #3 = \fpeval{\mc@suma / \mc@sumb};
+            #3 = \fpeval{\mc@suma/\mc@sumb};
           };
         };%if not stop
       };%end of power method iteration
@@ -659,26 +636,26 @@
       };
     }%tikzmath
   },
-  % pivot
-  % mat/pivot={\A,\m,\n,\pivot,\i,\j}
+  % find pivot
+  % mat/pivot={\A,\m,\n,\pivot,\pivotRow,\pivotCol}
   mat/pivot/.code args={#1,#2,#3,#4,#5,#6}{
     \tikzmath{
-      int \mc@m, \mc@n, \mc@i, \mc@j;
-      \mc@i = 1;
-      \mc@j = 1;
-      \mc@pivot = 0.0;
+      int \mc@m, \mc@n, \mc@pivotRow, \mc@pivotCol;
+      \mc@pivotRow = 1;
+      \mc@pivotCol = 1;
+      \mc@pivot = 0;
       for \mc@m in {1,...,(#2)}{
         for \mc@n in {1,...,(#3)}{
           if abs(#1{\mc@m,\mc@n}) > \mc@pivot then {
-            \mc@i = \mc@m;
-            \mc@j = \mc@n;
+            \mc@pivotRow = \mc@m;
+            \mc@pivotCol = \mc@n;
             \mc@pivot = abs(#1{\mc@m,\mc@n});
           };
         };
       };
       #4 = \mc@pivot;
-      #5 = \mc@i;
-      #6 = \mc@j;
+      #5 = \mc@pivotRow;
+      #6 = \mc@pivotCol;
     }%tikzmath
   },
   % extract the i-th row as a column vector
@@ -717,11 +694,13 @@
       int \mc@i, \mc@j, \mc@k, \mc@l;
       for \mc@i in {1,...,(#3)}{
         for \mc@j in {1,...,(#3)}{
-          #4{\mc@i,\mc@j} = 0.0;
+          #4{\mc@i,\mc@j} = 0;
           for \mc@k in {1,...,(#3)}{
             for \mc@l in {1,...,(#3)}{
-              #4{\mc@i,\mc@j} = \fpeval{#4{\mc@i,\mc@j} + 
-                              #2{\mc@k,\mc@i} * #1{\mc@k,\mc@l} * #2{\mc@l,\mc@j}};
+              #4{\mc@i,\mc@j} = \fpeval{
+                #4{\mc@i,\mc@j}+
+                #2{\mc@k,\mc@i}*#1{\mc@k,\mc@l}*#2{\mc@l,\mc@j}
+              };
             };
           };
         };
@@ -729,17 +708,17 @@
     }%tikzmath
   },
   % bilinear form
-  % If the n × 1 matrix x represents a vector x with respect to this basis, 
+  % If the n × 1 matrix x represents a vector x with respect to this basis, 
   % and similarly, the n × 1 matrix y represents another vector y, then:
   % B(x,y) = x^T A y
   % mat/bilinear={\A,\x,\y,\n,\b}
   mat/bilinear/.code args={#1,#2,#3,#4,#5}{
     \tikzmath{
       int \mc@i, \mc@j;
-      #5 = 0.0;
+      #5 = 0;
       for \mc@i in {1,...,(#4)}{
         for \mc@j in {1,...,(#4)}{
-          #5 = \fpeval{#5 + #1{\mc@i,\mc@j} * #2{\mc@i,1} * #3{\mc@j,1}};
+          #5 = \fpeval{#5+#1{\mc@i,\mc@j}*#2{\mc@i,1}*#3{\mc@j,1}};
         };
       };
     }%tikzmath
@@ -761,11 +740,13 @@
         {\pgferror{Unable to find nonzero entry}};
       };
       % extract i-th row and j-th column (vectors)
+      int \mc@k; % CAUTION: \mc@k should be an integer!
       for \mc@k in {1,...,(#3)}{
-        #4{\mc@k,1} = \fpeval{#1{\mc@i,\mc@k} / \mc@max};
+        {\message{Succeed!(\mc@i,\mc@k)^^J}};
+        #4{\mc@k,1} = \fpeval{#1{\mc@i,\mc@k}/\mc@max};
       };
       for \mc@k in {1,...,(#2)}{
-        #5{\mc@k,1} = \fpeval{#1{\mc@k,\mc@j} / \mc@max};
+        #5{\mc@k,1} = \fpeval{#1{\mc@k,\mc@j}/\mc@max};
       };
     }
   },

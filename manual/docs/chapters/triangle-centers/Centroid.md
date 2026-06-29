@@ -27,8 +27,10 @@
 
 #### 示例
 
+examples/triangles/centroid
+
 ```latex
-![[ ../../snippets/triangle-centers/centroid.tikz ]]
+![[ ../../../../examples/triangles/centroid.tikz ]]
 ```
 
-![[ ../../snippets/triangle-centers/centroid.tikz ]]
+![[ ../../../../examples/triangles/centroid.tikz ]]

@@ -16,10 +16,10 @@ $$O = w_2 \bm{x_1} + w_1 \bm{x_2} = \begin{bmatrix} x_1w_2 + x_2w_1 \\ y_1w_2 + 
 
 与其垂直的方向向量为 $\bm{d}_\perp = (-(y_2/w_2 - y_1/w_1), x_2/w_2 - x_1/w_1)$。
 
-靠近 $F_1$ 的准线与长轴的交点 $P$，将曲线中心 $O$ 按长轴方向平移 $-\dfrac{a^2}{c}$ 就得到 $P$，平移向量 $\bm{s}$ 为：
+靠近 $F_1$ 的准线与长轴的交点 $P$，将曲线中心 $O$ 按长轴方向平移 $-\cfrac{a^2}{c}$ 就得到 $P$，平移向量 $\bm{s}$ 为：
 
 $$
-\bm{s} = -\dfrac{a^2}{c}\dfrac{\overline{F_1F_2}}{|\overline{F_1F_2}|}=-\dfrac{1}{2e^2}\overline{F_1F_2}
+\bm{s} = -\cfrac{a^2}{c}\cfrac{\overline{F_1F_2}}{|\overline{F_1F_2}|}=-\cfrac{1}{2e^2}\overline{F_1F_2}
 $$
 
 将 $P$ 向垂直方向平移任意非零距离就得到 $Q$。
@@ -51,19 +51,23 @@ $$\bm{l}_{directrix} = P \times Q$$
 
 #### 示例 1：椭圆和双曲线的双焦点定义
 
+examples/definition-of-conics/foci-and-semi-axis
+
 ```latex
-![[ ../../snippets/conics/definition-2-foci.tikz ]]
+![[ ../../../../examples/definition-of-conics/foci-and-semi-axis.tikz ]]
 ```
 
-![[ ../../snippets/conics/definition-2-foci.tikz ]]
+![[ ../../../../examples/definition-of-conics/foci-and-semi-axis.tikz ]]
 
 #### 示例 2：由焦点和曲线上一点确定椭圆或双曲线
 
+examples/definition-of-conics/foci-and-point
+
 ```latex
-![[ ../../snippets/conics/definition-3-foci-point.tikz ]]
+![[ ../../../../examples/definition-of-conics/foci-and-point.tikz ]]
 ```
 
-![[ ../../snippets/conics/definition-3-foci-point.tikz ]]
+![[ ../../../../examples/definition-of-conics/foci-and-point.tikz ]]
 
 
 

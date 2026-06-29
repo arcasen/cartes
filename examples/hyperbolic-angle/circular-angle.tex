@@ -1,0 +1,47 @@
+% https://www.graphicmaths.com/pure/hyperbolic-functions/hyperbolic-angle/
+% https://tex.stackexchange.com/questions/750414/how-to-properly-fill-the-area-under-a-hyperbola-arc-in-tikz-without-fillbetween
+
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{cartes}
+
+\begin{document}
+
+% begin_snippet
+\begin{tikzpicture}%[scale=1.2]
+    \tikzmath{
+    % Circular angle of point P
+    \ang = 1;
+    \k = 180/pi;
+    }
+    
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (P) at ({cos(\k*\ang)},{sin(\k*\ang)});
+    \coordinate (Q) at ({cos(\k*\ang)},0);
+    \coordinate (R) at (0,{sin(\k*\ang)});
+    
+    \axes[grid] (-4:4,-4:4);
+    \draw[domain=-2:2,smooth,variable=\t,teal,thick] 
+        plot ({cos(\k*\t},{sin(\k*\t)});
+    \draw[domain=-2:2,smooth,variable=\t,teal,thick] 
+        plot ({-cos(\k*\t},{sin(\k*\t)});
+    \draw[red] (O) -- (P);
+    \draw[dashed,red] (P) -- (Q) node[below] {$\cos t$};
+    \draw[dashed,red] (P) -- (R) node[left] {$\sin t$};
+    \fill[violet, opacity=0.3] (O) -- (A) -- plot[domain=0:\ang,variable=\t] ({cos(\k*\t},{sin(\k*\t)}) -- cycle;
+
+    \draw[violet] (0,5) node[above, align=center] {Unit Circle: $x^2+y^2=1$\\$x=\cos t,\quad y=\sin t$};
+    \draw[violet] (2,2) node[above] {$Area_{sector}=\dfrac{t}{2}$};
+    \draw[-latex,navy] (2,2) to [out=-110,in=-10] (0.65,0.25);
+    
+    \foreach \p/\placement in {A/below right,P/above right}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+    }
+
+\end{tikzpicture}
+% end_snippet
+
+\end{document}

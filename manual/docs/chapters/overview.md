@@ -1,6 +1,6 @@
 ## 概述
 
-`tikz-cartes` 是一个功能强大的 TikZ 扩展库，专为平面几何、空间向量以及圆锥曲线的解析几何计算与绘图而设计。通过引入强大的向量运算和矩阵变换功能，彻底改变传统的 TikZ 绘图模式。在传统 TikZ 绘图中，用户往往需要手动计算坐标点，或者依赖有限的 `calc` 库进行简单的线性插值。本库填补了高级数学计算与图形绘制之间的空白，允许用户在 \LaTeX 代码中直接进行向量和矩阵等操作，能够直接在 \LaTeX 环境中完成复杂的几何运算（如交点、极点、矩阵变换等），并提供简洁的绘图命令。
+`tikz-cartes` 是一个功能强大的 TikZ 扩展库，专为平面几何、空间向量以及圆锥曲线的解析几何计算与绘图而设计。通过引入强大的向量和矩阵计算功能，彻底改变传统的 TikZ 绘图模式。在传统 TikZ 绘图中，用户往往需要手动计算坐标点，或者依赖有限的 `calc` 库进行简单的计算。本库填补了高级数学计算与图形绘制之间的空白，允许用户在 \LaTeX 代码中直接进行向量和矩阵等操作，能够直接在 \LaTeX 环境中完成复杂的几何运算（如交点、极点、矩阵变换等），并提供简洁的绘图命令。
 
 ### 核心特性
 
@@ -15,76 +15,93 @@
 
 | 命令 | 描述 |
 | ------------ | ------------ |
-| `plane/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
-| `plane/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
-| `plane/combine/origin={\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = m \overline{OA} + n \overline{OB}$ |
-| `plane/add/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} + \overline{OB}$ |
-| `plane/sub/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} - \overline{OB}$ |
-| `plane/scale/origin={\A,\k,\B}` | $\overline{OB} = k \overline{OA}$ |
-| `plane/dot/origin={\A,\B,\d}` | $d = \overline{OA} \cdot \overline{OB}$ |
-| `plane/length/origin={\A,\a}` | $a = |\overline{OA}|$ |
-| `plane/angle/origin={\A,\B,\a}` | $a = \angle{AOB}$, 有向角: $(-180^\circ,180^\circ]$ |
-| `plane/normalize/origin={\A,\B}` | $OB= \overline{OA} / |\overline{OA}|$ |
-| `plane/rotate/origin={\A,\a,\B}` | vector rotation |
-| `plane/project/origin={\A,\B,\C}` | vector projection |
-| `plane/reject/origin={\A,\B,\C}` | vector rejection |
+| `plane/equal={\A,\B,\ans}` | 判断向量 $A$ 和向量 $B$ 是否相等 |
+| `plane/exclude={\A,\B,\C,\D}` | 在向量 $A$ 和向量 $B$ 中选择与向量 $C$ 不相等的向量 |
+| `plane/combine={\A,\B,\a,\b,\C}` | 平面向量线性组合，$\overline{OC} = a \cdot \overline{OA} + b \cdot \overline{OB}$ |
+| `plane/combine={\A,\B,\C,\a,\b,\c,\D}` | 平面向量线性组合：$\overline{OD} = a \cdot \overline{OA} + b \cdot \overline{OB} + c \cdot \overline{OC}$ |
+| `plane/midpoint={\A,\B,\C}` | $C = (A+B)/2$ |
+: 基本运算{.striped}
+
+| 命令 | 描述 |
+| ------------ | ------------ |
+| `plane/add/origin={\A,\B,\C}` | 平面向量加法，$\overline{OC} = \overline{OA} + \overline{OB}$ |
+| `plane/sub/origin={\A,\B,\C}` | 平面向量减法，$\overline{OC} = \overline{OA} - \overline{OB}$ |
+| `plane/scale/origin={\A,\k,\B}` | 平面向量数乘，$\overline{OB} = k \cdot \overline{OA}$ |
+| `plane/dot/origin={\A,\B,\d}` | 平面向量点乘，$d = \overline{OA} \cdot \overline{OB}$ |
+| `plane/length/origin={\A,\a}` | 平面向量的长度，$a = |\overline{OA}|$ |
+| `plane/angle/origin={\A,\B,\a}` | 平面向量夹角，$a = \angle{AOB}$, 有向角: $(-180^\circ,180^\circ]$ |
+| `plane/normalize/origin={\A,\B}` | 平面向量单位化，$OB= \overline{OA} / |\overline{OA}|$ |
+| `plane/rotate/origin={\A,\ang,\B}` | 平面向量 $\overline{OA}$ 绕原点旋转 `\ang` 角度得到 $\overline{OB}$ |
+| `plane/project/origin={\A,\B,\C}` | 平面向量 $\overline{OA}$ 在 $\overline{OB}$ 上的向量投影（$\overline{OC}$） |
+| `plane/reject/origin={\A,\B,\C}` | 平面向量 $\overline{OA}$ 在 $\overline{OB}$ 上的向量拒绝（$\overline{OC}$） |
 | `plane/reflect/origin={\A,\B,\C}` | vector reflection |
 : 基于原点的向量运算{.striped}
 
 | 命令 | 描述 |
 | ------------ | ------------ |
-| `plane/combine={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
-| `plane/add ={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
-| `plane/sub={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
-| `plane/scale={\P,\A,\k,\B}` | $\overline{OB} = \overline{OP} + k \overline{PA}$ |
-| `plane/dot={\P,\A,\B,\d}` | $d = \overline{PA} \cdot \overline{PB}$ |
-| `plane/length={\P,\A,\a}` | $a = |\overline{PA}|$ |
+| `plane/add ={\P,\A,\B,\C}` | 平面向量加法，$\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
+| `plane/sub={\P,\A,\B,\C}` | 平面向量减法，$\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
+| `plane/scale={\P,\A,\k,\B}` | 平面向量数乘，$\overline{OB} = \overline{OP} + k \cdot \overline{PA}$ |
+| `plane/dot={\P,\A,\B,\d}` | 平面向量点乘，$d = \overline{PA} \cdot \overline{PB}$ |
+| `plane/length={\P,\A,\a}` | 平面向量的长度，$a = |\overline{PA}|$ |
 | `plane/length={\A,\B,\C,\a,\b,\c}` | 计算三角形 $ABC$ 的边长 $a,b,c$ |
-| `plane/angle={\P,\A,\B,\a}` | $a = \angle{APB}$, 有向角: $(-180^\circ,180^\circ]$ |
-| `plane/normalize={\P,\A,\B}` | $OB= \overline{PA} / |\overline{PA}|$ |
-| `plane/rotate={\P,\A,\a,\B}` | vector rotation |
-| `plane/project={\P,\A,\B,\C}` | vector projection |
-| `plane/reject={\P,\A,\B,\C}` | vector rejection |
-| `plane/reflect={\P,\A,\B,\C}` | vector reflection |
+| `plane/angle={\P,\A,\B,\a}` | 平面向量夹角，$a = \angle{APB}$, 有向角: $(-180^\circ,180^\circ]$ |
+| `plane/normalize={\P,\A,\B}` | 平面向量单位化，$OB= \overline{PA} / |\overline{PA}|$ |
+| `plane/rotate={\P,\A,\ang,\B}` | 平面向量 $\overline{PA}$ 绕点 $P$ 旋转 `\ang` 角度得到 $\overline{PB}$，$\overline{OB} = \overline{OP} + \overline{PB}$ |
+| `plane/project={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量投影（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
+| `plane/reject={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量拒绝（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
+| `plane/reflect={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 关于 $\overline{PB}$ 的对称向量 $\overline{PC}$，$\overline{OC} = \overline{OP} + \overline{PC}$ |
 : 基于任意点 $P$ 的向量运算{.striped}
 
 ### 空间向量运算命令
 
 | 命令 | 描述 |
 | ------------ | ------------ |
-| `space/equal={\A,\B,\ans}` | 判断两个向量是否相等 |
-| `space/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的向量 |
-| `space/combine/origin={\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = m \overline{OA} + n \overline{OB}$ |
-| `space/add/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} + \overline{OB}$ |
-| `space/sub/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} - \overline{OB}$ |
-| `space/scale/origin={\A,\k,\B}` | $\overline{OB} = k \overline{OA}$ |
-| `space/dot/origin={\A,\B,\d}` | $d = \overline{OA} \cdot \overline{OB}$ |
-| `space/cross/origin={\A,\B,\C}` | $\overline{OC} = \overline{OA} \times \overline{OB}$ |
-| `space/length/origin={\A,\a}` | $a = |\overline{OA}|$ |
-| `space/angle/origin={\A,\B,\a}` | $a = \angle{AOB}$, 无向角: $[0^\circ,180^\circ]$ |
-| `space/normalize/origin={\A,\B}` | $OB= \overline{OA} / |\overline{OA}|$ |
-| `space/rotate/origin={\A,\U,\a,\B}` | vector rotation |
-| `space/project/origin={\A,\B,\C}` | vector projection |
-| `space/reject/origin={\A,\B,\C}` | vector rejection |
-| `space/reflect/origin={\A,\B,\C}` | vector reflection |
+| `space/equal={\A,\B,\ans}` | 判断向量 $A$ 和向量 $B$ 是否相等 |
+| `space/exclude={\A,\B,\C,\D}` | 在向量 $A$ 和向量 $B$ 中选择与向量 $C$ 不相等的向量 |
+| `space/combine={\A,\B,\a,\b,\C}` | 空间向量线性组合，$\overline{OC} = a \cdot \overline{OA} + b \cdot \overline{OB}$ |
+| `space/combine={\A,\B,\C,\a,\b,\c,\D}` | 空间向量线性组合：$\overline{OD} = a \cdot \overline{OA} + b \cdot \overline{OB} + c \cdot \overline{OC}$ |
+| `space/midpoint={\A,\B,\C}` | $C = (A+B)/2$ |
+: 基本运算{.striped}
+
+| 命令 | 描述 |
+| ------------ | ------------ |
+| `space/add/origin={\A,\B,\C}` | 空间向量加法，$\overline{OC} = \overline{OA} + \overline{OB}$ |
+| `space/sub/origin={\A,\B,\C}` | 空间向量减法，$\overline{OC} = \overline{OA} - \overline{OB}$ |
+| `space/scale/origin={\A,\k,\B}` | 空间向量数乘，$\overline{OB} = k \cdot \overline{OA}$ |
+| `space/dot/origin={\A,\B,\d}` | 空间向量点乘，$d = \overline{OA} \cdot \overline{OB}$ |
+| `space/cross/origin={\A,\B,\C}` | 空间向量叉乘，$\overline{OC} = \overline{OA} \times \overline{OB}$ |
+| `space/length/origin={\A,\a}` | 空间向量的长度，$a = |\overline{OA}|$ |
+| `space/angle/origin={\A,\B,\a}` | 空间向量夹角，$a = \angle{AOB}$，无向角: $[0^\circ,180^\circ]$ |
+| `space/normalize/origin={\A,\B}` | 空间向量单位化，$OB= \overline{OA} / |\overline{OA}|$ |
+| `space/rotate/origin={\U,\V,\ang,\W}` | 空间向量 $\overline{OV}$ 绕 $\overline{OU}$ 轴旋转 `\ang` 角度到达 $\overline{OW}$ |
+| `space/project/origin={\A,\B,\C}` | 空间向量 $\overline{OA}$ 在 $\overline{OB}$ 上的向量投影（$\overline{OC}$） |
+| `space/reject/origin={\A,\B,\C}` | 空间向量 $\overline{OA}$ 在 $\overline{OB}$ 上的向量拒绝（$\overline{OC}$ |
+| `space/reflect/origin={\A,\B,\C}` | 空间向量 $\overline{OA}$ 关于 $\overline{OB}$ 的对称向量 $\overline{OC}$ |
 : 基于原点的向量运算{.striped}
 
 | 命令 | 描述 |
 | ------------ | ------------ |
-| `space/combine={\P,\A,\B,\m,\n,\C}` | 线性组合：$\overline{OC} = \overline{OP} + m \overline{PA} + n \overline{PB}$ |
-| `space/add ={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
-| `space/sub={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
-| `space/scale={\P,\A,\k,\B}` | $\overline{OB} = \overline{OP} + k \overline{PA}$ |
-| `space/dot={\P,\A,\B,\d}` | $d = \overline{PA} \cdot \overline{PB}$ |
-| `space/cross={\P,\A,\B,\C}` | $\overline{OC} = \overline{OP} + \overline{PA} \times \overline{PB}$ |
-| `space/length={\P,\A,\a}` | $a = |\overline{PA}|$ |
-| `space/angle={\P,\A,\B,\a}` | $a = \angle{APB}$, 无向角: $[0^\circ,180^\circ]$ |
-| `space/normalize={\P,\A,\B}` | $OB= \overline{PA} / |\overline{PA}|$ |
-| `space/rotate={\P,\A,\U,\a,\B}` | vector rotation |
-| `space/project={\P,\A,\B,\C}` | vector projection |
-| `space/reject={\P,\A,\B,\C}` | vector rejection |
-| `space/reflect={\P,\A,\B,\C}` | vector reflection |
+| `space/add ={\P,\A,\B,\C}` | 空间向量加法，$\overline{OC} = \overline{OP} + \overline{PA} + \overline{PB}$ |
+| `space/sub={\P,\A,\B,\C}` | 空间向量减法，$\overline{OC} = \overline{OP} + \overline{PA} - \overline{PB}$ |
+| `space/scale={\P,\A,\k,\B}` | 空间向量数乘，$\overline{OB} = \overline{OP} + k \cdot \overline{PA}$ |
+| `space/dot={\P,\A,\B,\d}` | 空间向量点乘，$d = \overline{PA} \cdot \overline{PB}$ |
+| `space/cross={\P,\A,\B,\C}` | 空间向量叉乘，$\overline{OC} = \overline{PA} \times \overline{PB}$ |
+| `space/length={\P,\A,\a}` | 空间向量的长度，$a = |\overline{PA}|$ |
+| `space/angle={\P,\A,\B,\a}` | 空间向量夹角，$a = \angle{APB}$，无向角: $[0^\circ,180^\circ]$ |
+| `space/normalize={\P,\A,\B}` | 空间向量单位化，$OB= \overline{PA} / |\overline{PA}|$ |
+| `space/rotate={\P,\U,\V,\ang,\W}` | 空间向量 $\overline{PV}$ 绕 $\overline{PU}$ 轴旋转 `\ang` 角度到达 $\overline{PW}$，$\overline{OW} = \overline{OP} + \overline{PW}$ |
+| `space/project={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量投影（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
+| `space/reject={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量拒绝（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
+| `space/reflect={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 关于 $\overline{PB}$ 的对称向量 $\overline{PC}$，$\overline{OC} = \overline{OP} + \overline{PC}$ |
 : 基于任意点 $P$ 的向量运算{.striped}
+
+| 命令 | 描述 |
+| ------------ | ------------ |
+| `space/orthonormal basis={\U,\V,\W}` | 由空间单位向量 $U$， 由 Gram-Schmidt 算法构造一组正交基 $(U,V,W)$ |
+| `space/intersect pl={\P,\n,\A,\B,\C}` | $P,n$ 是平面的一点和法向量（空间向量），$A,B$是直线上一点，$C$ 返回直线与平面的交点 |
+| `space/perspective transform={\Center,\S,\m,\T,\n,\H}` | 求平面摄影变换矩阵 $H$，$Center$ 是射影中心，$S,m,T,n$ 是源平面 $\pi$和目标平面 $\pi'$ 的原点和法向量（空间向量）|
+: 射影变换相关的计算{.striped}
 
 ### 直线与圆的相关运算
 
@@ -113,6 +130,11 @@
 | `plane/circumcenter = {\A,\B,\C,\O}` | 三角形 $ABC$ 的外心 |
 | `plane/orthocenter={\A,\B,\C,\H}` | 三角形 $ABC$ 的垂心 |
 | `plane/centroid ={\A,\B,\C,\G}` | 三角形 $ABC$ 的重心 |
+| `plane/perimeter={\A,\B,\C,\p}` | 三角形 $ABC$ 的周长 |
+| `plane/area={\A,\B,\C,\area}` | 三角形 $ABC$ 的面积 |
+| `plane/circumradius={\A,\B,\C,\r}` | 三角形 $ABC$ 的外接圆半径 |
+| `plane/inradius={\A,\B,\C,\r}` | 三角形 $ABC$ 的内切圆半径 |
+| `plane/exradius={\A,\B,\C,\r}` | 三角形 $ABC$ 的顶点 $A$ 的对面外切圆半径 |
 : 三角形相关的运算{.striped}
 
 ### 圆锥曲线相关的运算
@@ -121,9 +143,10 @@
 | ------------ | ------------ |
 | `conics/homogenize={\P,\Q}` | 将二维笛卡尔坐标齐次化，`\P` 为笛卡尔坐标，`\Q` 为齐次坐标 |
 | `conics/equal={\A,\B,\ans}` | 判断两个齐次坐标是否相等 |
-| `conics/select distinct={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的齐次坐标 |
+| `conics/exclude={\A,\B,\C,\D}` | 在$(A,B)$ 选择与 $C$ 不相等的齐次坐标 |
 | `conics/dehomogenize={\P,\Q}` | 将齐次坐标去齐次化，`\P` 为齐次坐标，`\Q` 为笛卡尔坐标 |
-| `conicss/distance={\P,\Q,\d}` | 求齐次坐标下的两点 $P,Q$ 的距离 |
+| `conics/distance={\P,\Q,\d}` | 求齐次坐标下的两点 $P,Q$ 的距离 |
+| `conics/midpoint={\A,\B,\C}` | 求齐次坐标下的两点 $A,B$ 的中点 |
 | `conics/cross={\U,\V,\W}` | 向量叉乘，`\U,\V,\W` 为点或直线的齐次坐标 |
 | `conics/x-intercept={\l,\P}` | 直线 $l$ 在 $x$ 轴上的截距点（齐次坐标） |
 | `conics/y-intercept={\l,\P}` | 直线 $l$ 在 $y$ 轴上的截距点（齐次坐标） |
@@ -131,11 +154,12 @@
 | `conics/rotation matrix={\ang,\R}` | 构造旋转矩阵，`\ang` 是旋转角度（deg） |
 | `conics/define/quadratic={\coefs,\C}` | 由二次曲线方程系数计算系数矩阵 |
 | `conics/define/focus-directrix={\F,\D,\e,\C}` | 由焦点-准线定义推导圆锥曲线的系数矩阵 |
-| `conics/define/foci={\Fa,\Fb,\a,\C}` | 由焦点-准线定义推导圆锥曲线的系数矩阵 |
+| `conics/define/foci-axis={\Fa,\Fb,\a,\C}` | 由焦点-准线定义推导圆锥曲线的系数矩阵 |
 | `conics/define/ellipse/foci-point={\Fa,\Fb,\P,\C}` | 由焦点和曲线上一点确定一个椭圆 |
 | `conics/define/hyperbola/foci-point={\Fa,\Fb,\P,\C}` | 由焦点和曲线上一点确定一个双曲线 |
 | `conics/define/circle={\A,\B,\C,\Circle}` | 求过 $A,B,C$ 三点的圆的系数矩阵 |
-| `conics/define/circle={\O,\r,\Circle}` | 求以 $O$ 为圆心，$r$ 为半径的圆的系数矩阵 |
+| `conics/define/circle={\O,\P,\Circle}` | 求以 $O$ 为圆心和圆上一点 $P$ 的圆的系数矩阵 |
+| `conics/define/circle/center-radius={\O,\r,\Circle}` | 求以 $O$ 为圆心，$r$ 为半径的圆的系数矩阵 |
 | `conics/define/five points={\Pa,\Pb,\Pc,\Pd,\Pe,\C}` | 由五点确定的圆锥曲线的系数矩阵 |
 | `conics/define/five tangents={\La,\Lb,\Lc,\Ld,\Le,\C}` | 由五条切线确定的圆锥曲线的系数矩阵 |
 | `conics/rotate={\CO,\CR,\R,\ang}` | 将含 $xy$ 交叉项的二次曲线系数矩阵通过旋转变换消除交叉项 |
@@ -152,7 +176,11 @@
 
 ::: {.messagebox title="Syntax"}
 - `\segment[options,clip=(xmin:xmax,ymin:ymax)] (\l)`：用于 `tikzpicture` 环境内绘制直线（线段）
-  - `\l`：直线的齐次坐标，列向量 |
+  - `\l`：直线的齐次坐标，列向量 
+- `\segment[options,clip=(xmin:xmax,ymin:ymax)] (\A,\B)`：用于 `tikzpicture` 环境内绘制直线（线段）
+  - `\A,\B`：直线上两点的齐次坐标，列向量 
+- `\segment[options,clip=(xmin:xmax,ymin:ymax)] (\a,\b,\c)`：用于 `tikzpicture` 环境内绘制直线（线段）
+  - `\a,\b,\c`：直线 $a x + b y + c = 0$ 的系数
 - `\conic[opitons] (\C)`：用于 `tikzpicture` 环境内绘制圆锥曲线（非退化），对于双曲线和抛物线，可以在 `options` 中设置 `domain`
   - `C`：圆锥曲线的系数矩阵
 :::
@@ -161,7 +189,7 @@
 
 在绘制双曲线或抛物线时，`doamin` 默认为 `domain=(-2:2)`，可以在调用时重新设置。
 
-- 在绘制双曲线（$\dfrac{x^2}{a^2}-\dfrac{y^2}{b^2}=1$）时，`domain` 是下列双曲线参数方程中 $t$ 的取值范围:
+- 在绘制双曲线（$\cfrac{x^2}{a^2}-\cfrac{y^2}{b^2}=1$）时，`domain` 是下列双曲线参数方程中 $t$ 的取值范围:
 
   $$
   \begin{cases}
@@ -169,9 +197,7 @@
   \end{cases}
   $$
 
-  $t$ 的几何意义: 射线出原点交单位双曲线 $x^2-y^2=1$ 于 $(x = \cosh t, y = \sinh t)$,
-
-  $t$ 是射线,双曲线和 $x$ 轴围成的面积的二倍. 对于双曲线上位于 $x$ 轴下方的点, 这个面积被认为是负值.
+  $t$ 的几何意义：射线出原点交单位双曲线 $x^2-y^2=1$ 于 $(x = \cosh t, y = \sinh t)$，$t$ 是射线,双曲线和 $x$ 轴围成的面积的二倍. 对于双曲线上位于 $x$ 轴下方的点, 这个面积被认为是负值。（见 *[双曲角 Hyperbolic Angle]*）
 
 - 在绘制抛物线（$y^2=2px$）时，`domain` 是下列抛物线参数方程中 $t$ 的取值范围:
   
@@ -188,19 +214,23 @@
 
 #### 几何作图-三等分线段
 
+examples/geometric-constructions/线段三等分-segment-trisection
+
 ```latex
-![[ ../../../gallery/euclidean-constructions/线段三等分-segment-trisection.tikz ]]
+![[ ../../../examples/geometric-constructions/线段三等分-segment-trisection.tikz ]]
 ```
 
-![[ ../../../gallery/euclidean-constructions/线段三等分-segment-trisection.tikz ]]
+![[ ../../../examples/geometric-constructions/线段三等分-segment-trisection.tikz ]]
 
 #### 几何作图-过两点与一直线相切的圆
 
+examples/geometric-constructions/maximal-angle-problem
+
 ```latex
-![[ ../../../gallery/euclidean-constructions/maximal-angle-problem.tikz ]]
+![[ ../../../examples/geometric-constructions/maximal-angle-problem.tikz ]]
 ```
 
-![[ ../../../gallery/euclidean-constructions/maximal-angle-problem.tikz ]]
+![[ ../../../examples/geometric-constructions/maximal-angle-problem.tikz ]]
 
 #### 圆锥曲线的包络线
 
@@ -211,23 +241,29 @@
 
 [^pst-eucl]: <https://www.sys.kth.se/docs/texlive/texmf-dist/doc/generic/pst-eucl/euclide_english.pdf>
 
-```latex
-![[ ../../../gallery/lines-and-circles-envelope/ellipse.tikz ]]
-```
-
-![[ ../../../gallery/lines-and-circles-envelope/ellipse.tikz ]]
+examples/envelopes/ellipse
 
 ```latex
-![[ ../../../gallery/lines-and-circles-envelope/hyperbola.tikz ]]
+![[ ../../../examples/envelopes/ellipse.tikz ]]
 ```
 
-![[ ../../../gallery/lines-and-circles-envelope/hyperbola.tikz ]]
+![[ ../../../examples/envelopes/ellipse.tikz ]]
+
+examples/envelopes/hyperbola
 
 ```latex
-![[ ../../../gallery/lines-and-circles-envelope/parabola.tikz ]]
+![[ ../../../examples/envelopes/hyperbola.tikz ]]
 ```
 
-![[ ../../../gallery/lines-and-circles-envelope/parabola.tikz ]]
+![[ ../../../examples/envelopes/hyperbola.tikz ]]
+
+examples/envelopes/parabola
+
+```latex
+![[ ../../../examples/envelopes/parabola.tikz ]]
+```
+
+![[ ../../../examples/envelopes/parabola.tikz ]]
 
 #### 心形线（Cardioid）
 
@@ -235,8 +271,10 @@
 绘制一簇圆，其共同特点是：圆心都在同一个基圆上，且都经过该基圆上的一个定点 $O’$
 在点 $O’$ 附近，线条会非常密集，形成一个尖点（Cusp）。在远离 $O’$ 的另一侧，圆的边缘会勾勒出一个类似“爱心”的轮廓。
 
+examples/envelopes/cardioid
+
 ```latex
-![[ ../../../gallery/lines-and-circles-envelope/cardioid.tikz ]]
+![[ ../../../examples/envelopes/cardioid.tikz ]]
 ```
 
-![[ ../../../gallery/lines-and-circles-envelope/cardioid.tikz ]]
+![[ ../../../examples/envelopes/cardioid.tikz ]]

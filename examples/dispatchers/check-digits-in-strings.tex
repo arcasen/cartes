@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage{pgf} % 仅需 pgf 即可
+
+\makeatletter
+\newcommand{\checkdigits}[1]{%
+  \pgfutil@in@{0}{#1}%
+  \ifpgfutil@in@\else\pgfutil@in@{1}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{2}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{3}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{4}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{5}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{6}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{7}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{8}{#1}\fi
+  \ifpgfutil@in@\else\pgfutil@in@{9}{#1}\fi
+  \ifpgfutil@in@
+    ``#1'' has digit(s)%
+  \else
+    ``#1'' has no digit%
+  \fi
+}
+\makeatother
+
+\begin{document}
+  \checkdigits{Hello World}\\
+  \checkdigits{Agent 007}\\
+  \checkdigits{21st centry}\\
+  \checkdigits{Typsetting with \LaTeX}\\
+  \checkdigits{Typsetting with \LaTeXe}\\
+\end{document}

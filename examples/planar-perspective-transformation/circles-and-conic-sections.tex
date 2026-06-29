@@ -1,0 +1,86 @@
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1,1} = 0; \O{2,1} = 0; \O{3,1} = 1; \radius = 1;
+    % center of projection
+    \Center{1} = 0; \Center{2} = 0; \Center{3} = 1;
+    % source plane
+    \S{1} = 0; \S{2} = 0; \S{3} = 0;
+    \m{1} = 0; \m{2} = 0; \m{3} = 1;
+    % target plane
+    \T{1} = 0; \T{2} = 0; \T{3} = 0;
+    \n{1} = -1; \n{2} = 0; \n{3} = 2; 
+  }
+  \tikzset{
+    % 以 O 为圆心 radius 为半径的圆
+    conics/define/circle/center-radius={\O,\radius,\Circle},
+    space/perspective transform={\Center,\S,\m,\T,\n,\H},
+    mat/inverse={\H,3,\Hi},
+    mat/congruence={\Circle,\Hi,3,\Ca},
+    mat/stdout={\Ca,3,3},
+  }
+  
+  \axes[grid] (-5:5,-5:5);
+  \conic[thick,draw=magenta] (\Circle);
+  \conic[thick,draw=teal] (\Ca);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1,1} = 0; \O{2,1} = 0; \O{3,1} = 1; \radius = 1;
+    % center of projection
+    \Center{1} = 0; \Center{2} = 0; \Center{3} = 1;
+    % source plane
+    \S{1} = 0; \S{2} = 0; \S{3} = 0;%origin
+    \m{1} = 0; \m{2} = 0; \m{3} = 1;%normal vecotr
+    % target plane
+    \T{1} = 0; \T{2} = 0; \T{3} = 0;%origin
+    \n{1} = -1; \n{2} = 0; \n{3} = 1/2;%normal vector 
+  }
+  \tikzset{
+    % 以 O 为圆心 radius 为半径的圆
+    conics/define/circle/center-radius={\O,\radius,\Circle},
+    space/perspective transform={\Center,\S,\m,\T,\n,\H},
+    mat/inverse={\H,3,\Hi},
+    mat/congruence={\Circle,\Hi,3,\Ca},
+    mat/stdout={\Ca,3,3},
+  }
+  
+  \axes[grid] (-5:5,-5:5);
+  \conic[thick,draw=magenta] (\Circle);
+  \conic[thick,draw=teal] (\Ca);
+\end{tikzpicture}
+
+% begin_snippet
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1,1} = 0; \O{2,1} = 0; \O{3,1} = 1; \radius = 1;
+    % center of projection
+    \Center{1} = 0; \Center{2} = 0; \Center{3} = 1;
+    % source plane
+    \S{1} = 0; \S{2} = 0; \S{3} = 0;
+    \m{1} = 0; \m{2} = 0; \m{3} = 1;
+    % target plane
+    \T{1} = 0; \T{2} = 0; \T{3} = 0;
+    \n{1} = -1; \n{2} = 0; \n{3} = 1; 
+  }
+  \tikzset{
+    % 以 O 为圆心 radius 为半径的圆
+    conics/define/circle/center-radius={\O,\radius,\Circle},
+    space/perspective transform={\Center,\S,\m,\T,\n,\H},
+    mat/inverse={\H,3,\Hi},
+    mat/congruence={\Circle,\Hi,3,\Ca},
+    mat/stdout={\Ca,3,3},
+  }
+  
+  \axes[grid] (-5:5,-5:5);
+  \conic[thick,draw=magenta] (\Circle);
+  \conic[thick,draw=teal] (\Ca);
+\end{tikzpicture}
+% end_snippet
+
+\end{document}

@@ -13,7 +13,7 @@ $$ x > 0, \quad y > 0, \quad z > 0 $$
 
 这里的 $x, y, z$ 称为点 $P$ 关于 $\triangle ABC$ 的**重心坐标（Barycentric Coordinates）**。
 
-这些系数的具体物理意义是：$x = \dfrac{S_{\triangle PBC}}{S_{\triangle ABC}}$，$y = \dfrac{S_{\triangle PAC}}{S_{\triangle ABC}}$，$z = \dfrac{S_{\triangle PAB}}{S_{\triangle ABC}}$。即系数代表了对侧小三角形面积与总面积的比值。
+这些系数的具体物理意义是：$x = \cfrac{S_{\triangle PBC}}{S_{\triangle ABC}}$，$y = \cfrac{S_{\triangle PAC}}{S_{\triangle ABC}}$，$z = \cfrac{S_{\triangle PAB}}{S_{\triangle ABC}}$。即系数代表了对侧小三角形面积与总面积的比值。
 
 主要包含两个部分：
 
@@ -86,10 +86,10 @@ $$ P = xA + yB + zC \quad \text{且} \quad x + y + z = 1 $$
 我们可以利用**面积法**（这是最直观的几何解释）来证明系数的具体含义。
 
 * **引理**：系数 $x, y, z$ 分别等于子三角形面积与总面积的比值。
-    即：$x = \dfrac{S_{\triangle PBC}}{S_{\triangle ABC}}, \quad y = \dfrac{S_{\triangle PCA}}{S_{\triangle ABC}}, \quad z = \dfrac{S_{\triangle PAB}}{S_{\triangle ABC}}$。
+    即：$x = \cfrac{S_{\triangle PBC}}{S_{\triangle ABC}}, \quad y = \cfrac{S_{\triangle PCA}}{S_{\triangle ABC}}, \quad z = \cfrac{S_{\triangle PAB}}{S_{\triangle ABC}}$。
 
     *证明引理*：
-    利用向量叉积（二维外积）计算面积。设 $S_{\triangle ABC} = \dfrac{1}{2} |(B-A) \times (C-A)|$。
+    利用向量叉积（二维外积）计算面积。设 $S_{\triangle ABC} = \cfrac{1}{2} |(B-A) \times (C-A)|$。
     考虑 $S_{\triangle PBC}$：
     $$ 2S_{\triangle PBC} = |(B-P) \times (C-P)| $$
     将 $P = xA + yB + zC$ 代入（利用 $x=1-y-z$）：
@@ -98,7 +98,7 @@ $$ P = xA + yB + zC \quad \text{且} \quad x + y + z = 1 $$
     经过繁琐但直接的代数运算（利用 $\overline{u} \times \overline{u} = 0$ 和分配律），可以得出：
     $$ (B-P) \times (C-P) = (1-y-z) [(B-A) \times (C-A)] = x [(B-A) \times (C-A)] $$
     取模长并除以2，得 $S_{\triangle PBC} = |x| S_{\triangle ABC}$。
-    由于 $P$ 在内部，$P$ 与 $A$ 在 $BC$ 同侧，方向一致，故 $x$ 为正，即 $x = \dfrac{S_{\triangle PBC}}{S_{\triangle ABC}}$。
+    由于 $P$ 在内部，$P$ 与 $A$ 在 $BC$ 同侧，方向一致，故 $x$ 为正，即 $x = \cfrac{S_{\triangle PBC}}{S_{\triangle ABC}}$。
     同理可证 $y, z$。
 
 * **推导**：

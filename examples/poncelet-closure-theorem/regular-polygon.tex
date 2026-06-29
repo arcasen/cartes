@@ -1,0 +1,90 @@
+% \foreach 的局部作用域问题是 TeX “组”（Group）机制的直接体现，
+% 而非现代编程语言中的“沙盒”概念。每次循环迭代都相当于进入了一个
+% 临时的 TeX 组，组内的宏定义和变量修改在组结束（即本次迭代结束）
+% 时会被自动还原。针对在循环中计算出某个值（例如动态生成的节点名、
+% 坐标或数组元素），并希望在循环结束后继续使用它的需求，使用 \xdef
+% （或 \global\edef，或 \global\let）进行全局赋值是最经典且
+% 有效的解决方案。
+
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    % 正 n 边形的边数
+    \n = 11;
+    % 外接圆和内切圆的圆心
+    \O{1,1} = 0; \O{2,1} = 0; \O{3,1} = 1; 
+    % 外接圆的半径
+    \ra = 4;
+    % 内切圆的半径
+    % \rb = \ra * cos(180/\n);
+    % 对角线形成的正 n 边形内切圆的半径
+    \rb = \ra * cos(360/\n);
+    % 正 n 边的起始点, 每次都修改, 用于排除已找到顶点
+    \ang = 110;
+    \PUprev = \O{1,1} + \ra * cos(\ang);
+    \PVprev = \O{2,1} + \ra * sin(\ang);
+    \PWprev = 1;
+    % 正 n 边与内切圆的切点, 每次都修改, 用于排除已找到的边
+    \TUprev = 0;
+    \TVprev = 0;
+    \TWprev = 1;
+  }
+  
+  \tikzset{
+    conics/define/circle/center-radius={\O,\ra,\CCa},% 外接圆
+    conics/define/circle/center-radius={\O,\rb,\CCb},% 内切圆
+    mat/normalize={\CCa,3,3,\Ca},% 归一化, 避免 Dimension too large
+    mat/normalize={\CCb,3,3,\Cb},
+    mat/stdout={\Ca,3,3},
+    mat/stdout={\Cb,3,3},
+  }
+  
+  \axes[grid] (-5:5,-5:5);
+  \conic[draw=navy] (\Ca);
+  \conic[draw=violet] (\Cb);
+
+  \foreach \i in {1,...,\n}{
+    \tikzmath{
+      % 当前的顶点和切点
+      \Pcurr{1,1} = \PUprev; \Pcurr{2,1} = \PVprev; \Pcurr{3,1} = \PWprev;
+      \Tcurr{1,1} = \TUprev; \Tcurr{2,1} = \TVprev; \Tcurr{3,1} = \TWprev;
+    }
+    
+    \tikzset{
+      mat/stdout={\Pcurr,3,1},
+      mat/stdout={\Tcurr,3,1},
+      conics/tangents={\Cb,\Pcurr,\Ta,\Tb},
+      conics/dehomogenize={\Pcurr,\PPa},
+      conics/exclude={\Ta,\Tb,\Tcurr,\Tnext},
+      conics/intersect cl={\Ca,\Pcurr,\Tnext,\P,\Q},
+      conics/exclude={\P,\Q,\Pcurr,\Pnext},
+      mat/stdout={\P,3,1},
+      mat/stdout={\Q,3,1},
+      mat/stdout={\Pnext,3,1},
+      conics/dehomogenize={\Pnext,\PPn},
+      conics/dehomogenize={\Tnext,\TTn},
+    }
+    % 导出下一个顶点和切点
+    \xdef\PUprev{\Pnext{1,1}}
+    \xdef\PVprev{\Pnext{2,1}}
+    \xdef\PWprev{\Pnext{3,1}}
+    \xdef\TUprev{\Tnext{1,1}}
+    \xdef\TVprev{\Tnext{2,1}}
+    \xdef\TWprev{\Tnext{3,1}}
+    
+    \coordinate (P) at (\PPa{1},\PPa{2});
+    \coordinate (Q) at (\PPn{1},\PPn{2});
+    \coordinate (T) at (\TTn{1},\TTn{2});
+    \draw[navy,thick] (P) -- (Q);
+    \foreach \p/\placement in {P/above,T/above}{
+      \fill[red] (\p) circle (1.5pt);
+     \draw (\p) node[\placement] {$\p\i$};
+    }
+  }
+\end{tikzpicture}
+
+\end{document}

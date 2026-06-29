@@ -93,8 +93,10 @@ $$
 
 #### 示例：椭圆、抛物线和双曲线的焦点-准线定义
 
+examples/definition-of-conics/focus-and-directrix
+
 ```latex
-![[ ../../snippets/conics/definition-1-focus-directrix.tikz ]]
+![[ ../../../../examples/definition-of-conics/focus-and-directrix.tikz ]]
 ```
 
-![[ ../../snippets/conics/definition-1-focus-directrix.tikz ]]
+![[ ../../../../examples/definition-of-conics/focus-and-directrix.tikz ]]

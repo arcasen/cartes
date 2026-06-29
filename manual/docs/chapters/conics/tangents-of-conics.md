@@ -65,11 +65,33 @@ $$(\bm{p}^T C \bm{p})(\bm{x}^T C \bm{x}) - (\bm{p}^T C \bm{x})^2 = 0$$
   - `\Ta,\Tb`：切点的齐次坐标，列向量，顺序是过这两点直线的正方向
 :::
 
-#### 示例：椭圆的切线
+#### 示例 1：椭圆的切线
+
+examples/tangents/tangents-of-ellipse
 
 ```latex
-![[ ../../snippets/conics/tangents.tikz ]]
+![[ ../../../../examples/tangents/tangents-of-ellipse.tikz ]]
 ```
 
-![[ ../../snippets/conics/tangents.tikz ]]
+![[ ../../../../examples/tangents/tangents-of-ellipse.tikz ]]
+
+#### 示例 2：双曲线的切线
+
+examples/tangents/tangents-of-hyperbola
+
+```latex
+![[ ../../../../examples/tangents/tangents-of-hyperbola.tikz ]]
+```
+
+![[ ../../../../examples/tangents/tangents-of-hyperbola.tikz ]]
+
+#### 示例 3：抛物线的切线
+
+examples/tangents/tangents-of-parabola
+
+```latex
+![[ ../../../../examples/tangents/tangents-of-parabola.tikz ]]
+```
+
+![[ ../../../../examples/tangents/tangents-of-parabola.tikz ]]
 

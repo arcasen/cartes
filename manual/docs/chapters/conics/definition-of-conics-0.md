@@ -35,8 +35,10 @@ $C$ 是一个 $3 \times 3$ 的对称矩阵,称为圆锥曲线的**系数矩阵**
 
 #### 示例：由方程系数确定的二次曲线
 
+examples/definition-of-conics/quadratic-form
+
 ```latex
-![[ ../../snippets/conics/definition-0-quadratic.tikz ]]
+![[ ../../../../examples/definition-of-conics/quadratic-form.tikz ]]
 ```
 
-![[ ../../snippets/conics/definition-0-quadratic.tikz ]]
+![[ ../../../../examples/definition-of-conics/quadratic-form.tikz ]]

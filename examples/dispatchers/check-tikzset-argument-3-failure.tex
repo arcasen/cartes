@@ -1,0 +1,74 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{math}
+
+\makeatletter
+% 1. 核心判断开关
+\newif\iffounddigit
+
+% 2. 递归扫描器：逐个 token 检查是否为数字
+\def\scan@for@digits#1{%
+  \ifx#1\@empty\else % 如果没处理完就继续
+    \ifcat0\detokenize{#1}% 检查当前 token 是否为数字字符
+      \global\founddigittrue
+    \fi
+    \expandafter\scan@for@digits % 递归处理下一个
+  \fi
+}
+
+% 3. 辅助宏：预处理字符串并启动扫描
+\newcommand{\checkfornumbers}[1]{%
+  \global\founddigitfalse
+  % 使用 \detokenize 将宏彻底转为字符串，并去掉大括号的特殊性
+  \edef\temp@str{\detokenize{#1}}%
+  % 在末尾加一个 @empty 作为结束标志，启动递归
+  \expandafter\scan@for@digits\temp@str\@empty
+}
+
+\tikzset{
+  define/@circle-point/.code args={#1,#2}{%
+  \message{^^J[PASS] #2 is a Point^^J}%
+},
+define/@circle-radius/.code args={#1,#2}{%
+  \message{^^J[MATCH] #2 contains Numbers/Expression^^J}%
+},
+  define/circle/.code args={#1,#2}{%
+    \checkfornumbers{#2}%
+    \iffounddigit
+      \pgfkeys{/tikz/define/@circle-radius={#1,#2}}%
+    \else
+      \pgfkeys{/tikz/define/@circle-point={#1,#2}}%
+    \fi
+  },
+}
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1} = 1; \O{2} = 1;
+    \P{1} = 2; \P{2} = 3;
+    \radius = 5;
+  }
+
+  % 测试 1：不含数字，应输出 [PASS]
+  \tikzset{define/circle={\O,\P}}
+
+  % 测试 2：含数字 1，应输出 [MATCH]
+  \tikzset{define/circle={\O,\P{1}}}
+
+  % 测试 3：含数字 5，应输出 [MATCH]
+  \tikzset{define/circle={\O,5cm}}
+
+  % 测试 4：含数字 2，应输出 [MATCH]
+  \tikzset{define/circle={\O,\P{1}+\O{2}}}
+
+\end{tikzpicture}
+\end{document}
+
+% 如果全都识别成了 Number，那是因为 \detokenize 会把宏名（控制序列）拆解开。
+
+% 根本原因
+% 在 \tikzmath 中，你定义的 \O 和 \P 在被 \detokenize 处理时，会变成类似 \O  和 \P 。
+% 但是，如果你的环境里开启了某些设置，或者在某些 LaTeX 引擎下，\detokenize 可能会暴露宏背后的内存地址或内部编号（例如 \char"12 之类的东西），或者更常见的：你传入的 #2 本身在 pgfkeys 传递过程中已经被展开了一部分，包含了内部索引数字。
+
+% 为了解决“全都识别成数字”的问题，我们需要精确匹配，只对字符 0-9 产生反应，而忽略掉宏名（以 \ 开头的字符）。

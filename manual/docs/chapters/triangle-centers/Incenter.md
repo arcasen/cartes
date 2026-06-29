@@ -18,12 +18,15 @@
 
 ::: {.messagebox title="Syntax"}
 - `plane/incenter={\A,\B,\C,\I}`: 三角形 $ABC$ 的内心
+- `plane/inradius={\A,\B,\C,\r}`: 三角形 $ABC$ 的内切圆半径
 :::
 
 #### 示例
 
+examples/triangles/incenter
+
 ```latex
-![[ ../../snippets/triangle-centers/incenter.tikz ]]
+![[ ../../../../examples/triangles/incenter.tikz ]]
 ```
 
-![[ ../../snippets/triangle-centers/incenter.tikz ]]
+![[ ../../../../examples/triangles/incenter.tikz ]]

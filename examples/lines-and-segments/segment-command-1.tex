@@ -1,0 +1,27 @@
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+% \usetikzlibrary{cartes}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \Le{1,1} = 1; \Le{2,1} = 2; \Le{3,1} = 1;
+  }
+  \axes[grid] (-3:3,-3:3);
+  \segment[draw=red,clip=(-4:1,-2:2)] (\Le);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \l{1,1} = 1; \l{2,1} = -1; \l{3,1} = 0;
+    \m{1,1} = 2; \m{2,1} = -1; \m{3,1} = 7;
+    \a=2;
+  }
+  \axes[grid] (-3:3,-3:3);
+  \segment[draw=red,clip=(-4:4,-4:4)] (\l);
+  \segment[draw=red,clip=(-4:4,-4:4)] (1,1,2);
+\end{tikzpicture}
+
+\end{document}  

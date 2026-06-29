@@ -1,5 +1,13 @@
 # Cartes: The Missing Geometry Computation Library for TikZ
 
+    There is a profound and enduring beauty in simplicity; in clarity, in efficiency. True simplicity is derived from so much more than just the absence of clutter and ornamentation. It's about bringing order to complexity.
+
+    意味深长与历久弥新之美，蕴涵于简约之中，于清晰之中，于高效之中。真正的简洁不止是删繁就简，而是在纷繁中建立秩序。
+
+    ― Jonathan Ive
+
+[![Overleaf](https://img.shields.io/badge/Overleaf-47A141?style=flat&logo=Overleaf&logoColor=white)](https://www.overleaf.com/read/rwwpbrxdmqpg#a5df3a)
+
 ## Introduction
 
 `tikz-cartes` is a powerful extension library for TikZ, specifically engineered for analytical geometry calculations and the rendering of plane geometry, spatial vectors, and conic sections. By introducing robust vector operations and matrix transformation capabilities, it fundamentally revolutionizes the traditional TikZ drawing workflow. In conventional TikZ usage, users are often burdened with manual coordinate calculations or limited to the basic linear interpolations provided by the `calc` library. This library bridges the gap between advanced mathematical computation and graphical synthesis, enabling users to perform vector and matrix operations directly within LaTeX code. It allows for the execution of complex geometric tasks—such as finding intersections, poles, and applying matrix transformations—entirely within the LaTeX environment, complemented by a suite of concise drawing commands.
@@ -40,9 +48,9 @@ The following code demonstrates the classic **Euler Line** and the **Nine-Point 
     plane/project={\A,\C,\B,\Ci},
     % --- Medial Triangle Construction ---
     % Find midpoints of the sides (Aj, Bj, Cj)
-    plane/scale={\B,\C,0.5,\Aj},
-    plane/scale={\C,\A,0.5,\Bj},
-    plane/scale={\A,\B,0.5,\Cj},
+    plane/midpoint={\B,\C,\Aj},
+    plane/midpoint={\C,\A,\Bj},
+    plane/midpoint={\A,\B,\Cj},
     % --- Triangle Centers & Euler Line ---
     % Compute the Orthocenter (H) and Circumcenter (O)
     plane/orthocenter={\A,\B,\C,\H},
@@ -51,13 +59,13 @@ The following code demonstrates the classic **Euler Line** and the **Nine-Point 
     plane/scale={\O,\H,0.5,\N},
     % --- Euler Points ---
     % Find midpoints between vertices and the orthocenter (Ak, Bk, Ck)
-    plane/scale={\A,\H,0.5,\Ak},
-    plane/scale={\B,\H,0.5,\Bk},
-    plane/scale={\C,\H,0.5,\Ck},
+    plane/midpoint={\A,\H,\Ak},
+    plane/midpoint={\B,\H,\Bk},
+    plane/midpoint={\C,\H,\Ck},
     % --- Geometric Radii ---
     % Circumradius (Radius) and Nine-point radius (radius)
-    plane/length={\O,\A,\Radius},
-    plane/length={\N,\Ai,\radius},
+    plane/circumradius={\A,\B,\C,\Radius},
+    plane/circumradius={\Ai,\Bi,\Ci,\radius},
   }
   
   % Convert calculated vectors/points to TikZ coordinates
@@ -96,7 +104,7 @@ The following code demonstrates the classic **Euler Line** and the **Nine-Point 
   A1/below,B1/above right,C1/above left,
   A2/above left,B2/below,C2/below right,
   O/above,H/below right,N/below right}{
-    \fill[red] (\p) circle (2pt);
+    \fill[red] (\p) circle (1.5pt);
     \draw (\p) node[\placement] {\small $\p$};
   }
 \end{tikzpicture}
@@ -214,7 +222,7 @@ The following code demonstrates the construction of conics passing through four 
 \usetikzlibrary{cartes}
 
 \begin{document}
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.85]
   \tikzmath{
     % Define 5 points in homogeneous coordinates (x, y, w) 
     % These serve as the basis for the initial conic construction.
@@ -255,8 +263,7 @@ The following code demonstrates the construction of conics passing through four 
     % Construct tangents from Ub to Circleb to find contact points Va and Vb
     conics/tangents={\Circleb,\Ub,\Va,\Vb},
     % Define a third auxiliary circle centered at Ub passing through Va
-    conics/distance={\Ub,\Va,\dist},
-    conics/define/circle={\Ub,\dist,\Circlec},
+    conics/define/circle={\Ub,\Va,\Circlec},
     % Solve for the intersection points Ta and Tb between Circlec and the tangent line Le
     conics/intersect cn={\Circlec,\Le,\Ta,\Tb},
     % Construct the final target conics passing through the original four points and 
@@ -312,14 +319,14 @@ The following code demonstrates the construction of conics passing through four 
   U1/above, U2/above,
   V1/above, V2/above,
   T1/above, T2/above}{
-    \fill[red] (\p) circle (2pt);
+    \fill[red] (\p) circle (1.5pt);
     \draw (\p) node[\placement] {$\p$};
   }
 \end{tikzpicture}
 \end{document}
 ```
 
-![conics-through-4-pts-and-tangent-to-1-line](gallery/conics-4P1T-a.png)
+![conics-through-four-points-and-tangent-to-one-line](gallery/4P1T.png)
 
 ## References
 

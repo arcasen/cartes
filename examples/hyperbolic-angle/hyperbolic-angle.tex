@@ -1,0 +1,46 @@
+% https://www.graphicmaths.com/pure/hyperbolic-functions/hyperbolic-angle/
+% https://tex.stackexchange.com/questions/750414/how-to-properly-fill-the-area-under-a-hyperbola-arc-in-tikz-without-fillbetween
+
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{cartes}
+
+\begin{document}
+
+% begin_snippet
+\begin{tikzpicture}%[scale=1.2]
+    \tikzmath{
+    % hyperbolic angle of point P
+    \ang = 1.5;
+    }
+    
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (1,0);
+    \coordinate (P) at ({cosh(\ang)},{sinh(\ang)});
+    \coordinate (Q) at ({cosh(\ang)},0);
+    \coordinate (R) at (0,{sinh(\ang)});
+    
+    \axes[grid] (-4:4,-4:4);
+    \draw[domain=-2:2,smooth,variable=\t,teal,thick] 
+        plot ({cosh(\t},{sinh(\t)});
+    \draw[domain=-2:2,smooth,variable=\t,teal,thick] 
+        plot ({-cosh(\t},{sinh(\t)});
+    \draw[red] (O) -- (P);
+    \draw[dashed,red] (P) -- (Q) node[below] {$\cosh t$};
+    \draw[dashed,red] (P) -- (R) node[left] {$\sinh t$};
+    \fill[violet, opacity=0.3] (O) -- (A) -- plot[domain=0:\ang,variable=\t] ({cosh(\t},{sinh(\t)}) -- cycle;
+
+    \draw[violet] (0,5) node[above, align=center] {Unit Hyperbola: $x^2-y^2=1$\\$x=\cosh t,\quad y=\sinh t$};
+    \draw[violet] (.5,-2) node[below] {$Area_{sector}=\dfrac{t}{2}$};
+    \draw[-latex,navy] (.5,-2) to [out=90,in=210] (0.5,0.25);
+    
+    \foreach \p/\placement in {A/below left,P/above}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+    }
+
+\end{tikzpicture}
+% end_snippet
+
+\end{document}

@@ -76,8 +76,10 @@ $$\det(\lambda C_1 + \mu C_2) = 0$$
 
 #### 示例：圆锥曲线束
 
+examples/pencil-of-conics/pencil-1
+
 ```latex
-![[ ../../snippets/conics/pencil-of-conics.tikz ]]
+![[ ../../../../examples/pencil-of-conics/pencil-1.tikz ]]
 ```
 
-![[ ../../snippets/conics/pencil-of-conics.tikz ]]
+![[ ../../../../examples/pencil-of-conics/pencil-1.tikz ]]

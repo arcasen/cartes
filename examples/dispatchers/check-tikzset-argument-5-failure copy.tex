@@ -1,0 +1,61 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{math}
+
+\makeatletter
+
+\newif\iffounddigit
+
+% === Improved scanner: expand first, then look for digits ===
+\def\scan@for@digits#1{%
+  \ifx#1\@empty
+  \else
+    \ifnum`#1>47 \ifnum`#1<58 \global\founddigittrue\fi\fi
+    \expandafter\scan@for@digits
+  \fi}
+
+\newcommand{\checkfornumbers}[1]{%
+  \global\founddigitfalse
+  % Fully expand once, then detokenize
+  \edef\temp@str{\detokenize{\expanded{#1}}}%
+  \expandafter\scan@for@digits\temp@str\@empty
+}
+
+\tikzset{
+  define/@circle-point/.code args={#1,#2}{%
+    \message{^^J[PASS] Point: #1, #2^^J}%
+    % do whatever you need for a center+point circle
+  },
+  define/@circle-radius/.code args={#1,#2}{%
+    \message{^^J[MATCH] Radius: #1, #2^^J}%
+    % do whatever you need for a center+radius circle
+  },
+
+  define/circle/.code args={#1,#2}{%
+    \checkfornumbers{#2}%
+    \iffounddigit
+      \pgfkeys{/tikz/define/@circle-radius={#1,#2}}%
+    \else
+      \pgfkeys{/tikz/define/@circle-point={#1,#2}}%
+    \fi
+  },
+}
+
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1} = 1; \O{2} = 1;
+    \P{1} = 2; \P{2} = 3;
+    \radius = 5;
+  }
+
+  \tikzset{define/circle={\O,\P}}           % → Point
+  \tikzset{define/circle={\O,\P{1}}}        % → Radius (has digit)
+  \tikzset{define/circle={\O, 5cm}}         % → Radius
+  \tikzset{define/circle={\O, \radius}}     % → Radius (now works!)
+  \tikzset{define/circle={\O, 3.14}}        % → Radius
+  \tikzset{define/circle={\O, abc}}         % → Point
+
+\end{tikzpicture}
+\end{document}

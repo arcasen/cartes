@@ -1,0 +1,21 @@
+\documentclass{standalone}
+\usepackage{tikzplot}
+% \usepackage{tikz-3dplot}
+
+% \usetikzlibrary{cartes}
+
+\begin{document}
+
+\tikzmath{
+  \A{1} = 1/sqrt(3); \A{2} = 1/sqrt(3); \A{3} = 1/sqrt(3);
+}
+
+\tikzset{% 调用向量运算库命令
+  space/orthonormal basis={\A,\B,\C},
+}
+
+\message{\A{1},\A{2},\A{3}^^J}
+\message{\B{1},\B{2},\B{3}^^J}
+\message{\C{1},\C{2},\C{3}^^J}
+
+\end{document}

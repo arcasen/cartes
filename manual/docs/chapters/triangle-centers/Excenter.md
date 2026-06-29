@@ -19,12 +19,15 @@
 
 ::: {.messagebox title="Syntax"}
 - `plane/excenter={\A,\B,\C,\J}`: 顶点 $A$ 的对面区域（即跨越边 $BC$ 的一侧）的旁心，改变参数位置可以得其它旁心
+- `plane/exradius={\A,\B,\C,\r}`: 三角形 $ABC$ 的顶点 $A$ 的对面外切圆半径
 :::
 
 #### 示例
 
+examples/triangles/excenter
+
 ```latex
-![[ ../../snippets/triangle-centers/excenter.tikz ]]
+![[ ../../../../examples/triangles/excenter.tikz ]]
 ```
 
-![[ ../../snippets/triangle-centers/excenter.tikz ]]
+![[ ../../../../examples/triangles/excenter.tikz ]]

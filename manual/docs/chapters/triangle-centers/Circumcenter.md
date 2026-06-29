@@ -19,7 +19,7 @@ $$
 由余弦定理可知：
 
 $$
-\cos{A}:\cos{B}:\cos{C} = \dfrac{b^2+c^2-a^2}{2bc}:\dfrac{c^2+a^2-b^2}{2ca}:\dfrac{a^2+b^2-c^2}{2ab}
+\cos{A}:\cos{B}:\cos{C} = \cfrac{b^2+c^2-a^2}{2bc}:\cfrac{c^2+a^2-b^2}{2ca}:\cfrac{a^2+b^2-c^2}{2ab}
 $$
 
 由这些式子可以计算：
@@ -41,12 +41,15 @@ $$
 
 ::: {.messagebox title="Syntax"}
 - `plane/circumcenter={\A,\B,\C,\O}`: 三角形 $ABC$ 的外心
+- `plane/circumradius={\A,\B,\C,\r}`: 三角形 $ABC$ 的外接圆半径
 :::
 
 #### 示例
 
+examples/triangles/circumcenter
+
 ```latex
-![[ ../../snippets/triangle-centers/circumcenter.tikz ]]
+![[ ../../../../examples/triangles/circumcenter.tikz ]]
 ```
 
-![[ ../../snippets/triangle-centers/circumcenter.tikz ]]
+![[ ../../../../examples/triangles/circumcenter.tikz ]]

@@ -1,0 +1,71 @@
+% 马尔法蒂问题是几何学经典问题之一，要求在一个已知三角形内作三个圆，使得每个圆与其他两圆及三角形
+% 的两边相切。该问题由意大利数学家马尔法蒂于1803年提出，1826年瑞士数学家雅各布·施泰纳（Jacob 
+% Steiner）首次提出构造方法。
+% 施泰纳的解法基于三角形内心分割原理：先确定原三角形内心，再依次构造子三角形内切圆，通过内公切线
+% 确定切点完成三圆绘制。但其构造步骤长期缺乏严格证明，直至1865年英国数学家安德鲁·哈特（Andrew 
+% Hart）利用根心定理和角平分线性质完成系统论证。1992年，数学家扎尔加勒（Zalgaller）和洛斯
+% （Los）推翻了马尔法蒂关于“三圆面积之和最大”的原始假设。该问题后被收录于《100个著名初等数学问题》，
+% 成为几何作图领域的标志性课题。
+
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{cartes}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = 0; \A{2} = 1; 
+    \B{1} = -2; \B{2} = -3;
+    \C{1} = 8; \C{2} = -1;
+  }
+
+  \tikzset{
+    plane/incenter={\A,\B,\C,\I},
+    plane/incenter={\B,\C,\I,\Ia},
+    plane/inradius={\B,\C,\I,\ra},
+    plane/incenter={\C,\A,\I,\Ib},
+    plane/inradius={\C,\A,\I,\rb},
+    plane/incenter={\A,\B,\I,\Ic},
+    plane/inradius={\A,\B,\I,\rc},
+    plane/project={\I,\Ib,\A,\Ta},
+    plane/internal center={\Ib,\rb,\Ic,\rc,\Ca},
+    plane/tangents={\Ib,\rb,\Ca,\P,\Q},
+    plane/exclude={\P,\Q,\Ta,\Sa},
+    plane/project={\I,\Ic,\B,\Tb},
+    plane/internal center={\Ic,\rc,\Ia,\ra,\Cb},
+    plane/tangents={\Ic,\rc,\Cb,\P,\Q},
+    plane/exclude={\P,\Q,\Tb,\Sb},
+    plane/project={\I,\Ia,\C,\Tc},
+    plane/internal center={\Ia,\ra,\Ib,\rb,\Cc},
+    plane/tangents={\Ia,\ra,\Cc,\P,\Q},
+    plane/exclude={\P,\Q,\Tc,\Sc},
+  }
+
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (I) at (\I{1},\I{2});
+  \coordinate (Ia) at (\Ia{1},\Ia{2});
+  \coordinate (Ib) at (\Ib{1},\Ib{2});
+  \coordinate (Ic) at (\Ic{1},\Ic{2});
+  \coordinate (Sa) at (\Sa{1},\Sa{2});
+  \coordinate (Sb) at (\Sb{1},\Sb{2});
+  \coordinate (Sc) at (\Sc{1},\Sc{2});
+
+  \draw[navy] (A) -- (B) -- (C) -- cycle (I) -- (A) (I) -- (B) (I) -- (C);
+  \draw[red] (Ia) circle (\ra);
+  \draw[red] (Ib) circle (\rb);
+  \draw[red] (Ic) circle (\rc);
+
+  \foreach \p/\placement in {A/above right,B/above left,C/above,
+  I/above,Ia/above,Ib/above,Ic/above,
+  Sa/above,Sb/above,Sc/above}{%,
+   \fill[red] (\p) circle (1.5pt);
+   \draw (\p) node[\placement] {$\p$};
+  }
+
+\end{tikzpicture}
+
+\end{document}

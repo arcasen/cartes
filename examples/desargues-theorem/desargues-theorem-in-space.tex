@@ -1,0 +1,77 @@
+\documentclass{standalone}
+\usepackage{tikzplot}
+% \usepackage{tikz-3dplot}
+
+% \usetikzlibrary{cartes}
+
+\begin{document}
+
+% begin_snippet
+\begin{tikzpicture}[
+  x={({0.5*cos(-135)},{0.5*sin(-135)})}, % default: cm
+  y={(1cm,0cm)}, 
+  z={(0cm,1cm)}
+]
+  \tikzmath{
+    % center of perspectivity
+    \Center{1} = 4; \Center{2} = -3; \Center{3} = 9;
+    % 定义点 A, B, C 的坐标, y = 0
+    \A{1} = -1; \A{2} = 0; \A{3} = 1;
+    \B{1} = 6; \B{2} = 0; \B{3} = 2;
+    \C{1} = 2; \C{2} = 0; \C{3} = 3;
+    % 目标平面的点及法向量 z = 0
+    \P{1} = 0; \P{2} = 0; \P{3} = 0;
+    \n{1} = 0; \n{2} = 1; \n{3} = 1;
+  }
+  
+  \tikzset{
+    % 计算 A, B, C 在目标平面上的投影 A' B' C'
+    space/intersect pl={\P,\n,\Center,\A,\Aa},
+    space/intersect pl={\P,\n,\Center,\B,\Ba},
+    space/intersect pl={\P,\n,\Center,\C,\Ca},
+    % 计算平面 ABC 的法向量
+    space/cross={\A,\B,\C,\m},
+    % 计算 B'C' C'A' A'B' 与 平面 ABC 的交点 D E F
+    space/intersect pl={\A,\m,\Ba,\Ca,\D},
+    space/intersect pl={\A,\m,\Ca,\Aa,\E},
+    space/intersect pl={\A,\m,\Aa,\Ba,\F},
+  }
+
+  % 绘制坐标轴
+  \draw[help lines,teal,-latex] (0,0,0) -- (1,0,0) node[right]{$x$};
+  \draw[help lines,teal,-latex] (0,0,0) -- (0,1,0) node[below left]{$y$};
+  \draw[help lines,teal,-latex] (0,0,0) -- (0,0,1) node[above]{$z$};
+  \draw[teal] (0,0) node[above right]{$O$};
+
+  % 定义 tikz 坐标
+  \coordinate (Center) at (\Center{1},\Center{2},\Center{3});
+  \coordinate (A) at (\A{1},\A{2},\A{3});
+  \coordinate (B) at (\B{1},\B{2},\B{3});
+  \coordinate (C) at (\C{1},\C{2},\C{3});
+  \coordinate (A') at (\Aa{1},\Aa{2},\Aa{3});
+  \coordinate (B') at (\Ba{1},\Ba{2},\Ba{3});
+  \coordinate (C') at (\Ca{1},\Ca{2},\Ca{3});
+  \coordinate (D) at (\D{1},\D{2},\D{3});
+  \coordinate (E) at (\E{1},\E{2},\E{3});
+  \coordinate (F) at (\F{1},\F{2},\F{3});
+
+  % 绘制三角形
+  \draw[fill=orange!25] (A)  -- (B) -- (C) -- cycle;
+  \draw[fill=blue!15] (A')  -- (B') -- (C') -- cycle;
+
+  \draw[purple] (Center) -- (A') (Center) -- (B') (Center) -- (C');
+  \draw[orange] (B) -- (D) (B') -- (D);
+  \draw[green!30!black!60] (A) -- (E) (A') -- (E);
+  \draw[violet] (A) -- (F) (A') -- (F);
+  \draw[navy,thick] ($(D)!-0.15!(F)$) -- ($(D)!1.15!(F)$);
+
+  \foreach \B/\Blacement in {Center/above,A/above,B/below right,C/above left,
+  A'/right,B'/below,C'/below,
+  D/above left,E/above,F/above}{
+    \fill[red] (\B) circle (1.5pt);
+    \draw (\B) node[\Blacement] {$\B$};
+  }
+\end{tikzpicture}
+% end_snippet
+
+\end{document}

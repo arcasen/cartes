@@ -4,11 +4,15 @@
 
 ![[ conics/homogeneous-coordinates.md ]]
 
+![[ conics/planar-projective-transformation.md ]]
+
 ![[ conics/definition-of-conics-0.md ]]
 
 ![[ conics/definition-of-conics-1.md ]]
 
 ![[ conics/definition-of-conics-2.md ]]
+
+![[ conics/hyperbolic-angle.md ]]
 
 ![[ conics/definition-of-circles.md ]]
 

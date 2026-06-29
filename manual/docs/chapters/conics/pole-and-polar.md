@@ -19,9 +19,9 @@ $$
 
 - $x^2 \to x x_0$
 - $y^2 \to y y_0$
-- $xy \to \dfrac{x y_0 + x_0 y}{2}$
-- $x \to \dfrac{x + x_0}{2}$
-- $y \to \dfrac{y + y_0}{2}$
+- $xy \to \cfrac{x y_0 + x_0 y}{2}$
+- $x \to \cfrac{x + x_0}{2}$
+- $y \to \cfrac{y + y_0}{2}$
 - 常数项不变
 
 ##### 核心性质
@@ -80,14 +80,10 @@ $$
 
 #### 示例：极点与极线
 
-```latex
-![[ ../../snippets/conics/polar.tikz ]]
-```
-
-![[ ../../snippets/conics/polar.tikz ]]
+examples/pole-and-polar/pole-and-polar
 
 ```latex
-![[ ../../snippets/conics/pole.tikz ]]
+![[ ../../../../examples/pole-and-polar/pole-and-polar.tikz ]]
 ```
 
-![[ ../../snippets/conics/pole.tikz ]]
+![[ ../../../../examples/pole-and-polar/pole-and-polar.tikz ]]

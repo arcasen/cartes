@@ -87,24 +87,30 @@
 
 #### 示例 1： 五条切线确定的椭圆
 
+examples/definition-of-conics/five-tangents-1-ellipse
+
 ```latex
-![[ ../../snippets/conics/five-tangents-ellipse.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-tangents-1-ellipse.tikz ]]
 ```
 
-![[ ../../snippets/conics/five-tangents-ellipse.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-tangents-1-ellipse.tikz ]]
 
 #### 示例 2： 五条切线确定的双曲线
 
+five-tangents-determine-a-conic/2-hyperbola
+
 ```latex
-![[ ../../snippets/conics/five-tangents-hyperbola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-tangents-2-hyperbola.tikz ]]
 ```
 
-![[ ../../snippets/conics/five-tangents-hyperbola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-tangents-2-hyperbola.tikz ]]
 
 #### 示例 3： 五条切线确定的抛物线
 
+examples/definition-of-conics/five-tangents-3-parabola
+
 ```latex
-![[ ../../snippets/conics/five-tangents-parabola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-tangents-3-parabola.tikz ]]
 ```
 
-![[ ../../snippets/conics/five-tangents-parabola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-tangents-3-parabola.tikz ]]

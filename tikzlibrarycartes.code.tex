@@ -1,4 +1,4 @@
-\ProvidesFile{tikzlibrarycartes.code.tex}[2026/05/01 v1.0.0 A tikz library for geometry computations]
+\ProvidesFile{tikzlibrarycartes.code.tex}[2026/05/08 v1.0.1 A tikz library for geometry computations]
 
 \RequirePackage{tikz}
 \RequirePackage{tikz-3dplot}
@@ -6,8 +6,12 @@
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
 \RequirePackage{bm}
+\RequirePackage{xcolor}
 
 \usetikzlibrary{math,calc,quotes,mc,vc,conics}
+
+% colors
+\definecolor{navy}{HTML}{0D3A69}
 
 % pgfmath-solution to the error:
 % Package PGF Math: Could not parse input 'A' as a floating 
@@ -46,9 +50,9 @@
 %   \parabola [options] (a,b,c); 
 \newcommand\parabola{} % just for safety
 \def\parabola[#1]#2(#3,#4,#5){
-  \path[smooth,domain=-2:2,#1,variable=\euclidea@var]
-    plot({\euclidea@var},
-      {(#3)*\euclidea@var*\euclidea@var+(#4)*\euclidea@var+(#5)})
+  \path[smooth,domain=-2:2,#1,variable=\cates@var]
+    plot({\cates@var},
+      {(#3)*\cates@var*\cates@var+(#4)*\cates@var+(#5)})
 }
 
 % Syntax of ellipse:
@@ -64,11 +68,11 @@
 % wherein, a,b are major/minor semi axis.
 \newcommand\hyperbola{} % just for safety
 \def\hyperbola[#1]#2(#3,#4){
-  \path[smooth,domain=-1.5:1.5,#1,variable=\euclidea@var]
-    plot({-(#3)*cosh(\euclidea@var)},
-      {(#4)*sinh(\euclidea@var)})% right arm
-    plot({ (#3)*cosh(\euclidea@var)},
-      {(#4)*sinh(\euclidea@var)})% left arm
+  \path[smooth,domain=-1.5:1.5,#1,variable=\cates@var]
+    plot({-(#3)*cosh(\cates@var)},
+      {(#4)*sinh(\cates@var)})% right arm
+    plot({ (#3)*cosh(\cates@var)},
+      {(#4)*sinh(\cates@var)})% left arm
 }
 
 % Syntax of asymptote:
@@ -76,9 +80,9 @@
 % wherein, a,b are major/minor semi axis.
 \newcommand\asymptote{} % just for safety
 \def\asymptote[#1]#2(#3,#4){
-  \path[domain=-2:2,#1,variable=\euclidea@var,]
-    plot({\euclidea@var},{ (#4)/(#3)*(\euclidea@var)})  
-    plot({\euclidea@var},{-(#4)/(#3)*(\euclidea@var)}) 
+  \path[domain=-2:2,#1,variable=\cates@var,]
+    plot({\cates@var},{ (#4)/(#3)*(\cates@var)})  
+    plot({\cates@var},{-(#4)/(#3)*(\cates@var)}) 
 }
 
 % Syntax: \axes[grid] (xmin:xmax, ymin:ymax)

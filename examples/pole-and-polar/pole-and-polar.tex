@@ -1,0 +1,74 @@
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+\begin{document}
+
+% begin_snippet
+\begin{tikzpicture}
+  \tikzmath{
+    \a = 4; \b = 1.75; 
+    \coefs{1} = \fpeval{1/(\a)^2};
+    \coefs{2} = 0;
+    \coefs{3} = \fpeval{1/(\b)^2};
+    \coefs{4} = 0;
+    \coefs{5} = 0;
+    \coefs{6} = -1;
+    \P{1,1} = 4; \P{2,1} = 3.5; \P{3,1} = 1;
+    \Q{1,1} = -0.25*\a; \Q{2,1} = 0; \Q{3,1} = 1;
+    \R{1,1} = 0.85*\a; \R{2,1} = 0; \R{3,1} = 1;
+  }
+
+  \tikzset{
+    conics/define/quadratic={\coefs,\Ca},
+    conics/intersect cl={\Ca,\P,\Q,\A,\B},
+    conics/intersect cl={\Ca,\P,\R,\C,\D},
+    conics/cross={\A,\D,\Lad},
+    conics/cross={\B,\C,\Lbc},
+    conics/cross={\Lad,\Lbc,\E},
+    conics/cross={\A,\C,\Lac},
+    conics/cross={\B,\D,\Lbd},
+    conics/cross={\Lac,\Lbd,\F},
+    conics/intersect cl={\Ca,\E,\F,\X,\Y},
+    conics/dehomogenize={\A,\AA},
+    conics/dehomogenize={\B,\BB},
+    conics/dehomogenize={\C,\CC},
+    conics/dehomogenize={\D,\DD},
+    conics/dehomogenize={\E,\EE},
+    conics/dehomogenize={\F,\FF},
+    conics/dehomogenize={\P,\PP},
+    conics/dehomogenize={\X,\XX},
+    conics/dehomogenize={\Y,\YY},
+  }
+
+  \coordinate (A) at (\AA{1},\AA{2});
+  \coordinate (B) at (\BB{1},\BB{2});
+  \coordinate (C) at (\CC{1},\CC{2});
+  \coordinate (D) at (\DD{1},\DD{2});
+  \coordinate (E) at (\EE{1},\EE{2});
+  \coordinate (F) at (\FF{1},\FF{2});
+  \coordinate (P) at (\PP{1},\PP{2});
+  \coordinate (X) at (\XX{1},\XX{2});
+  \coordinate (Y) at (\YY{1},\YY{2});
+
+  \axes[grid] (-5:9,-5:5);
+  \conic[thick,draw=red] (\Ca);
+  \segment[thick,draw=black,clip=(-5:4,-2:4)] (\P,\B);
+  \segment[thick,draw=black,clip=(-5:4,-2:4)] (\P,\D);
+  \segment[thick,draw=black,clip=(-5:4,-2:2)] (\A,\D);
+  \segment[thick,draw=black,clip=(-4:4,-2:2)] (\B,\C);
+  \segment[thick,draw=black,clip=(-1:8,-2:2)] (\A,\C);
+  \segment[thick,draw=black,clip=(-4:8,-2:2)] (\B,\D);
+  \segment[very thick,draw=green!50!black!50,clip=(-5:4,-2:4)] (\P,\X);
+  \segment[very thick,draw=green!50!black!50,clip=(-4:4,-2:4)] (\P,\Y);
+  \segment[very thick,draw=blue,clip=(-4:9,-2:2)] (\E,\F);
+
+  \foreach \p/\placement in {A/above,B/above,C/above left,D/below left,
+  E/above,F/above,P/above right,X/above,Y/above right}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+
+\end{tikzpicture}
+% end_snippet
+
+\end{document}

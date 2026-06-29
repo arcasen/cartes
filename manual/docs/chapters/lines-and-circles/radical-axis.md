@@ -17,13 +17,13 @@
    计算距离平方 $D^2 = |\bm{d}|^2$。
 
 2. **计算常数项**：
-   计算 $C = \dfrac{1}{2} (D^2 + r_1^2 - r_2^2)$。
+   计算 $C = \cfrac{1}{2} (D^2 + r_1^2 - r_2^2)$。
 
 3. **写出向量方程**：
    根轴上任意点 $P$ 满足：
    $$ \overline{O_1P} \cdot \bm{d} = C $$
    即：
-   $$ (P - O_1) \cdot (O_2 - O_1) = \dfrac{1}{2} (|O_2 - O_1|^2 + r_1^2 - r_2^2) $$
+   $$ (P - O_1) \cdot (O_2 - O_1) = \cfrac{1}{2} (|O_2 - O_1|^2 + r_1^2 - r_2^2) $$
 
 特殊情况
 
@@ -32,13 +32,13 @@
 - **两圆相离**：根轴位于两圆之间，垂直于连心线，且靠近半径较小的圆（如果 $r_1 \neq r_2$）。
 - **两圆半径相等 ($r_1 = r_2$)**：
     此时常数项为： 
-    $$C = \dfrac{1}{2} |\overline{O_1O_2}|^2$$
+    $$C = \cfrac{1}{2} |\overline{O_1O_2}|^2$$
     方程变为：
-    $$\overline{O_1P} \cdot \overline{O_1O_2} = \dfrac{1}{2} |\overline{O_1O_2}|^2$$
+    $$\overline{O_1P} \cdot \overline{O_1O_2} = \cfrac{1}{2} |\overline{O_1O_2}|^2$$
     这意味着 $\overline{O_1P}$ 在 $\overline{O_1O_2}$ 上的投影长度是 $O_1O_2$ 长度的一半。此时根轴是线段 $O_1O_2$ 的**垂直平分线**。
 
 使用向量 $\overline{O_1O_2}$ 求解根轴的核心公式为：
-$$ \overline{O_1P} \cdot \overline{O_1O_2} = \dfrac{|\overline{O_1O_2}|^2 + r_1^2 - r_2^2}{2} $$
+$$ \overline{O_1P} \cdot \overline{O_1O_2} = \cfrac{|\overline{O_1O_2}|^2 + r_1^2 - r_2^2}{2} $$
 该式清晰地表明根轴是一条**法向量为 $\overline{O_1O_2}$** 的直线。
 
 求解两圆的交点的问题可以转换为求解根轴与其中一圆的交点。
@@ -52,18 +52,22 @@ $$ \overline{O_1P} \cdot \overline{O_1O_2} = \dfrac{|\overline{O_1O_2}|^2 + r_1^
 
 #### 示例 1：求两圆的交点
 
+examples/intersections/circle-circle-intersection
+
 ```latex
-![[ ../../snippets/lines-and-circles/intersect-cc.tikz ]]
+![[ ../../../../examples/intersections/circle-circle-intersection.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/intersect-cc.tikz ]]
+![[ ../../../../examples/intersections/circle-circle-intersection.tikz ]]
 
 #### 示例 2：根心定理
 
 **根心定理（Radical Center Theorem）**，也称为三圆根轴定理，是平面几何中关于圆的幂（Power of a Point）的一个重要结论。当三个圆的圆心不在同一直线上时，两两圆之间的三条根轴（Radical Axes）必交于一点，这个点被称为这三个圆的**根心 (Radical Center)**。
 
+examples/circles/radical-center
+
 ```latex
-![[ ../../snippets/lines-and-circles/radical-center.tikz ]]
+![[ ../../../../examples/circles/radical-center.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/radical-center.tikz ]]
+![[ ../../../../examples/circles/radical-center.tikz ]]

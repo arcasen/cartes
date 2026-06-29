@@ -1,0 +1,95 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{math}
+
+\makeatletter
+\newif\iffounddigit
+
+% 1. 递归检查每一个字符
+\def\scan@for@digits#1{%
+  \ifx#1\@empty
+    % 扫描结束
+  \else
+    % 针对 0-9 每一个数字进行硬比对
+    \if#10\global\founddigittrue\fi
+    \if#11\global\founddigittrue\fi
+    \if#12\global\founddigittrue\fi
+    \if#13\global\founddigittrue\fi
+    \if#14\global\founddigittrue\fi
+    \if#15\global\founddigittrue\fi
+    \if#16\global\founddigittrue\fi
+    \if#17\global\founddigittrue\fi
+    \if#18\global\founddigittrue\fi
+    \if#19\global\founddigittrue\fi
+    % 继续处理下一个 token
+    \expandafter\scan@for@digits
+  \fi
+}
+
+% 2. 预处理：将内容转为字符串并剔除“\”的影响
+\newcommand{\checkfornumbers}[1]{%
+  \global\founddigitfalse
+  % 将参数转为纯文本字符串
+  \edef\temp@str{\detokenize{#1}}%
+  % 启动递归扫描
+  \expandafter\scan@for@digits\temp@str\@empty
+}
+
+\tikzset{
+  define/@circle-point/.code args={#1,#2}{%
+  \message{^^J[PASS] \detokenize{#2} is a Point^^J}%
+},
+define/@circle-radius/.code args={#1,#2}{%
+  \message{^^J[MATCH] \detokenize{#2} contains Numbers/Expression^^J}%
+},
+  define/circle/.code args={#1,#2}{%
+    % \message{^^J#2}
+    \checkfornumbers{#2}%
+    \iffounddigit
+      \pgfkeys{/tikz/define/@circle-radius={#1,#2}}%
+    \else
+      \pgfkeys{/tikz/define/@circle-point={#1,#2}}%
+    \fi
+  },
+  doublee/.code args={#1,#2}{
+    #2 = 2* #1;
+  },
+}
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1} = 1; \O{2} = 1;
+    \P{1} = 2; \P{2} = 3;
+    \radius = 5;
+  }
+
+  % 情况 A：只有 \P，不含数字 0-9，应该识别为 Point
+  \tikzset{define/circle={\O,\P}}
+
+  % 情况 B：含数字 1，应该识别为 Radius
+  \tikzset{define/circle={\O,\P{1}}}
+
+  % 情况 C：含常数，应该识别为 Radius
+  \tikzset{define/circle={\O, 5cm}}
+
+  \tikzset{
+    doublee={\radius,\d},
+    define/circle={\O,\d}}
+
+\end{tikzpicture}
+\end{document}
+
+% 这是一个非常经典的问题：在 LaTeX 中，宏的展开（Expansion）时机决定了逻辑判断的结果。
+
+% 为什么最后一个识别为 Point？
+% 在你的代码中，最后一个测试用例是：
+% \tikzset{double={\radius,\r}, define/circle={\O, \r}}
+
+% 赋值阶段：double 样式虽然计算了结果，但 \r 此时只是一个存储了数值的宏（或者在 tikzmath 作用域内的变量）。
+
+% 检测阶段：当你调用 define/circle={\O, \r} 时，\checkfornumbers 接收到的参数 #2 是 \r 这个原始记号（Token）。
+
+% 字符串化：\detokenize{#1} 将 \r 转换成了字符串 "\r "（反斜杠 + 字母 r + 空格）。
+
+% 扫描结果：你的递归扫描函数 \scan@for@digits 只检查字符 0-9。因为字符串 "\r " 中不包含任何数字字符，所以 \iffounddigit 返回 false，最终被误判为 Point。

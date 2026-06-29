@@ -1,0 +1,135 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{math}
+
+\makeatletter
+\newif\iffounddigit
+
+% 1. 递归检查每一个字符
+\def\scan@for@digits#1{%
+  \ifx#1\@empty
+    % 扫描结束
+  \else
+    % 针对 0-9 每一个数字进行硬比对
+    \if#10\global\founddigittrue\fi
+    \if#11\global\founddigittrue\fi
+    \if#12\global\founddigittrue\fi
+    \if#13\global\founddigittrue\fi
+    \if#14\global\founddigittrue\fi
+    \if#15\global\founddigittrue\fi
+    \if#16\global\founddigittrue\fi
+    \if#17\global\founddigittrue\fi
+    \if#18\global\founddigittrue\fi
+    \if#19\global\founddigittrue\fi
+    % 继续处理下一个 token
+    \expandafter\scan@for@digits
+  \fi
+}
+
+% 2. 预处理：将内容转为字符串并剔除“\”的影响
+\newcommand{\checkfornumbers}[1]{%
+  \global\founddigitfalse
+  % 将参数转为纯文本字符串
+  \edef\temp@str{\detokenize{#1}}%
+  % 启动递归扫描
+  \expandafter\scan@for@digits\temp@str\@empty
+}
+
+\tikzset{
+  define/@circle-point/.code args={#1,#2}{%
+  \message{^^J[PASS] \detokenize{#2} is a Point^^J}%
+},
+define/@circle-radius/.code args={#1,#2}{%
+  \message{^^J[MATCH] \detokenize{#2} contains Numbers/Expression^^J}%
+},
+  define/circle/.code args={#1,#2}{%
+    \checkfornumbers{#2}%
+    \iffounddigit
+      \pgfkeys{/tikz/define/@circle-radius={#1,#2}}%
+    \else
+      \pgfkeys{/tikz/define/@circle-point={#1,#2}}%
+    \fi
+  },
+}
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \tikzmath{
+    \O{1} = 1; \O{2} = 1;
+    \P{1} = 2; \P{2} = 3;
+    \radius = 5;
+  }
+
+  % 情况 A：只有 \P，不含数字 0-9，应该识别为 Point
+  \tikzset{define/circle={\O,\P}}
+
+  % 情况 B：含数字 1，应该识别为 Radius
+  \tikzset{define/circle={\O,\P{1}}}
+
+  % 情况 C：含常数，应该识别为 Radius
+  \tikzset{define/circle={\O, 5cm}}
+
+  \tikzset{define/circle={\O, \radius}}%failed
+
+\end{tikzpicture}
+\end{document}
+
+% founddigitfalse 要设置为全局吗
+% **必须设置为全局（Global）。**
+
+% 在 TikZ 的 `pgfkeys` 环境中，`.code` 或 `.code args` 执行的代码块实际上是在一个**隐藏的分组（Group/Scope）**中运行的。
+
+% ### 为什么要用全局？
+
+% 如果你在 `.code` 块中使用 `\founddigitfalse`（局部赋值）：
+% 1.  进入 `define/circle/.code`，开启一个 LaTeX 分组。
+% 2.  执行 `\checkfornumbers`，变量被设为 `true` 或 `false`。
+% 3.  **退出代码块时，分组结束，变量的值会立即回滚（回滚到执行该键之前的状态）。**
+
+% 这会导致你在外面（或者接下来的逻辑判断中）永远拿不到正确的更新结果。
+
+% ### 改进后的标准化写法
+
+% 为了确保安全，你应该使用 `\global\founddigitfalse` 或 `\founddigitfalse` 的全局版本（如果使用的是原生 `\newif`，通常配合 `\global` 使用）。
+
+% 在 LaTeX 中，`\newif\iffound` 会自动生成三个宏：
+% *   `\foundtrue`
+% *   `\foundfalse`
+% *   `\iffound`
+
+% 当你需要全局操作时，标准的做法是：
+
+% ```latex
+% \newcommand{\checkfornumbers}[1]{%
+%   \global\founddigitfalse % 初始化为全局假
+%   \edef\temp@str{\detokenize{#1}}%
+%   \expandafter\scan@for@digits\temp@str\@empty
+% }
+
+% \def\scan@for@digits#1{%
+%   \ifx#1\@empty\else
+%     % 如果匹配到数字，必须全局设为真
+%     \if#10\global\founddigittrue\fi
+%     \if#11\global\founddigittrue\fi
+%     \if#12\global\founddigittrue\fi
+%     \if#13\global\founddigittrue\fi
+%     \if#14\global\founddigittrue\fi
+%     \if#15\global\founddigittrue\fi
+%     \if#16\global\founddigittrue\fi
+%     \if#17\global\founddigittrue\fi
+%     \if#18\global\founddigittrue\fi
+%     \if#19\global\founddigittrue\fi
+%     \expandafter\scan@for@digits
+%   \fi
+% }
+% ```
+
+% ### 为什么你之前“全都识别成一种结果”可能与此有关？
+% 如果 `\founddigit` 默认是 `false`，且你没有使用 `\global\founddigittrue`，那么即便程序在扫描时发现了数字，一旦退出 `\scan@for@digits` 所在的那个小环境，它就又变回 `false` 了。结果就是：**永远进不了 Number 分支**。
+
+% ### 总结
+% 1.  **初始化**：`\global\founddigitfalse`
+% 2.  **命中目标**：`\global\founddigittrue`
+% 3.  **判断**：`\iffounddigit`（判断不需要加 global）
+
+% 这样就能确保你在 `\tikzset` 的复杂逻辑嵌套里，依然能准确捕获到判断结果。

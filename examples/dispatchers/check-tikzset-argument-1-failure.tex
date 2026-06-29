@@ -1,0 +1,78 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{math}
+
+\makeatletter
+\tikzset{
+  define/@circle-point/.code args={#1,#2}{
+    % 这里的 #2 是一个标识符（如 P），我们需要取其分量
+    \message{#1,#2}
+  },
+  define/@circle-radius/.code args={#1,#2}{
+    \message{#1,#2}
+  },
+  define/circle/.code args={#1,#2}{
+    % 此处传递参数的解析非常特别
+    \message{^^JArg2: #2^^J}
+    % 关键：使用 \expandafter 让 \string 处理 #2
+    \expandafter\def\expandafter\@tempa\expandafter{\string#2}%
+    \message{String Representation of Arg2: \@tempa^^J}%与 message 不一样
+    \typeout{Arg1: \detokenize{#1}}%直接typeout \O 会出错
+    \typeout{Arg2: \detokenize{#2}}%直接typeout \P 会出错
+    % 将 #1 的“去宏化”字符串保存到 \tempA
+    \edef\tempA{\detokenize{#1}}
+    % 将 #2 保存到 \tempB
+    \edef\tempB{\detokenize{#2}}
+    % 现在你可以安全地对 \tempA 进行操作了
+    \typeout{Saved value: \tempA}
+    \typeout{Saved value: \tempB}
+    
+    % 尝试判断 #2 是否为数字
+    % 检查是否包含数字,需要使用 \tempB
+    \pgfutil@in@{0}{\tempB}%
+    \ifpgfutil@in@\else\pgfutil@in@{1}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{2}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{3}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{4}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{5}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{6}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{7}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{8}{\tempB}\fi
+    \ifpgfutil@in@\else\pgfutil@in@{9}{\tempB}\fi
+    \ifpgfutil@in@
+      \message{\tempB has digit(s)}%
+    \else
+      \message{\tempB has no digit}%
+    \fi
+  },
+}
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \tikzmath{
+    % circle center
+    \O{1} = 1; \O{2} = 1;
+    % point on circle
+    \P{1} = 2; \P{2} = 3;
+    % radius of another circle
+    \radius = 5;
+  }
+
+  % 调用 1：识别为点
+  \tikzset{define/circle={\O,\P}}
+
+  % 调用 2：识别为半径
+  \tikzset{define/circle={\O,\radius}}
+  \tikzset{define/circle={\O,\P{1}+\P{2}+\O{2}^2}}
+
+\end{tikzpicture}
+\end{document}
+
+% 这个问题非常经典，你掉进了一个由 \detokenize、\string 和 Category Codes（分类码） 共同挖下的“深坑”。
+
+% 核心原因：分类码不一致
+% 当你执行 \edef\tempB{\detokenize{#2}} 时，\tempB 里的内容已经变成了 Catcode 12 (other) 的字符。
+% 而在你的 \pgfutil@in@{0}{\tempB} 检查中，输入的 0, 1, 2... 是 Catcode 12 的字符，这看似匹配，但关键在于：\pgfutil@in@ 在比较时，宏内部的展开状态和 token 的一致性非常敏感。
+
+% 为什么 \pgfutil@in@ 会失败？
+% 因为你传给它的第一个参数（如 0）是普通字符，而第二个参数 \tempB 是由 \detokenize 生成的。对于 LaTeX 来说，\detokenize 生成的空格和普通空格是不一样的。此外，\detokenize 在处理宏名（如 \P）时，会在后面强制加一个空格。

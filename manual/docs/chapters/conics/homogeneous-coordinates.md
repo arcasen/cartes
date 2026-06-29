@@ -95,7 +95,7 @@ $$
 
 ##### 坐标平移 Translation of Coordinates
 
-![[ ../../snippets/coordinate-transformations/coordinate-translation.tikz ]]
+![[ ../../../../examples/coordinate-transformations/coordinate-translation.tikz ]]
 
 $$
 \begin{cases}
@@ -143,7 +143,7 @@ $$
 
 ##### 坐标旋转 Rotation of Coordinates
 
-![[ ../../snippets/coordinate-transformations/coordinate-rotation.tikz ]]
+![[ ../../../../examples/coordinate-transformations/coordinate-rotation.tikz ]]
 
 $$
 \begin{cases}
@@ -210,7 +210,7 @@ $$
 
 ##### 坐标轴平移 Translation of Axes
 
-![[ ../../snippets/coordinate-transformations/coordinate-system-translation.tikz ]]
+![[ ../../../../examples/coordinate-transformations/coordinate-system-translation.tikz ]]
 
 $$
 \begin{cases}
@@ -258,7 +258,7 @@ $$
 
 ##### 坐标轴旋转 Rotation of Axes
 
-![[ ../../snippets/coordinate-transformations/coordinate-system-rotation.tikz ]]
+![[ ../../../../examples/coordinate-transformations/coordinate-system-rotation.tikz ]]
 
 $$
 \begin{cases}
@@ -345,8 +345,18 @@ $$
 
 #### 示例：Desargues's Theorem
 
+examples/desargues-theorem/desargues-theorem-in-plane
+
 ```latex
-![[ ../../../../gallery/desargues-theorem.tikz ]]
+![[ ../../../../examples/desargues-theorem/desargues-theorem-in-plane.tikz ]]
 ```
 
-![[ ../../../../gallery/desargues-theorem.tikz ]]
+![[ ../../../../examples/desargues-theorem/desargues-theorem-in-plane.tikz ]]
+
+examples/desargues-theorem/desargues-theorem-in-space
+
+```latex
+![[ ../../../../examples/desargues-theorem/desargues-theorem-in-space.tikz ]]
+```
+
+![[ ../../../../examples/desargues-theorem/desargues-theorem-in-space.tikz ]]

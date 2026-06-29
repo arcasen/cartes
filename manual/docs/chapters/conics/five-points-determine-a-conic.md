@@ -110,24 +110,30 @@ $$\bm{x}_5^T C_1 \bm{x}_5 + \lambda \bm{x}_5^T C_2 \bm{x}_5 = 0 $$
 
 #### 示例 1： 五点确定的椭圆
 
+examples/definition-of-conics/five-points-1-ellipse
+
 ```latex
-![[ ../../snippets/conics/five-points-ellipse.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-points-1-ellipse.tikz ]]
 ```
 
-![[ ../../snippets/conics/five-points-ellipse.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-points-1-ellipse.tikz ]]
 
 #### 示例 2： 五点确定的双曲线
 
+examples/definition-of-conics/five-points-2-hyperbola
+
 ```latex
-![[ ../../snippets/conics/five-points-hyperbola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-points-2-hyperbola.tikz ]]
 ```
 
-![[ ../../snippets/conics/five-points-hyperbola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-points-2-hyperbola.tikz ]]
 
 #### 示例 3： 五点确定的抛物线
 
+examples/definition-of-conics/five-points-3-parabola
+
 ```latex
-![[ ../../snippets/conics/five-points-parabola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-points-3-parabola.tikz ]]
 ```
 
-![[ ../../snippets/conics/five-points-parabola.tikz ]]
+![[ ../../../../examples/definition-of-conics/five-points-3-parabola.tikz ]]

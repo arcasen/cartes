@@ -1,0 +1,69 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{cartes}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = -1; \A{2} = -1; \ra = 3;
+    \B{1} = 0; \B{2} = 2; \rb = 2;
+  }
+  \tikzset{
+    plane/radical axis={\A,\ra,\B,\rb,\C,\U},
+    plane/scale/origin={\U,2,\V},
+    plane/add/origin={\C,\V,\D},
+    plane/sub/origin={\C,\V,\E},
+  }
+  \axes[grid] (-4:4,-4:4);
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+  \coordinate (C) at (\C{1},\C{2});
+  \coordinate (D) at (\D{1},\D{2});
+  \coordinate (E) at (\E{1},\E{2});
+
+  \draw[thick,red] (A) circle (\ra);
+  \draw[thick,teal] (B) circle (\rb);
+
+  \draw[thick] (D) -- (E);
+  
+  \foreach \p/\placement in {A/left,B/right,C/above,D/above,E/above}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1} = -1; \A{2} = -1; \ra = 3;
+    \B{1} = 0; \B{2} = 2; \rb = 2;
+  }
+  \tikzset{
+    plane/radical axis={\A,\ra,\B,\rb,\a,\b,\c},
+    plane/anchor={\a,\b,\c,\anchor},
+    plane/direct={\a,\b,\c,\direct},
+    plane/combine={\anchor,\direct,1,0.5,\D},
+    plane/combine={\anchor,\direct,1,-0.5,\E},
+  }
+  \tikzmath{
+    \l{1,1} = \a;
+    \l{2,1} = \b;
+    \l{3,1} = \c;
+  }
+  \axes[grid] (-4:4,-4:4);
+  \coordinate (A) at (\A{1},\A{2});
+  \coordinate (B) at (\B{1},\B{2});
+
+  \draw[thick,red] (A) circle (\ra);
+  \draw[thick,teal] (B) circle (\rb);
+
+  \segment[draw,clip=(-3:3,-1:4)](\a,\b,\c);
+  
+  \foreach \p/\placement in {A/left,B/right}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}

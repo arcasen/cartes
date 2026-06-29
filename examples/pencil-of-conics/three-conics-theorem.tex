@@ -1,0 +1,56 @@
+% Three Conics Theorem
+% https://mathworld.wolfram.com/ThreeConicsTheorem.html
+% If three conics pass through two given points, 
+% then the lines joining the other two intersections 
+% of each pair of conics are concurrent at a point X 
+% (Evelyn 1974, p. 15). 
+
+\documentclass{standalone}
+\usepackage{tikzplot}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \tikzmath{
+    \A{1,1} = -2; \A{2,1} = 1; \A{3,1} = 1;
+    \B{1,1} = 1; \B{2,1} = -3; \B{3,1} = 1; 
+    \C{1,1} = -1; \C{2,1} = 2; \C{3,1} = 1; 
+    \D{1,1} = 1; \D{2,1} = 2; \D{3,1} = 1; 
+    \E{1,1} = 4; \E{2,1} = 0; \E{3,1} = 1; 
+    \F{1,1} = 3; \F{2,1} = 1; \F{3,1} = 1; 
+    \G{1,1} = -4; \G{2,1} = 1; \G{3,1} = 1; 
+    \H{1,1} = -3; \H{2,1} = -2; \H{3,1} = 1; 
+  }
+  \tikzset{
+    % Create three conics pass through two given points (A and B)
+    conics/define/pencil={\A,\B,\C,\D,2,\Ca},
+    conics/define/pencil={\A,\B,\E,\F,-1.2,\Cb},
+    conics/define/pencil={\A,\B,\G,\H,2,\Cc},
+    % line AB and midpoint
+    conics/cross={\A,\B,\lab},
+    conics/midpoint={\A,\B,\M},
+    % other line of intersections
+    conics/linear factor={\Ca,\Cb,\lab,\M,\l},
+    conics/linear factor={\Cb,\Cc,\lab,\M,\m},
+    conics/linear factor={\Cc,\Ca,\lab,\M,\n},
+  }
+
+  \clip (-7,-7) rectangle (5,5);
+  \axes[grid] (-6:4,-6:4);
+  \conic[thick,draw=teal] (\Ca);
+  \conic[thick,draw=magenta] (\Cb);
+  \conic[thick,draw=purple] (\Cc);
+  \segment[thick,draw=navy,clip=(-5:3,-4:2)] (\l);
+  \segment[thick,draw=teal,clip=(-5:3,-5:3)] (\m);
+  \segment[thick,draw=red,clip=(-4:2,-5:3)] (\n);
+
+  \coordinate (A) at (\A{1,1},\A{2,1});
+  \coordinate (B) at (\B{1,1},\B{2,1});
+
+  \foreach \p/\placement in {A/above left, B/below right}{
+    \fill[red] (\p) circle (1.5pt);
+    \draw (\p) node[\placement] {$\p$};
+  }
+\end{tikzpicture}
+
+\end{document}

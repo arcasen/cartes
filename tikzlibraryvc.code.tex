@@ -1,9 +1,4 @@
-\ProvidesFile{tikzlibraryvc.code.tex}[2026/05/01 v1.2.0 A tikz library for 2d/3d vector computations]
-
-% 绝对不要在 \tikzmath 块内留空行
-% Paragraph ended before \tikz@math@parse@keyword@check was complete.
-% 有可能是未添加分号, if ... then ... else ... 之后也需要分号
-% 特别注意: 类似 \vc@temp 是全局的, 如果在不同的 \tikzmath \tikzset 中使用会出现交叉引用, 导致错误结果!
+\ProvidesFile{tikzlibraryvc.code.tex}[2026/06/05 v1.2.4 A tikz library for 2d/3d vector computations]
 
 % 提高数值计算精度
 % https://tex.stackexchange.com/questions/521857/tikz-fpu-seems-to-be-inaccurate
@@ -18,200 +13,149 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% Space Vector Operations
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % select distinct coorindate
-  % space/select distinct={\A,\B,\C,\D}
+  % exclude coorindate
+  % space/exclude={\A,\B,\C,\D}
   % if A != C, result D = A
   % if B != C, result D = B
   % else throw pgferror
   space/equal/.code args={#1,#2,#3}{
     \tikzmath{
-      if abs((#1{1})-(#2{1})) < \EPSILON && 
-      abs((#1{2})-(#2{2})) < \EPSILON && 
-      abs((#1{3})-(#2{3})) < \EPSILON then {
+      if abs((#1{1})-(#2{1})) < 10*\EPSILON
+          && abs((#1{2})-(#2{2})) < 10*\EPSILON
+          && abs((#1{3})-(#2{3})) < 10*\EPSILON then {
         #3 = 1;
       } else {
         #3 = 0;
       };
     }
   },
-  space/select distinct/.code args={#1,#2,#3,#4}{
+  space/exclude/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/equal={#1,#3,\cs@aequal},
-      space/equal={#2,#3,\cs@bequal},
+      space/equal={#1,#3,\cs@firstequal},
+      space/equal={#2,#3,\cs@secondequal},
     }
     \tikzmath{
-      if \cs@aequal == 0 then {
+      if \cs@firstequal == 0 then {
         #4{1} = #1{1}; #4{2} = #1{2}; #4{3} = #1{3};
       } else {
-        if \cs@bequal == 0 then {
+        if \cs@secondequal == 0 then {
           #4{1} = #2{1}; #4{2} = #2{2}; #4{3} = #2{3};
         } else {
-          {\pgferror{Cannot select distinct coordinate}};
+          {\pgferror{Cannot exclude coordinate}};
         };
       };
     }
   },
-  % linear combination: w = a * u + b * v
-  space/combine/origin/.code args={#1,#2,#3,#4,#5}{
+  % linear combination: w = a*u+b*v
+  space/combine/@2 vectors/.code args={#1,#2,#3,#4,#5}{
     \tikzmath {
-      #5{1} = \fpeval{(#3) * (#1{1}) + (#4) * (#2{1})};
-      #5{2} = \fpeval{(#3) * (#1{2}) + (#4) * (#2{2})};
-      #5{3} = \fpeval{(#3) * (#1{3}) + (#4) * (#2{3})};
+      #5{1} = \fpeval{(#3)*(#1{1})+(#4)*(#2{1})};
+      #5{2} = \fpeval{(#3)*(#1{2})+(#4)*(#2{2})};
+      #5{3} = \fpeval{(#3)*(#1{3})+(#4)*(#2{3})};
+      % #5{1} = (#3)*(#1{1})+(#4)*(#2{1});
+      % #5{2} = (#3)*(#1{2})+(#4)*(#2{2});
+      % #5{3} = (#3)*(#1{3})+(#4)*(#2{3});
     }
   },
-  space/combine/.code args={#1,#2,#3,#4,#5,#6}{
-    \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/combine/origin={\vc@PA,\vc@PB,#4,#5,\vc@PC},
-      space/add/origin={#1,\vc@PC,#6},
+  % linear combination: w = a*u+b*v+c*w
+  space/combine/@3 vectors/.code args={#1,#2,#3,#4,#5,#6,#7}{
+    \tikzmath {
+      #7{1} = \fpeval{(#4)*(#1{1})+(#5)*(#2{1})+(#6)*(#3{1})};
+      #7{2} = \fpeval{(#4)*(#1{2})+(#5)*(#2{2})+(#6)*(#3{2})};
+      #7{3} = \fpeval{(#4)*(#1{3})+(#5)*(#2{3})+(#6)*(#3{3})};
+      % #7{1} = (#4)*(#1{1})+(#5)*(#2{1})+(#6)*(#3{1});
+      % #7{2} = (#4)*(#1{2})+(#5)*(#2{2})+(#6)*(#3{2});
+      % #7{3} = (#4)*(#1{3})+(#5)*(#2{3})+(#6)*(#3{3});
     }
   },
-  % Vector addition: c = a + b
+  space/combine/@argn/.initial=0,
+  space/combine/.code={%dispatcher
+    % compute the number of arguments
+    \pgfkeyssetvalue{/tikz/space/combine/@argn}{0} % 重置计数器
+    \pgfutil@for\arg:=#1\do{
+      \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/space/combine/@argn},1))}
+      \pgfkeysalso{/tikz/space/combine/@argn = \pgfmathresult}
+    }
+    \ifnum \pgfkeysvalueof{/tikz/space/combine/@argn} = 5
+      \tikzset{space/combine/@2 vectors= {#1}}
+    \else\ifnum \pgfkeysvalueof{/tikz/space/combine/@argn} = 7
+      \tikzset{space/combine/@3 vectors= {#1}}
+    \else
+      \pgferror{Incorrect number of arguments for 'space/combine'}
+    \fi\fi
+  },
+  space/midpoint/.code args={#1,#2,#3}{
+    \tikzset {
+      space/combine={#1,#2,0.5,0.5,#3},
+    }
+  },
+  % Vector addition: c = a+b
   space/add/origin/.code args={#1,#2,#3}{
-    \tikzmath {
-      #3{1} = #1{1} + #2{1};
-      #3{2} = #1{2} + #2{2};
-      #3{3} = #1{3} + #2{3};
+    \tikzset {
+      space/combine={#1,#2,1,1,#3},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector a+b: (#3{1},#3{2},#3{3})}
-    % \typeout{=========================}
   },
-  % C = P + PA + PB
+  % C = P+PA+PB =-P+A+B
   space/add/.code args={#1,#2,#3,#4}{
-    \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/add/origin={\vc@PA,\vc@PB,\vc@PC},
-      space/add/origin={#1,\vc@PC,#4},
+    \tikzset {
+      space/combine={#1,#2,#3,-1,1,1,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{vector d: (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
-  % Vector subtraction: c = a - b
+  % Vector subtraction: c = a-b
   space/sub/origin/.code args={#1,#2,#3}{
-    \tikzmath {
-      #3{1} = #1{1} - #2{1};
-      #3{2} = #1{2} - #2{2};
-      #3{3} = #1{3} - #2{3};
+    \tikzset {
+      space/combine={#1,#2,1,-1,#3},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector a-b: (#3{1},#3{2},#3{3})}
-    % \typeout{=========================}
   },
-  % C = P + PA - PB
+  % C = P+PA-PB = P+A-B
   space/sub/.code args={#1,#2,#3,#4}{
-    \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/sub/origin={\vc@PA,\vc@PB,\vc@PC},
-      space/add/origin={#1,\vc@PC,#4},
+    \tikzset {
+      space/combine={#1,#2,#3,1,1,-1,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{vector d: (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
-  % Scalar multiplication: b = k * a
+  % Scalar multiplication: b = k*a
   space/scale/origin/.code args={#1,#2,#3}{
     \tikzmath {
-      #3{1} = #2 * #1{1};
-      #3{2} = #2 * #1{2};
-      #3{3} = #2 * #1{3};
+      #3{1} = \fpeval{(#2)*(#1{1})};
+      #3{2} = \fpeval{(#2)*(#1{2})};
+      #3{3} = \fpeval{(#2)*(#1{3})};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{scale k: #2}
-    % \typeout{vector k*a: (#3{1},#3{2},#3{3})}
-    % \typeout{=========================}
   },
-  % B = P + k (A-P)
+  % B = P+k (A-P) = (1-k) P+k A
   space/scale/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/scale/origin={\vc@PA,#3,\vc@PB},
-      space/add/origin={#1,\vc@PB,#4},
+      space/combine={#1,#2,(1-#3),#3,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{scale k: #3}
-    % \typeout{vector c=a+k(b-a): (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
   % Dot product: c = a · b
   space/dot/origin/.code args={#1,#2,#3}{
     \tikzmath {
-      #3 = \fpeval{#1{1} * #2{1} + #1{2} * #2{2} + #1{3} * #2{3}};
+      #3 = \fpeval{#1{1}*#2{1}+#1{2}*#2{2}+#1{3}*#2{3}};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{dot product a·b: #3}
-    % \typeout{=========================}
   },
   % dot = PA · PB: space/dot={\P,\A,\B,\dot}
   space/dot/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/dot/origin={\vc@PA,\vc@PB,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/dot/origin={\vc@pa,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{dot product (b-a)·(c-a): #4}
-    % \typeout{=========================}
   },
   % Cross product: c = a × b
   space/cross/origin/.code args={#1,#2,#3}{
     \tikzmath{
-      #3{1} = \fpeval{#1{2} * #2{3} - #1{3} * #2{2}};
-      #3{2} = \fpeval{#1{3} * #2{1} - #1{1} * #2{3}};
-      #3{3} = \fpeval{#1{1} * #2{2} - #1{2} * #2{1}};
+      #3{1} = \fpeval{#1{2}*#2{3}-#1{3}*#2{2}};
+      #3{2} = \fpeval{#1{3}*#2{1}-#1{1}*#2{3}};
+      #3{3} = \fpeval{#1{1}*#2{2}-#1{2}*#2{1}};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{cross product axb: (#3{1},#3{2},#3{3})}
-    % \typeout{=========================}
   },
-  % C = P + PA x PB
+  % C = PA x PB
   space/cross/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/cross/origin={\vc@PA,\vc@PB,\vc@PC},
-      space/add/origin={#1,\vc@PC,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/cross/origin={\vc@pa,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{vector d=a+(b-a)x(c-a): (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
   % Vector length: b = |a|
   space/length/origin/.code args={#1,#2}{
@@ -219,151 +163,87 @@
       % 无穷范数 Infinity norm
       \vc@inf = max(abs(#1{1}), abs(#1{2}), abs(#1{3}));
       % 向量长度 Vector length
-      \vc@eps = 0.00001;
-      if \vc@inf < \vc@eps then {
+      if \vc@inf < \EPSILON then {
         #2 = 0;
       } else {
         % 使用缩放法计算，防止平方溢出
-        #2 = \fpeval{\vc@inf * sqrt((#1{1}/\vc@inf)^2 + (#1{2}/\vc@inf)^2 + (#1{3}/\vc@inf)^2)};
+        #2 = \fpeval{\vc@inf*sqrt(((#1{1})/\vc@inf)^2+((#1{2})/\vc@inf)^2+((#1{3})/\vc@inf)^2)};
       };
     }
-
-    % \typeout{=========================}
-    % \typeout{vector: (#1{1}, #1{2}, #1{3})}
-    % \typeout{length: #2}
-    % \typeout{=========================}
   },
   % |PA|
   space/length/.code args={#1,#2,#3}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/length/origin={\vc@PA,#3},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/length/origin={\vc@pa,#3},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{|b-a|: #3}
-    % \typeout{=========================}
   },
-  % Vector normalization: b = a / |a|
+  % Vector normalization: b = a/|a|
   space/normalize/origin/.code args={#1,#2}{
+    \tikzset{
+      space/length/origin={#1,\vc@length},
+    }
     \tikzmath {
-      \vc@zero = 0; % 初始化，防止 ifnum 找不到宏
-      % 无穷范数 Infinity norm
-      \vc@inf = max(abs(#1{1}), abs(#1{2}), abs(#1{3}));
-      % 向量长度 Vector length
-      \vc@length = \fpeval{\vc@inf * sqrt((#1{1}/\vc@inf)^2 + (#1{2}/\vc@inf)^2 + (#1{3}/\vc@inf)^2)};
-      \vc@eps = 0.00001;
-      if \vc@inf > \vc@eps then {
-        #2{1} = \fpeval{#1{1} / \vc@length};
-        #2{2} = \fpeval{#1{2} / \vc@length};
-        #2{3} = \fpeval{#1{3} / \vc@length};
+      if \vc@length > \EPSILON then {
+        #2{1} = \fpeval{(#1{1})/\vc@length};
+        #2{2} = \fpeval{(#1{2})/\vc@length};
+        #2{3} = \fpeval{(#1{3})/\vc@length};
       } else {
-        \vc@zero = 1;
+        \pgferror{Zero vector detected}
         #2{1}=0; #2{2}=0; #2{3}=0;
       };
     }
-
-    \ifnum\vc@zero=1
-      \pgferror{Zero vector detected}
-    \fi
-
-    % \typeout{=========================}
-    % \typeout{vector: (#1{1},#1{2},#1{3})}
-    % \typeout{normalized: (#2{1},#2{2},#2{3})}
-    % \typeout{=========================}
   },
   % normalize: space/normalize={\P,\A,\B}
   space/normalize/.code args={#1,#2,#3}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/normalize/origin={\vc@PA,#3},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/normalize/origin={\vc@pa,#3},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{normalized of b-a: (#3{1},#3{2},#3{3})}
-    % \typeout{=========================}
   },
   % Scalar projection of vector 'a' on 'b' is the length (magnitude) of 
   % the component of 'a' in the direction of 'b'.
   % comp_b{a} = (a·b)/|b|
   space/component/origin/.code args={#1,#2,#3}{
-    % 将向量 #2 归一化
     \pgfkeys{
-      /tikz/space/normalize/origin={#2,\vc@onto},
+      /tikz/space/dot/origin={#1,#2,\vc@dot},
+      /tikz/space/length/origin={#2,\vc@length},
     }
 
     \tikzmath{
       % 投影标量
-      #3 = \fpeval{(#1{1} * \vc@onto{1} + #1{2} * \vc@onto{2} + #1{3} * \vc@onto{3})};
+      #3 = \fpeval{\vc@dot/\vc@length};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{scalar projection (a onto b): #3}
-    % \typeout{=========================}
   },
   % Scalar projection of PA onto PB
   space/component/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/component/origin={\vc@PA,\vc@PB,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/component/origin={\vc@pa,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{scalar projection (b-a onto c-a): #4}
-    % \typeout{=========================}
   },
   % The vector projection of vector 'a' onto vector 'b' is the orthogonal 
   % projection of onto a straight line parallel to 'b'.
   % proj_b{a} = (a·b)/(b·b) b
   space/project/origin/.code args={#1,#2,#3}{
-    % 将向量 #2 归一化
     \pgfkeys{
-      /tikz/space/normalize/origin={#2,\vc@onto},
+      /tikz/space/dot/origin={#1,#2,\vc@dotab},
+      /tikz/space/dot/origin={#2,#2,\vc@dotbb},
+      /tikz/space/scale/origin={#2,(\vc@dotab/\vc@dotbb),#3},
     }
-    
-    \tikzmath{
-      % 投影标量
-      \vc@scalar = \fpeval{(#1{1} * \vc@onto{1} + #1{2} * \vc@onto{2} + #1{3} * \vc@onto{3})};
-      % 向量投影
-      #3{1} = \vc@scalar * \vc@onto{1};
-      #3{2} = \vc@scalar * \vc@onto{2};
-      #3{3} = \vc@scalar * \vc@onto{3};
-    }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector projection (a onto b): (#3{1},#3{2},#3{3})}
-    % \typeout{=========================}
   },
   % Vector projection of PA onto PB: PC
-  % projection of A onto PB: C = P + PC
+  % projection of A onto PB: C = P+PC
   space/project/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/project/origin={\vc@PA,\vc@PB,\vc@PC},
-      space/add/origin={#1,\vc@PC,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/project/origin={\vc@pa,\vc@pb,\vc@pc},
+      space/add/origin={#1,\vc@pc,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{projection (B onto AC): (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
-  % vector rejection: rej_b{a} = a - proj_b{a}
+  % vector rejection: rej_b{a} = a-proj_b{a}
   space/reject/origin/.code args={#1,#2,#3}{
     \tikzset{
       space/project/origin={#1,#2,\vc@proj},
@@ -372,13 +252,13 @@
   },
   space/reject/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/reject/origin={\vc@PA,\vc@PB,\vc@PC},
-      space/add/origin={#1,\vc@PC,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/reject/origin={\vc@pa,\vc@pb,\vc@pc},
+      space/add/origin={#1,\vc@pc,#4},
     }
   },
-  % vector reflection: ref_b{a} = a - 2 rej_b{a} = 2 proj_b{a} - a
+  % vector reflection: ref_b{a} = a-2 rej_b{a} = 2 proj_b{a}-a
   space/reflect/origin/.code args={#1,#2,#3}{
     \tikzset{
       space/project/origin={#1,#2,\vc@proj},
@@ -390,10 +270,10 @@
   % space/reflect={\P,\A,\B,\C}
   space/reflect/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/reflect/origin={\vc@PA,\vc@PB,\vc@PC},
-      space/add/origin={#1,\vc@PC,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/reflect/origin={\vc@pa,\vc@pb,\vc@pc},
+      space/add/origin={#1,\vc@pc,#4},
     }
   },
   % the angle between two vectors: angle/origin={a,b,theta}
@@ -405,94 +285,180 @@
     }
     
     \tikzmath{
-      #3 = acos(\vc@w / (\vc@u * \vc@v));
+      #3 = acos(\vc@w/(\vc@u*\vc@v));
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{angle <a,b>: #3}
-    % \typeout{=========================}
   },
   % the angle between two vectors AB and AC: angle/origin={A,B,C,theta}
   space/angle/.code args={#1,#2,#3,#4}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@PA},
-      space/sub/origin={#3,#1,\vc@PB},
-      space/angle/origin={\vc@PA,\vc@PB,#4},
+      space/sub/origin={#2,#1,\vc@pa},
+      space/sub/origin={#3,#1,\vc@pb},
+      space/angle/origin={\vc@pa,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{angle <b-a,c-a>: #4}
-    % \typeout{=========================}
   },
   % 罗德里格旋转公式 (Rodrigues' Rotation Formula)
   % 绕任意单位向量轴 $\bm{u}$ 旋转角度 $\theta$：
-  % \bm{v}_{\text{rot}} = \cos\theta \bm{v}  + (\bm{u} \cdot \bm{v}) (1 - \cos\theta) \bm{u} + \sin\theta (\bm{u} \times \bm{v}) 
+  % \bm{v}_{\text{rot}} = \cos\theta \bm{v} +(\bm{u} \cdot \bm{v}) (1-\cos\theta) \bm{u}+\sin\theta (\bm{u} \times \bm{v}) 
   % space/rotate/origin={u,v,theta,w}
   space/rotate/origin/.code args={#1,#2,#3,#4}{
+    \tikzmath{
+      % Note: \fpeval use radians, compute cos, sin immediately
+      \vc@cos = cos(#3);
+      \vc@sin = sin(#3);
+    }
+    
     \tikzset{
       space/normalize/origin={#1,\vc@U},
       space/cross/origin={\vc@U,#2,\vc@cross},
       space/dot/origin={\vc@U,#2,\vc@dot},
-      space/scale/origin={#2,(cos(#3)),\vc@radical},
-      space/scale/origin={\vc@cross,(sin(#3)),\vc@tagential},
-      space/scale/origin={\vc@U,(\vc@dot * (1-cos(#3))),\vc@axial},
-      space/add/origin={\vc@radical,\vc@tagential,\vc@temp},
-      space/add/origin={\vc@temp,\vc@axial,#4},
+      space/combine={#2,\vc@cross,\vc@U,
+        \vc@cos,
+        \vc@sin,
+        \vc@dot*(1-\vc@cos),
+        #4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector u: (#1{1},#1{2},#1{3})}
-    % \typeout{vector v: (#2{1},#2{2},#2{3})}
-    % \typeout{theta: #3}
-    % \typeout{vector rot: (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
+    \message{U:(\vc@U{1},\vc@U{2},\vc@U{3})^^J}
+    \message{V:(#2{1},#2{2},#2{3})^^J}
+    \message{UxV:(\vc@cross{1},\vc@cross{2},\vc@cross{3})^^J}
+    \message{U·V:\vc@dot^^J}
   },
   % PV rotates around PU by an angle theta to obtain PW
   % space/rotate={\P,\U,\V,\ang,\W}
   space/rotate/.code args={#1,#2,#3,#4,#5}{
     \tikzset{
-      space/sub/origin={#2,#1,\vc@U},
-      space/sub/origin={#3,#1,\vc@V},
-      space/rotate/origin={\vc@U,\vc@V,#4,\vc@W},
+      space/sub/origin={#2,#1,\vc@Ua},
+      space/sub/origin={#3,#1,\vc@Va},
+      space/rotate/origin={\vc@Ua,\vc@Va,#4,\vc@W},
       space/add/origin={#1,\vc@W,#5},
+    }
+  },
+  % Gram-Schmidt Orthogonalization
+  % The Gram-Schmidt orthogonalization process is a mathematical 
+  % algorithm used to transform a set of linearly independent 
+  % vectors into an orthogonal (or orthonormal) basis.
+  % space/orthonormal basis={\U,\V,\W},
+  % \U,\V,\W: unit vectors, \U is the input, \V,\W are the outputs
+  space/orthonormal basis/.code args={#1,#2,#3}{
+    \tikzmath{
+      % 为避免 向量 a 与向量 u 接近平行导致数值误差,
+      % 采取下面的策略确保向量 a 与向量 u 夹角不太小, 提高数值稳定性
+      if abs(#1{1}) <= abs(#1{2}) && abs(#1{1}) <= abs(#1{3}) then {
+        \vc@a{1} = 1; \vc@a{2} = 0; \vc@a{3} = 0;
+      } else {
+        if abs(#1{2}) <= abs(#1{3}) then {
+          \vc@a{1} = 0; \vc@a{2} = 1; \vc@a{3} = 0;    
+        } else {
+          \vc@a{1} = 0; \vc@a{2} = 0; \vc@a{3} = 1;
+        };
+      };
+    }
+    \tikzset{
+      % Gram-Schmidt Orthogonalization Process
+      space/reject/origin={\vc@a,#1,\vc@v},
+      space/normalize/origin={\vc@v,#2},
+      space/cross/origin={#1,#2,#3},
+    }
+  },
+  % Intersection of a plane and a line
+  % space/intersect pl={\P,\n,\A,\B,\C}
+  % \P - a point on the plane
+  % \n - the normal vector of the plane
+  % \A, \B - two points on the line
+  % \C - the intersection
+  % raise error if the line is parallel to a plane or lies on the plane
+  space/@assert_not_parallel/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      space/normalize/origin={#2,\vc@n},
+      space/normalize={#3,#4,\vc@l},
+      space/dot/origin={\vc@n,\vc@l,\vc@dot},
+    }
+
+    \tikzmath{
+      if abs(\vc@dot) < \EPSILON then {
+        {\pgferror{The line is parallel to a plane or lies on the plane}};
+      };
+    }
+  },
+  space/intersect pl/.code args={#1,#2,#3,#4,#5}{
+    \tikzset{
+      space/@assert_not_parallel={#1,#2,#3,#4},
+      space/sub/origin={#4,#3,\vc@ab},
+      space/sub/origin={#1,#3,\vc@ap},
+      space/dot/origin={\vc@n,\vc@ab,\vc@dota},
+      space/dot/origin={\vc@n,\vc@ap,\vc@dotb},
+      space/scale={#3,#4,\fpeval{\vc@dotb/\vc@dota},#5},
+    }
+  },
+  % perspective transformation matrix or homography matrix
+  % space/perspective transform={\Center,\S,\m,\T,\n,\H}
+  % S - the origin of source plane, 源平面
+  % m - the normal vector of source plane, 源平面
+  % T - the origin of target plane, 目标平面
+  % n - the normal vector of target plane, 目标平面
+  space/perspective transform/.code args={#1,#2,#3,#4,#5,#6}{
+    \tikzset{
+      space/normalize/origin={#3,\vc@m},
+      space/normalize/origin={#5,\vc@n},
+      space/sub/origin={#2,#1,\vc@SC},
+      space/sub/origin={#4,#1,\vc@TC},
+      space/orthonormal basis={\vc@m,\vc@SU,\vc@SV},
+      space/orthonormal basis={\vc@n,\vc@TU,\vc@TV},
+      space/dot/origin={\vc@n,\vc@SU,\vc@Aa},
+      space/dot/origin={\vc@n,\vc@SV,\vc@Ab},
+      space/dot/origin={\vc@n,\vc@SC,\vc@Ac},
+      space/dot/origin={\vc@n,\vc@TC,\vc@Ad},
+      space/dot/origin={\vc@TU,\vc@SU,\vc@Ba},
+      space/dot/origin={\vc@TU,\vc@SV,\vc@Bb},
+      space/dot/origin={\vc@TU,\vc@SC,\vc@Bc},
+      space/dot/origin={\vc@TU,\vc@TC,\vc@Bd},
+      space/dot/origin={\vc@TV,\vc@SU,\vc@Ca},
+      space/dot/origin={\vc@TV,\vc@SV,\vc@Cb},
+      space/dot/origin={\vc@TV,\vc@SC,\vc@Cc},
+      space/dot/origin={\vc@TV,\vc@TC,\vc@Cd},  
+    }
+    \tikzmath{
+      #6{1,1} = \fpeval{\vc@Ad*\vc@Ba-\vc@Aa*\vc@Bd};
+      #6{1,2} = \fpeval{\vc@Ad*\vc@Bb-\vc@Ab*\vc@Bd};
+      #6{1,3} = \fpeval{\vc@Ad*\vc@Bc-\vc@Ac*\vc@Bd};
+      #6{2,1} = \fpeval{\vc@Ad*\vc@Ca-\vc@Aa*\vc@Cd};
+      #6{2,2} = \fpeval{\vc@Ad*\vc@Cb-\vc@Ab*\vc@Cd};
+      #6{2,3} = \fpeval{\vc@Ad*\vc@Cc-\vc@Ac*\vc@Cd};
+      #6{3,1} = \vc@Aa;
+      #6{3,2} = \vc@Ab;
+      #6{3,3} = \vc@Ac;
     }
   },
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% Plane Vector Operations
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % select distinct coorindate
-  % plane/select distinct={\A,\B,\C,\D}
+  % exclude coorindate
+  % plane/exclude={\A,\B,\C,\D}
   % if A != C, result D = A
   % if B != C, result D = B
   % else throw pgferror
   plane/equal/.code args={#1,#2,#3}{
     \tikzmath{
-      if abs((#1{1})-(#2{1})) < \EPSILON && 
-      abs((#1{2})-(#2{2})) < \EPSILON then {
+      if abs((#1{1})-(#2{1})) < 10*\EPSILON
+          && abs((#1{2})-(#2{2})) < 10*\EPSILON then {
         #3 = 1;
       } else {
         #3 = 0;
       };
     }
   },
-  plane/select distinct/.code args={#1,#2,#3,#4}{
+  plane/exclude/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/equal={#1,#3,\cs@aequal},
-      plane/equal={#2,#3,\cs@bequal},
+      plane/equal={#1,#3,\cs@firstequal},
+      plane/equal={#2,#3,\cs@secondequal},
     }
     \tikzmath{
-      if \cs@aequal == 0 then {
+      if \cs@firstequal == 0 then {
         #4{1} = #1{1}; #4{2} = #1{2};
       } else {
-        if \cs@bequal == 0 then {
+        if \cs@secondequal == 0 then {
           #4{1} = #2{1}; #4{2} = #2{2};
         } else {
-          {\pgferror{Cannot select distinct coordinate}};
+          {\pgferror{Cannot exclude coordinate}};
         };
       };
     }
@@ -501,32 +467,51 @@
     % \message{C: (#3{1},#3{2})^^J}
     % \message{ans: (#4{1},#4{2})^^J}
   },
-  % linear combination: w = a * u + b * v
-  plane/combine/origin/.code args={#1,#2,#3,#4,#5}{
+  % linear combination: w = a*u+b*v
+  plane/combine/@2 vectors/.code args={#1,#2,#3,#4,#5}{
     % \message{===== Linear Combination =====^^J}
     % \message{A: (#1{1},#1{2}) a: #3 ^^J}
     % \message{B: (#2{1},#2{2}) b: #4 ^^J}
 
     \tikzmath {
-      #5{1} = \fpeval{(#3) * (#1{1}) + (#4) * (#2{1})};
-      #5{2} = \fpeval{(#3) * (#1{2}) + (#4) * (#2{2})};
+      #5{1} = \fpeval{(#3)*(#1{1})+(#4)*(#2{1})};
+      #5{2} = \fpeval{(#3)*(#1{2})+(#4)*(#2{2})};
     }
 
     % \message{ans: (#5{1},#5{2})^^J}
   },
-  plane/combine/.code args={#1,#2,#3,#4,#5,#6}{
-    \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/combine/origin={\vc@PA,\vc@PB,#4,#5,\vc@PC},
-      plane/add/origin={#1,\vc@PC,#6},
+  % linear combination: w = a*u+b*v+c*w
+  plane/combine/@3 vectors/.code args={#1,#2,#3,#4,#5,#6,#7}{
+    \tikzmath {
+      #7{1} = \fpeval{(#4)*(#1{1})+(#5)*(#2{1})+(#6)*(#3{1})};
+      #7{2} = \fpeval{(#4)*(#1{2})+(#5)*(#2{2})+(#6)*(#3{2})};
     }
   },
-  % Vector addition: c = a + b
+  plane/combine/@argn/.initial=0,
+  plane/combine/.code={%dispatcher
+    % compute the number of arguments
+    \pgfkeyssetvalue{/tikz/plane/combine/@argn}{0} % 重置计数器
+    \pgfutil@for\arg:=#1\do{
+      \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/plane/combine/@argn},1))}
+      \pgfkeysalso{/tikz/plane/combine/@argn = \pgfmathresult}
+    }
+    \ifnum \pgfkeysvalueof{/tikz/plane/combine/@argn} = 5
+      \tikzset{plane/combine/@2 vectors= {#1}}
+    \else\ifnum \pgfkeysvalueof{/tikz/plane/combine/@argn} = 7
+      \tikzset{plane/combine/@3 vectors= {#1}}
+    \else
+      \pgferror{Incorrect number of arguments for 'plane/combine'}
+    \fi\fi
+  },
+  plane/midpoint/.code args={#1,#2,#3}{
+    \tikzset {
+      plane/combine={#1,#2,0.5,0.5,#3},
+    }
+  },
+  % Vector addition: c = a+b
   plane/add/origin/.code args={#1,#2,#3}{
-    \tikzmath {
-      #3{1} = \fpeval{#1{1} + #2{1}};
-      #3{2} = \fpeval{#1{2} + #2{2}};
+    \tikzset {
+      plane/combine={#1,#2,1,1,#3},
     }
 
     % \typeout{=========================}
@@ -535,133 +520,65 @@
     % \typeout{vector a+b: (#3{1},#3{2})}
     % \typeout{=========================}
   },
-  % C = P + PA + PB
+  % C = P+PA+PB = -P+A+B
   plane/add/.code args={#1,#2,#3,#4}{
-    \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/add/origin={\vc@PA,\vc@PB,\vc@PC},
-      plane/add/origin={#1,\vc@PC,#4},
+    \tikzset {
+      plane/combine={#1,#2,#3,-1,1,1,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{vector d: (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
-  % Vector subtraction: c = a - b
+  % Vector subtraction: c = a-b
   plane/sub/origin/.code args={#1,#2,#3}{
-    \tikzmath {
-      #3{1} = #1{1} - #2{1};
-      #3{2} = #1{2} - #2{2};
+    \tikzset {
+      plane/combine={#1,#2,1,-1,#3},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{vector a-b: (#3{1},#3{2})}
-    % \typeout{=========================}
   },
-  % C = P + PA - PB
+  % C = P+PA-PB = P+A-B
   plane/sub/.code args={#1,#2,#3,#4}{
-    \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/sub/origin={\vc@PA,\vc@PB,\vc@PC},
-      plane/add/origin={#1,\vc@PC,#4},
+    \tikzset {
+      plane/combine={#1,#2,#3,1,1,-1,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2},#1{3})}
-    % \typeout{vector b: (#2{1},#2{2},#2{3})}
-    % \typeout{vector c: (#3{1},#3{2},#3{3})}
-    % \typeout{vector d: (#4{1},#4{2},#4{3})}
-    % \typeout{=========================}
   },
-  % Scalar multiplication: b = k * a
+  % Scalar multiplication: b = k*a
   plane/scale/origin/.code args={#1,#2,#3}{
     \tikzmath {
-      #3{1} = #2 * #1{1};
-      #3{2} = #2 * #1{2};
+      #3{1} = \fpeval{(#2)*(#1{1})};
+      #3{2} = \fpeval{(#2)*(#1{2})};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{scale k: #2}
-    % \typeout{vector k*a: (#3{1},#3{2})}
-    % \typeout{=========================}
   },
-  % B = P + k (A-P)
+  % B = P+k (A-P) = (1-k) P+k A
   plane/scale/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/scale/origin={\vc@PA,#3,\vc@PB},
-      plane/add/origin={#1,\vc@PB,#4},
+      plane/combine={#1,#2,(1-#3),#3,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{scale k: #3}
-    % \typeout{vector c=a+k(b-a): (#4{1},#4{2})}
-    % \typeout{=========================}
   },
   % Rotation: rotate/origin={a,angle,b}
   plane/rotate/origin/.code args={#1,#2,#3}{
     \tikzmath {
-      #3{1} = #1{1} * cos(#2) - #1{2} * sin(#2);
-      #3{2} = #1{1} * sin(#2) + #1{2} * cos(#2);
+      #3{1} = #1{1}*cos(#2)-#1{2}*sin(#2);
+      #3{2} = #1{1}*sin(#2)+#1{2}*cos(#2);
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{angle: #2}
-    % \typeout{vector after rotation: (#3{1},#3{2})}
-    % \typeout{=========================}
   },
   % vector rotation: plane/rotate={P,A,angle,B} 
   plane/rotate/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/rotate/origin={\vc@PA,#3,\vc@PB},
-      plane/add/origin={#1,\vc@PB,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/rotate/origin={\vc@pa,#3,\vc@pb},
+      plane/add/origin={#1,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{angle: #3}
-    % \typeout{vector rotation: (#4{1},#4{2})}
-    % \typeout{=========================}
   },
   % Dot product: c = a · b
   plane/dot/origin/.code args={#1,#2,#3}{
     \tikzmath {
-      #3 = \fpeval{#1{1} * #2{1} + #1{2} * #2{2}};
+      #3 = \fpeval{#1{1}*#2{1}+#1{2}*#2{2}};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{dot product a·b: #3}
-    % \typeout{=========================}
   },
   % dot = PA · PB: plane/dot={\P,\A,\B,\dot}
   plane/dot/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/dot/origin={\vc@PA,\vc@PB,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/sub/origin={#3,#1,\vc@pb},
+      plane/dot/origin={\vc@pa,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{vector c: (#3{1},#3{2})}
-    % \typeout{dot product (b-a)·(c-a): #4}
-    % \typeout{=========================}
   },
   % Vector length: b = |a|
   plane/length/origin/.code args={#1,#2}{
@@ -669,24 +586,18 @@
       % 无穷范数 Infinity norm
       \vc@inf = max(abs(#1{1}), abs(#1{2}));
       % 向量长度 Vector length
-      \vc@eps = 0.00001;
-      if \vc@inf < \vc@eps then {
+      if \vc@inf < \EPSILON then {
         #2 = 0;
       } else {
         % 使用缩放法计算，防止平方溢出
-        #2 = \fpeval{\vc@inf * sqrt((#1{1}/\vc@inf)^2 + (#1{2}/\vc@inf)^2)};
+        #2 = \fpeval{\vc@inf*sqrt(((#1{1})/\vc@inf)^2+((#1{2})/\vc@inf)^2)};
       };
     }
-
-    % \typeout{=========================}
-    % \typeout{vector: (#1{1}, #1{2})}
-    % \typeout{length: #2}
-    % \typeout{=========================}
   },
   plane/length/@segment/.code args={#1,#2,#3}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/length/origin={\vc@PA,#3},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/length/origin={\vc@pa,#3},
     }
   },
   plane/length/@triangle/.code args={#1,#2,#3,#4,#5,#6}{
@@ -697,8 +608,8 @@
     }
     
     \tikzmath{
-      {\message{Triangle sides: a=\vc@a,b=\vc@b,c=\vc@c^^J}};
-      if (\vc@a + \vc@b > \vc@c) && (\vc@b + \vc@c > \vc@a) && (\vc@c + \vc@a > \vc@b) then {
+      % {\message{Triangle sides: a=\vc@a,b=\vc@b,c=\vc@c^^J}};
+      if (\vc@a+\vc@b > \vc@c) && (\vc@b+\vc@c > \vc@a) && (\vc@c+\vc@a > \vc@b) then {
         %pass
       } else {
         {\pgferror{Three points are collinear}};
@@ -721,122 +632,71 @@
       \pgferror{Incorrect number of arguments for 'plane/length'}
     \fi\fi
   },
-  % Vector normalization: b = a / |a|
+  % Vector normalization: b = a/|a|
   plane/normalize/origin/.code args={#1,#2}{
+    \tikzset{
+      plane/length/origin={#1,\vc@length},
+    }
     \tikzmath {
-      \vc@zero = 0; % 初始化，防止 ifnum 找不到宏
-      % 无穷范数 Infinity norm
-      \vc@inf = max(abs(#1{1}), abs(#1{2}));
-      % 向量长度 Vector length
-      \vc@length = \fpeval{\vc@inf * sqrt((#1{1}/\vc@inf)^2 + (#1{2}/\vc@inf)^2)};
-      \vc@eps = 0.00001;
-      if \vc@inf > \vc@eps then {
-        #2{1} = \fpeval{#1{1} / \vc@length};
-        #2{2} = \fpeval{#1{2} / \vc@length};
+      if \vc@length > \EPSILON then {
+        #2{1} = \fpeval{(#1{1})/\vc@length};
+        #2{2} = \fpeval{(#1{2})/\vc@length};
       } else {
-        \vc@zero = 1;
         #2{1}=0; #2{2}=0;
+        \pgferror{Zero vector detected}
       };
     }
-
-    \ifnum\vc@zero=1
-      \pgferror{Zero vector detected}
-    \fi
-
-    % \typeout{=========================}
-    % \typeout{vector: (#1{1},#1{2})}
-    % \typeout{normalized: (#2{1},#2{2})}
-    % \typeout{=========================}
   },
   % normalize: plane/normalize={\P,\A,\B}
   plane/normalize/.code args={#1,#2,#3}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/normalize/origin={\vc@PA,#3},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/normalize/origin={\vc@pa,#3},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{normalized of b-a: (#3{1},#3{2})}
-    % \typeout{=========================}
   },
   % Scalar projection of vector 'a' on 'b' is the length (magnitude) of 
   % the component of 'a' in the direction of 'b'.
   % comp_b{a} = (a·b)/|b|
   plane/component/origin/.code args={#1,#2,#3}{
-    % 将向量 #2 归一化
     \pgfkeys{
-      /tikz/plane/normalize/origin={#2,\vc@onto},
+      /tikz/plane/dot/origin={#1,#2,\vc@dot},
+      /tikz/plane/length/origin={#2,\vc@length},
     }
 
     \tikzmath{
       % 投影标量
-      #3 = \fpeval{(#1{1} * \vc@onto{1} + #1{2} * \vc@onto{2})};
+      #3 = \fpeval{\vc@dot/\vc@length};
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{scalar projection (a onto b): #3}
-    % \typeout{=========================}
   },
   % Scalar projection of PA onto PB
   plane/component/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/component/origin={\vc@PA,\vc@PB,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/sub/origin={#3,#1,\vc@pb},
+      plane/component/origin={\vc@pa,\vc@pb,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{vector c: (#3{1},#3{2})}
-    % \typeout{scalar projection (b-a onto c-a): #4}
-    % \typeout{=========================}
   },
   % The vector projection of vector 'a' onto vector 'b' is the orthogonal 
   % projection of onto a straight line parallel to 'b'.
   % proj_b{a} = (a·b)/(b·b) b
   plane/project/origin/.code args={#1,#2,#3}{
-    % 将向量 #2 归一化
     \pgfkeys{
-      /tikz/plane/normalize/origin={#2,\vc@onto},
+      /tikz/plane/dot/origin={#1,#2,\vc@dotab},
+      /tikz/plane/dot/origin={#2,#2,\vc@dotbb},
+      /tikz/plane/scale/origin={#2,(\vc@dotab/\vc@dotbb),#3},
     }
-    
-    \tikzmath{
-      % 投影标量
-      \vc@scalar = \fpeval{(#1{1} * \vc@onto{1} + #1{2} * \vc@onto{2})};
-      % 向量投影
-      #3{1} = \vc@scalar * \vc@onto{1};
-      #3{2} = \vc@scalar * \vc@onto{2};
-    }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{vector projection (a onto b): (#3{1},#3{2})}
-    % \typeout{=========================}
   },
   % Vector projection of PA onto PB: PC
-  % projection of A onto PB: C = P + PC
+  % projection of A onto PB: C = P+PC
   plane/project/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/project/origin={\vc@PA,\vc@PB,\vc@PC},
-      plane/add/origin={#1,\vc@PC,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/sub/origin={#3,#1,\vc@pb},
+      plane/project/origin={\vc@pa,\vc@pb,\vc@pc},
+      plane/add/origin={#1,\vc@pc,#4},
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{vector c: (#3{1},#3{2})}
-    % \typeout{projection (B onto AC): (#4{1},#4{2})}
-    % \typeout{=========================}
   },
-  % vector rejection: rej_b{a} = a - proj_b{a}
+  % vector rejection: rej_b{a} = a-proj_b{a}
   plane/reject/origin/.code args={#1,#2,#3}{
     \tikzset{
       plane/project/origin={#1,#2,\vc@proj},
@@ -845,13 +705,13 @@
   },
   plane/reject/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/reject/origin={\vc@PA,\vc@PB,\vc@PC},
-      plane/add/origin={#1,\vc@PC,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/sub/origin={#3,#1,\vc@pb},
+      plane/reject/origin={\vc@pa,\vc@pb,\vc@pc},
+      plane/add/origin={#1,\vc@pc,#4},
     }
   },
-  % vector reflection: ref_b{a} = a - 2 rej_b{a} = 2 proj_b{a} - a
+  % vector reflection: ref_b{a} = a-2 rej_b{a} = 2 proj_b{a}-a
   plane/reflect/origin/.code args={#1,#2,#3}{
     \tikzset{
       plane/project/origin={#1,#2,\vc@proj},
@@ -863,60 +723,108 @@
   % space/reflect={\P,\A,\B,\C}
   plane/reflect/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/reflect/origin={\vc@PA,\vc@PB,\vc@PC},
-      plane/add/origin={#1,\vc@PC,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/sub/origin={#3,#1,\vc@pb},
+      plane/reflect/origin={\vc@pa,\vc@pb,\vc@pc},
+      plane/add/origin={#1,\vc@pc,#4},
     }
   },
   % the oriented (or signed) angle between two vectors: angle/origin={a,b,theta}
   plane/angle/origin/.code args={#1,#2,#3}{
     \tikzmath{
-      % #3 = atan2(#2{2},#2{1}) - atan2(#1{2},#1{1});
-      #3 = atan2(#1{1} * #2{2} - #1{2} * #2{1}, #1{1} * #2{1} + #1{2} * #2{2});
+      % DO NOT USE \fpeval, which returns angle in radians
+      #3 = atan2((#1{1})*(#2{2})-(#1{2})*(#2{1}), (#1{1})*(#2{1})+(#1{2})*(#2{2}));
     }
-
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{angle <a,b>: #3}
-    % \typeout{=========================}
   },
   % the oriented (or signed) angle between two vectors AB and AC: angle/origin={A,B,C,theta}
   plane/angle/.code args={#1,#2,#3,#4}{
     \tikzset{
-      plane/sub/origin={#2,#1,\vc@PA},
-      plane/sub/origin={#3,#1,\vc@PB},
-      plane/angle/origin={\vc@PA,\vc@PB,#4},
+      plane/sub/origin={#2,#1,\vc@pa},
+      plane/sub/origin={#3,#1,\vc@pb},
+      plane/angle/origin={\vc@pa,\vc@pb,#4},
+    }
+  },
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% Triangle
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % perimeter
+  % plane/perimeter={\A,\B,\C,\p}
+  plane/perimeter/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      plane/length={#1,#2,#3,\vc@a,\vc@b,\vc@c},
     }
 
-    % \typeout{=========================}
-    % \typeout{vector a: (#1{1},#1{2})}
-    % \typeout{vector b: (#2{1},#2{2})}
-    % \typeout{vector c: (#3{1},#3{2})}
-    % \typeout{angle <b-a,c-a>: #4}
-    % \typeout{=========================}
+    \tikzmath{
+      #4 = \fpeval{\vc@a+\vc@b+\vc@c};
+    }
+  },
+  % Heron's Formula
+  plane/area/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      plane/length={#1,#2,#3,\vc@a,\vc@b,\vc@c},
+    }
+
+    \tikzmath{
+      \vc@s = \fpeval{0.5*(\vc@a+\vc@b+\vc@c)};
+      \vc@ka = \fpeval{\vc@a/\vc@s};
+      \vc@kb = \fpeval{\vc@b/\vc@s};
+      \vc@kc = \fpeval{\vc@c/\vc@s};
+      #4 = \fpeval{(\vc@s)^2*sqrt((1-\vc@ka)*(1-\vc@kb)*(1-\vc@kc))};
+    }
+  },
+  plane/circumradius/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      % byproducts: sides(\vc@a,\vc@b,\vc@c) and semiperimeter(\vc@s)
+      plane/area={#1,#2,#3,\vc@area},
+    }
+
+    \tikzmath{
+      #4 = \fpeval{(0.25/\vc@area)*\vc@a*\vc@b*\vc@c};
+    }
+  },
+  plane/inradius/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      % byproducts: sides(\vc@a,\vc@b,\vc@c) and semiperimeter(\vc@s)
+      plane/area={#1,#2,#3,\vc@area},
+    }
+
+    \message{a,b,c:\vc@a,\vc@b,\vc@c^^J};
+    \message{semiperimeter:\vc@s^^J};
+    \message{area:\vc@area^^J};
+
+    \tikzmath{
+      #4 = \fpeval{\vc@area/\vc@s};
+    }
+  },
+  plane/exradius/.code args={#1,#2,#3,#4}{
+    \tikzset{
+      % byproducts: sides(\vc@a,\vc@b,\vc@c) and semiperimeter(\vc@s)
+      plane/area={#1,#2,#3,\vc@area},
+    }
+
+    \tikzmath{
+      #4 = \fpeval{\vc@area/(\vc@s-\vc@a)};
+    }
   },
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% Triangle Centers
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % barycentric coordinatess
-  % P = (x A + y B + z C)/(x + y + z)
+  % P = (x A+y B+z C)/(x+y+z)
   % plane/barycenter={\A,\B,\C,\x,\y,\z,\P}
-  % P = C + a (A-C) + b (B-C), a = x/(x+y+z), b = y/(x+y+z)
+  % a = x/(x+y+z), b = y/(x+y+z), c = z/(x+y+z)
+  % P = a A+b B+c C
   plane/barycenter/.code args={#1,#2,#3,#4,#5,#6,#7}{
     \tikzmath{
-      \vc@sum = \fpeval{(#4) + (#5) + (#6)};
+      \vc@sum = \fpeval{(#4)+(#5)+(#6)};
+      if abs(\vc@sum) < \EPSILON then {
+        {\pgferror{Illeagal ratios in 'plane/barycenter'}};
+      };
     }
 
     \tikzset{
-      plane/combine={#3,#1,#2,(#4/\vc@sum),(#5/\vc@sum),#7},
+      plane/combine={#1,#2,#3,(#4/\vc@sum),(#5/\vc@sum),(#6/\vc@sum),#7},
     }
-
-    % \message{Cartesian coordinates: A(#1{1},#1{2})^^J}
-    % \message{Cartesian coordinates: B(#2{1},#2{2})^^J}
-    % \message{Cartesian coordinates: C(#3{1},#3{2})^^J}
-    % \message{Barycentric coordinates: (#4,#5,#6)^^J}
   },
   % incenter: plane/incenter={\A,\B,\C,\I}
   plane/incenter/.code args={#1,#2,#3,#4}{
@@ -952,13 +860,13 @@
 
     \tikzmath{
       \vc@m = max(\vc@a,\vc@b,\vc@c);
-      \vc@a = \fpeval{\vc@a / \vc@m};
-      \vc@b = \fpeval{\vc@b / \vc@m};
-      \vc@c = \fpeval{\vc@c / \vc@m};
-      \vc@temp{1} = \fpeval{\vc@a^2 * (\vc@b^2 + \vc@c^2 - \vc@a^2)};
-      \vc@temp{2} = \fpeval{\vc@b^2 * (\vc@c^2 + \vc@a^2 - \vc@b^2)};
-      \vc@temp{3} = \fpeval{\vc@c^2 * (\vc@a^2 + \vc@b^2 - \vc@c^2)};
-      {\message{Barycentric coordinates: (\vc@temp{1},\vc@temp{2},\vc@temp{3})^^J}};
+      \vc@a = \fpeval{\vc@a/\vc@m};
+      \vc@b = \fpeval{\vc@b/\vc@m};
+      \vc@c = \fpeval{\vc@c/\vc@m};
+      \vc@temp{1} = \fpeval{\vc@a^2*(\vc@b^2+\vc@c^2-\vc@a^2)};
+      \vc@temp{2} = \fpeval{\vc@b^2*(\vc@c^2+\vc@a^2-\vc@b^2)};
+      \vc@temp{3} = \fpeval{\vc@c^2*(\vc@a^2+\vc@b^2-\vc@c^2)};
+      % {\message{Barycentric coordinates: (\vc@temp{1},\vc@temp{2},\vc@temp{3})^^J}};
     }
 
     \tikzset{
@@ -976,16 +884,15 @@
 
     \tikzmath{
       \vc@m = max(\vc@a,\vc@b,\vc@c);
-      \vc@a = \fpeval{\vc@a / \vc@m};
-      \vc@b = \fpeval{\vc@b / \vc@m};
-      \vc@c = \fpeval{\vc@c / \vc@m};
-      \vc@t{1} = \fpeval{(\vc@a^2 + \vc@b^2 - \vc@c^2)};
-      \vc@t{2} = \fpeval{(\vc@b^2 + \vc@c^2 - \vc@a^2)};
-      \vc@t{3} = \fpeval{(\vc@c^2 + \vc@a^2 - \vc@b^2)};
-      \vc@temp{1} = \fpeval{\vc@t{1} * \vc@t{3}};
-      \vc@temp{2} = \fpeval{\vc@t{2} * \vc@t{1}};
-      \vc@temp{3} = \fpeval{\vc@t{3} * \vc@t{2}};
-      % {\message{Barycentric coordinates: (\vc@temp{1},\vc@temp{2},\vc@temp{3})^^J}};
+      \vc@a = \fpeval{\vc@a/\vc@m};
+      \vc@b = \fpeval{\vc@b/\vc@m};
+      \vc@c = \fpeval{\vc@c/\vc@m};
+      \vc@t{1} = \fpeval{(\vc@a^2+\vc@b^2-\vc@c^2)};
+      \vc@t{2} = \fpeval{(\vc@b^2+\vc@c^2-\vc@a^2)};
+      \vc@t{3} = \fpeval{(\vc@c^2+\vc@a^2-\vc@b^2)};
+      \vc@temp{1} = \fpeval{\vc@t{1}*\vc@t{3}};
+      \vc@temp{2} = \fpeval{\vc@t{2}*\vc@t{1}};
+      \vc@temp{3} = \fpeval{\vc@t{3}*\vc@t{2}};
     }
 
     \tikzset{
@@ -1001,7 +908,7 @@
   plane/centroid/.code args={#1,#2,#3,#4}{
     \tikzset{
       plane/barycenter={#1,#2,#3,
-        1.0,1.0,1.0,#4},
+        1,1,1,#4},
     }
   },
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1030,7 +937,7 @@
           #4{2} = -(#1);
         } else {
           #4{1} = abs(#2);
-          #4{2} = 0.0;
+          #4{2} = 0;
         };
       };
     }
@@ -1038,30 +945,30 @@
   % intersection of line AB and line CD
   % plane/intersect ll={\A,\B,\C,\D,\P}
   plane/intersect ll/.code args={#1,#2,#3,#4,#5}{
-  \tikzmath{
-    % (\yb-\ya) x - (\xb-\xa) y = \xa*(\yb-\ya) - \ya*(\xb-\xa)
-    % (\yd-\yc) y - (\xd-\xc) y = \xc*(\yd-\yc) - \yc*(\xd-\xc)
-    \vc@a{1,1} = \fpeval{#2{2} - #1{2}}; \vc@a{1,2} = \fpeval{-(#2{1} - #1{1})}; 
-    \vc@b{1,1} = \fpeval{#1{1} * \vc@a{1,1} + #1{2} * \vc@a{1,2}};
-    \vc@a{2,1} = \fpeval{#4{2} - #3{2}}; \vc@a{2,2} = \fpeval{-(#4{1} - #3{1})}; 
-    \vc@b{2,1} = \fpeval{#3{1} * \vc@a{2,1} + #3{2} * \vc@a{2,2}};
-  }
-  \tikzset{
-    mat/solve={\vc@a,\vc@b,2,1,\vc@ans},
-  }
-  \tikzmath{
-    #5{1} = \vc@ans{1,1};
-    #5{2} = \vc@ans{2,1};
-  }
-  % \typeout{=========================}
-  % \typeout{Line-Line Intersection:}
-  % \tikzset{
-  %   mat/stdout={\vc@a,2,2},
-  %   mat/stdout={\vc@b,2,1},
-  %   mat/stdout={\vc@ans,2,1},
-  % }
-  % \typeout{=========================}
-  % \coordinate (ll) at (\c{1,1},\c{2,1});
+    \tikzmath{
+      % (\yb-\ya) x-(\xb-\xa) y = \xa*(\yb-\ya)-\ya*(\xb-\xa)
+      % (\yd-\yc) x-(\xd-\xc) y = \xc*(\yd-\yc)-\yc*(\xd-\xc)
+      \vc@a{1,1} = \fpeval{#2{2}-#1{2}}; \vc@a{1,2} = \fpeval{-(#2{1}-#1{1})}; 
+      \vc@b{1,1} = \fpeval{#1{1}*\vc@a{1,1}+#1{2}*\vc@a{1,2}};
+      \vc@a{2,1} = \fpeval{#4{2}-#3{2}}; \vc@a{2,2} = \fpeval{-(#4{1}-#3{1})}; 
+      \vc@b{2,1} = \fpeval{#3{1}*\vc@a{2,1}+#3{2}*\vc@a{2,2}};
+    }
+    \tikzset{
+      mat/solve={\vc@a,\vc@b,2,1,\vc@ans},
+    }
+    \tikzmath{
+      #5{1} = \vc@ans{1,1};
+      #5{2} = \vc@ans{2,1};
+    }
+    % \typeout{=========================}
+    % \typeout{Line-Line Intersection:}
+    % \tikzset{
+    %   mat/stdout={\vc@a,2,2},
+    %   mat/stdout={\vc@b,2,1},
+    %   mat/stdout={\vc@ans,2,1},
+    % }
+    % \typeout{=========================}
+    % \coordinate (ll) at (\c{1,1},\c{2,1});
   },
   % intersection of circle and line (through point A and B)
   % plane/intersect cl={\O,\r,\A,\B,\Pa,\Pb}
@@ -1084,13 +991,8 @@
       plane/sub/origin={\vc@mid,\vc@v,#5},
       plane/add/origin={\vc@mid,\vc@v,#6},
     }
-    % \typeout{=========================}
-    % \typeout{P1: (#5{1},#5{2})}
-    % \typeout{P2: (#6{1},#6{2})}
-    % \typeout{=========================}
-    % \coordinate (ll) at (\c{1,1},\c{2,1});
   },
-    % intersection of circle and line (a x + b y + c = 0)
+    % intersection of circle and line (a x+b y+c = 0)
   % plane/intersect cn={\O,\r,\a,\b,\c,\Pa,\Pb}
   plane/intersect cn/.code args={#1,#2,#3,#4,#5,#6,#7}{
     \tikzset{
@@ -1099,30 +1001,24 @@
       plane/add/origin={\vc@P,\vc@direct,\vc@Q},
       plane/intersect cl={#1,#2,\vc@P,\vc@Q,#6,#7},
     }
-    % \typeout{=========================}
-    % \typeout{direct: (\vc@direct{1},\vc@direct{2})}
-    % \typeout{P1: (\vc@P{1},\vc@P{2})}
-    % \typeout{P2: (\vc@Q{1},\vc@Q{2})}
-    % \typeout{=========================}
   },
   % The radical axis of two non-concentric circles is a straight line 
   % perpendicular to the line of centers (the line connecting the centers 
   % of the circles). 
   % plane/radical axis={\Oa,\ra,\Ob,\rb,\H,\U}
   % \H: intersection of radical axis and line of centers
-  % H = O1 + 1/2 (d^2+r1^2-r2^2)/d^2 (O2-O1), d = |O1O2|
+  % H = O1+1/2 (d^2+r1^2-r2^2)/d^2 (O2-O1), d = |O1O2|
   % \U: unit direction vector
-  plane/radical axis/.code args={#1,#2,#3,#4,#5,#6}{
+  plane/radical axis/@point-direction/.code args={#1,#2,#3,#4,#5,#6}{
     \tikzset{
       plane/length={#1,#3,\vc@c},
     }
 
     % determine if there is a radical axis
     \tikzmath{
-      \vc@eps = 0.00001;
       \vc@a = abs(#2);
       \vc@b = abs(#4);
-      if \vc@c < \vc@eps then {
+      if \vc@c < \EPSILON then {
         {\pgferror{Concentric circles have no radical axis}};
       };
       \vc@scale = \fpeval{1/2*(\vc@c^2+\vc@a^2-\vc@b^2)/\vc@c^2};
@@ -1143,10 +1039,34 @@
       } else {
         if #6{1} < 0 then {
           #6{1} = -(#6{1});
-          #6{2} = 0.0;
+          #6{2} = 0;
         };
       };
     }
+  },
+  % plane/radical axis={\Oa,\ra,\Ob,\rb,\a,\b,\c}
+  plane/radical axis/@equation/.code args={#1,#2,#3,#4,#5,#6,#7}{
+    \tikzmath{
+      #5 = \fpeval{2*(#3{1}-#1{1})};
+      #6 = \fpeval{2*(#3{2}-#1{2})};
+      #7 = \fpeval{((#1{1})^2+(#1{2})^2-(#2)^2)-((#3{1})^2+(#3{2})^2-(#4)^2)};
+    }
+  },
+  plane/radical axis/@argn/.initial=0,
+  plane/radical axis/.code={%dispatcher
+    % compute the number of arguments
+    \pgfkeyssetvalue{/tikz/plane/radical axis/@argn}{0} % 重置计数器
+    \pgfutil@for\arg:=#1\do{
+      \pgfmathparse{int(add(\pgfkeysvalueof{/tikz/plane/radical axis/@argn},1))}
+      \pgfkeysalso{/tikz/plane/radical axis/@argn = \pgfmathresult}
+    }
+    \ifnum \pgfkeysvalueof{/tikz/plane/radical axis/@argn} = 6
+      \tikzset{plane/radical axis/@point-direction = {#1}}
+    \else\ifnum \pgfkeysvalueof{/tikz/plane/radical axis/@argn} = 7
+      \tikzset{plane/radical axis/@equation = {#1}}
+    \else
+      \pgferror{Incorrect number of arguments for 'plane/radical axis'}
+    \fi\fi
   },
   % intersection of circle and circle
   % plane/intersect cc={\Oa,\ra,\Ob,\rb,\Pa,\Pb}

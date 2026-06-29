@@ -25,10 +25,12 @@
 * **圆心位置**：九点圆的圆心位于三角形的**欧拉线**上（即外心、重心、垂心三点所在的直线），并且是**垂心与外心连线的中点**。
 * **费尔巴哈定理**：这是九点圆最著名的性质之一。它指出，九点圆与三角形的**内切圆**以及三个**旁切圆**都相切。
 
+examples/triangles/nine-point-circle
+
 ```latex
-![[ ../../../../gallery/nine-point-circle.tikz ]]
+![[ ../../../../examples/triangles/nine-point-circle.tikz ]]
 ```
 
-![[ ../../../../gallery/nine-point-circle.tikz ]]
+![[ ../../../../examples/triangles/nine-point-circle.tikz ]]
 
 

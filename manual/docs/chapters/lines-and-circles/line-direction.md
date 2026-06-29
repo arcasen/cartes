@@ -12,7 +12,7 @@
 对于直线 $ax + by + c = 0$，原点的投影点 $P$ 的坐标公式为：
 
 $$
-\left(\dfrac{-ac}{a^2 + b^2},\dfrac{-bc}{a^2 + b^2}\right)
+\left(\cfrac{-ac}{a^2 + b^2},\cfrac{-bc}{a^2 + b^2}\right)
 $$
 
 #### 直线的方向向量
@@ -44,8 +44,10 @@ $$
 
 #### 示例
 
+examples/lines-and-segments/line-direction
+
 ```latex
-![[ ../../snippets/lines-and-circles/line-direction.tikz ]]
+![[ ../../../../examples/lines-and-segments/line-direction.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/line-direction.tikz ]]
+![[ ../../../../examples/lines-and-segments/line-direction.tikz ]]

@@ -22,7 +22,7 @@ $$
 #### 示例：求两直线的交点
 
 ```latex
-![[ ../../snippets/lines-and-circles/intersect-ll.tikz ]]
+![[ ../../../../examples/intersections/line-line-intersection.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/intersect-ll.tikz ]]
+![[ ../../../../examples/intersections/line-line-intersection.tikz ]]

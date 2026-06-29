@@ -16,7 +16,7 @@ $$\bm{v} = \overline{AB}$$
 
 为了方便投影计算，将其单位化为 $\bm{u}$：
 
-$$\bm{u} = \dfrac{\bm{v}}{|\bm{v}|}$$
+$$\bm{u} = \cfrac{\bm{v}}{|\bm{v}|}$$
 
 **第二步：计算圆心在直线上的投影点 $M$**
 
@@ -52,8 +52,18 @@ $$P = M \pm h \cdot \bm{u}$$
 
 #### 示例
 
+examples/intersections/circle-line-intersection-1-points-form
+
 ```latex
-![[ ../../snippets/lines-and-circles/intersect-cl.tikz ]]
+![[ ../../../../examples/intersections/circle-line-intersection-1-points-form.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/intersect-cl.tikz ]]
+![[ ../../../../examples/intersections/circle-line-intersection-1-points-form.tikz ]]
+
+examples/intersections/circle-line-intersection-2-normal-form
+
+```latex
+![[ ../../../../examples/intersections/circle-line-intersection-2-normal-form.tikz ]]
+```
+
+![[ ../../../../examples/intersections/circle-line-intersection-2-normal-form.tikz ]]

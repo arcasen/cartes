@@ -140,8 +140,18 @@ $$Axx' + B(x + x') + C = 0$$
 
 #### 示例：过四点且与一直线相切的圆锥曲线
 
+examples/involution/4-points-and-1-tangent-1
+
 ```latex
-![[ ../../../../gallery/conics-4P1T-b.tikz ]]
+![[ ../../../../examples/involution/4-points-and-1-tangent-1.tikz ]]
 ```
 
-![[ ../../../../gallery/conics-4P1T-b.tikz ]]
+![[ ../../../../examples/involution/4-points-and-1-tangent-1.tikz ]]
+
+examples/involution/4-points-and-1-tangent-2
+
+```latex
+![[ ../../../../examples/involution/4-points-and-1-tangent-2.tikz ]]
+```
+
+![[ ../../../../examples/involution/4-points-and-1-tangent-2.tikz ]]

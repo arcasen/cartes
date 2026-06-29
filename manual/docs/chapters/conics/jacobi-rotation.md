@@ -21,7 +21,7 @@ $$
 $$
 a'_{pq} = (c^2 - s^2)a_{pq} + cs(a_{pp} - a_{qq}) = 0
 $$
-令 $\tau = \dfrac{a_{qq} - a_{pp}}{2a_{pq}}$，上述方程可以重写为关于 $t = \tan\theta = \dfrac{s}{c}$ 的二次方程：
+令 $\tau = \cfrac{a_{qq} - a_{pp}}{2a_{pq}}$，上述方程可以重写为关于 $t = \tan\theta = \cfrac{s}{c}$ 的二次方程：
 
 $$
 t^2 + 2\tau t - 1 = 0
@@ -34,7 +34,7 @@ $$
 **第一步：计算辅助量 $\tau$**
 
 $$
-\tau = \dfrac{a_{qq} - a_{pp}}{2a_{pq}}
+\tau = \cfrac{a_{qq} - a_{pp}}{2a_{pq}}
 $$
 
 **注意**：如果 $a_{pq} = 0$，则无需旋转。*
@@ -44,31 +44,31 @@ $$
 我们需要解 $t^2 + 2\tau t - 1 = 0$。为了保证数值稳定性（避免相近数相减导致精度丢失），我们选择绝对值较小的那个根：
 
 $$
-t = \dfrac{\text{sgn}(\tau)}{|\tau| + \sqrt{1 + \tau^2}}
+t = \cfrac{\text{sgn}(\tau)}{|\tau| + \sqrt{1 + \tau^2}}
 $$
 
 或者写作更常见的形式（若 $\tau \ge 0$，取负根；若 $\tau < 0$，取正根，以确保 $|\theta| \le \pi/4$）：
 
 $$
 t = \begin{cases} 
-\dfrac{1}{\tau + \sqrt{1+\tau^2}} & \text{if } \tau \ge 0 \\
-\dfrac{-1}{-\tau + \sqrt{1+\tau^2}} & \text{if } \tau < 0 
+\cfrac{1}{\tau + \sqrt{1+\tau^2}} & \text{if } \tau \ge 0 \\
+\cfrac{-1}{-\tau + \sqrt{1+\tau^2}} & \text{if } \tau < 0 
 \end{cases}
 $$
 
 这可以统一写为：
 
 $$
-t = \dfrac{1}{\tau + \text{sgn}(\tau)\sqrt{1+\tau^2}}
+t = \cfrac{1}{\tau + \text{sgn}(\tau)\sqrt{1+\tau^2}}
 $$
 
 *(注：这里选择小根是为了让旋转角度 $\theta$ 落在 $[-\pi/4, \pi/4]$ 之间，保证 $c \ge s$，从而提高稳定性)*
 
 **第三步：从 $t$ 计算 $c$ 和 $s$**
 
-利用恒等式 $1 + t^2 = 1 + \tan^2\theta = \sec^2\theta = \dfrac{1}{c^2}$，我们可以直接得到：
+利用恒等式 $1 + t^2 = 1 + \tan^2\theta = \sec^2\theta = \cfrac{1}{c^2}$，我们可以直接得到：
 $$
-c = \dfrac{1}{\sqrt{1 + t^2}}
+c = \cfrac{1}{\sqrt{1 + t^2}}
 $$
 $$
 s = c \cdot t

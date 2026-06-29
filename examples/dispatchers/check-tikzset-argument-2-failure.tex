@@ -1,0 +1,85 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{math}
+
+\makeatletter
+% 1. 定义一个全局布尔开关，用于记录是否发现数字
+\newif\iffounddigit
+
+% 2. 核心检查宏：确保待查字符和目标字符串的 Catcode 一致
+\newcommand{\checkfornumbers}[1]{%
+  \global\founddigitfalse
+  % 将输入的参数（如 \P{1}）彻底转为纯字符串，存入 \temp@target
+  \edef\temp@target{\detokenize{#1}}%
+  % 定义内部循环处理逻辑
+  \def\do##1{%
+    % 同样将 0-9 的数字转为 detokenize 格式，确保比对时 catcode 一致
+    \edef\temp@d{\detokenize{##1}}%
+    \expandafter\pgfutil@in@\expandafter{\temp@d}{\temp@target}%
+    \ifpgfutil@in@\global\founddigittrue\fi
+  }%
+  % 手动展开循环，避免 \foreach 产生子组(group)导致变量无法传出
+  \do0\do1\do2\do3\do4\do5\do6\do7\do8\do9
+}
+
+% 3. 定义 TikZ 键值逻辑
+\tikzset{
+  % 逻辑 A：处理点（例如 \P）
+  define/@circle-point/.code args={#1,#2}{%
+    \message{^^J[识别结果：点模式] 中心: \detokenize{#1}, 目标点: \detokenize{#2}^^J}%
+    % 这里可以继续写你的 TikZ 绘图逻辑
+  },
+  % 逻辑 B：处理表达式或数值（例如 \P{1} 或 5cm）
+  define/@circle-radius/.code args={#1,#2}{%
+    \message{^^J[识别结果：数学/半径模式] 中心: \detokenize{#1}, 表达式: \detokenize{#2}^^J}%
+    % 这里可以继续写你的 TikZ 绘图逻辑
+  },
+  % 主入口：根据 #2 是否含数字进行分发
+  define/circle/.code args={#1,#2}{%
+    \checkfornumbers{#2}%
+    \iffounddigit
+      % 如果含数字，跳转到半径/表达式处理逻辑
+      \pgfkeys{/tikz/define/@circle-radius={#1,#2}}%
+    \else
+      % 如果不含数字，跳转到点处理逻辑
+      \pgfkeys{/tikz/define/@circle-point={#1,#2}}%
+    \fi
+  },
+}
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \tikzmath{
+    % 定义圆心分量
+    \O{1} = 1; \O{2} = 1;
+    % 定义圆周上的点分量
+    \P{1} = 2; \P{2} = 3;
+    % 定义半径变量
+    \radius = 5;
+  }
+
+  % --- 测试场景 ---
+
+  % 调用 1：识别为点（\P 不含数字字符）
+  \tikzset{define/circle={\O,\P}}
+
+  % 调用 2：识别为数学表达式（含有数字 1）
+  \tikzset{define/circle={\O,\P{1}}}
+
+  % 调用 3：识别为具体数值
+  \tikzset{define/circle={\O,5cm}}
+
+  % 调用 4：复杂表达式（含有数字 2）
+  \tikzset{define/circle={\O,\P{1}+\P{2}+\O{2}^2}}
+
+\end{tikzpicture}
+\end{document}
+
+% 之所以全部识别为“目标点”，是因为你传入的参数（如 \P{1}）在进入 \detokenize 之前，由于 LaTeX 的参数传递机制，其中的数字被包裹在了大括号 {} 里，或者在展开过程中发生了变化。
+
+% 另一个极高概率的原因是：\pgfutil@in@ 在处理 \detokenize 生成的字符串时，对空格极其敏感。\detokenize 会在每个宏（如 \P）后面自动补一个空格。
+
+% 要彻底解决这个问题，我们需要让检查逻辑更加“暴力”一点：直接在原始 Token 流中搜索。
+
+% 修正后的完整方案
+% 这个版本舍弃了不稳定的 \pgfutil@in@，改用一个更可靠的 递归扫描器。它会逐个字符检查，不仅能看清文字，还能看穿 {} 内部的内容。

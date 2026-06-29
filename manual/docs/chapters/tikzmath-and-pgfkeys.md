@@ -28,10 +28,10 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 计算 TikZ 坐标是 `tikzmath` 最常用的功能之一，如下所示：
 
 ```latex
-![[ ../snippets/tikzmath/coordinate-calculation.tikz ]]
+%[[ ../snippets/tikzmath/coordinate-calculation.tikz ]]
 ```
 
-![[ ../snippets/tikzmath/coordinate-calculation.tikz ]]
+%[[ ../snippets/tikzmath/coordinate-calculation.tikz ]]
 
 你也可以直接在 `\coordinate` 命令中嵌入计算，但 `tikzmath` 适合处理多步骤的复杂逻辑。
 
@@ -111,26 +111,26 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 绘制一个简单的点阵：
 
 ```latex
-![[ ../snippets/tikzmath/dot-matrix.tikz ]]
+%[[ ../snippets/tikzmath/dot-matrix.tikz ]]
 ```
 
-![[ ../snippets/tikzmath/dot-matrix.tikz ]]
+%[[ ../snippets/tikzmath/dot-matrix.tikz ]]
 
 绘制函数上的点：
 
 ```latex
-![[ ../snippets/tikzmath/plot-points.tikz ]]
+%[[ ../snippets/tikzmath/plot-points.tikz ]]
 ```
 
-![[ ../snippets/tikzmath/plot-points.tikz ]]
+%[[ ../snippets/tikzmath/plot-points.tikz ]]
 
 综合运用变量定义、循环和三角函数计算，绘制正多边形：
 
 ```latex
-![[ ../snippets/tikzmath/regular-polygon.tikz ]]
+%[[ ../snippets/tikzmath/regular-polygon.tikz ]]
 ```
 
-![[ ../snippets/tikzmath/regular-polygon.tikz ]]
+%[[ ../snippets/tikzmath/regular-polygon.tikz ]]
 
 #### 条件判断：`if`-`then`-`else`
 
@@ -141,10 +141,10 @@ TikZ 是 \LaTeX 中一个功能极其强大的绘图宏包，而 `tikzmath` 是 
 你可以使用 `function` 关键字定义自己的数学函数。
 
 ```latex
-![[ ../snippets/tikzmath/function.tikz ]]
+%[[ ../snippets/tikzmath/function.tikz ]]
 ```
 
-![[ ../snippets/tikzmath/function.tikz ]]
+%[[ ../snippets/tikzmath/function.tikz ]]
 
 #### 注意事项与技巧
 

@@ -176,16 +176,20 @@ points(t(p_Cl), pch=20, col="red")
 
 #### 示例 1：直线（两点）与圆锥曲线的交点
 
+examples/intersections/conic-line-intersection-1-ellipse
+
 ```latex
-![[ ../../snippets/conics/intersect-cl.tikz ]]
+![[ ../../../../examples/intersections/conic-line-intersection-1-ellipse.tikz ]]
 ```
 
-![[ ../../snippets/conics/intersect-cl.tikz ]]
+![[ ../../../../examples/intersections/conic-line-intersection-1-ellipse.tikz ]]
 
 #### 示例 2：直线（系数）与圆锥曲线的交点
 
+examples/intersections/conic-line-intersection-4
+
 ```latex
-![[ ../../snippets/conics/intersect-cn.tikz ]]
+![[ ../../../../examples/intersections/conic-line-intersection-4.tikz ]]
 ```
 
-![[ ../../snippets/conics/intersect-cn.tikz ]]
+![[ ../../../../examples/intersections/conic-line-intersection-4.tikz ]]

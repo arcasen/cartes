@@ -1,5 +1,5 @@
 # Makefile for merging Markdown files and converting Markdown to PDF, HTML, TEX etc
-# Version: 20260228
+# Version: 20260626
 
 # Specify input and output directories
 DOCS ?= docs
@@ -80,7 +80,7 @@ $(DIST)/%.markdown: $(DOCS)/%.md
 	@echo "Creating $@ ..."
 	@mkdir -p $(dir $@)
 	@cp -rf $< $@
-	@$(call rebasepath,$@)
+	@mdtool rebase $@ -d $(DIST)
 
 # Rule: copy other files to the directory '$(DIST)'
 $(DIST)/%: %
@@ -92,24 +92,6 @@ $(DIST)/%: $(DOCS)/%
 	@echo "Creating $@ ..."
 	@mkdir -p $(dir $@)
 	@cp -rf $< $@
-
-# Rebasing paths of expandded images and markdowns
-# Caution: processing expandded images in both inline and reference form
-#          - ![<alt-text>](<url> "<picture-title>")
-#          - ![<atl-text>][<picture-reference>]
-#            [<pciture-reference>]: <url> "<picture-title>"
-define rebasepath
-$(eval RELPATH := $(patsubst $(DIST)/%,%,$(dir $1)))
-sed -i -E \
--e "/\!\[([^]]*)\]\(\ *(http|https|ftp):\/\/[^)]*\)/b" \
--e "/\!\[([^]]*)\]\(\ *(\/|\~)[^)]*\)/b" \
--e "s|\!\[([^]]*)\]\(\ *([^)]*)\)|\![\1]($(RELPATH)\2)|g" \
--e "/^\s*\!\[\[\s*(\/|\~)[^]]*\s*\]\]\s*$$/b" \
--e "s|^(\s*)\!\[\[\s*([^]]*)\s*\]\](\s*)$$|\1![[$(RELPATH)\2]]\3|g" \
--e "/\[([^]]*)\]\:\ *(http|https|ftp):\/\/(\S*)/b" \
--e "/\[([^]]*)\]\:\ *(\/|\~)\S*/b" \
--e "s|\[([^]]*)\]\:\ *(\S*)(jpg\|jpeg\|png)|[\1]\: $(RELPATH)\2\3|g" $1
-endef
 
 # https://stackoverflow.com/questions/649246/is-it-possible-to-create-a-multi-line-string-variable-in-a-makefile
 # It is almost impossible to use a heredoc with tab indentation in a Makefile;

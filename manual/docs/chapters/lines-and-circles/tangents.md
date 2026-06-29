@@ -13,8 +13,10 @@
 
 #### 示例
 
+examples/tangents/tangents-of-circle
+
 ```latex
-![[ ../../snippets/lines-and-circles/tangents.tikz ]]
+![[ ../../../../examples/tangents/tangents-of-circle.tikz ]]
 ```
 
-![[ ../../snippets/lines-and-circles/tangents.tikz ]]
+![[ ../../../../examples/tangents/tangents-of-circle.tikz ]]
