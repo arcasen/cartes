@@ -7,6 +7,7 @@
 
 \begin{document}
 
+% begin_snippet
 \begin{tikzpicture}
   \tikzmath{
     \coefs{1} = 1; \coefs{2} = 1; \coefs{3} = 1; 
@@ -26,6 +27,7 @@
 
   \axes[grid] (-5:5,-5:5);
   \conic[draw=teal,thick] (\A);
+  \segment[draw=navy,thick,clip=(-3:4.5,-4:4)] (\U,\V);
 
   \coordinate (U) at (\UU{1},\UU{2});
   \coordinate (V) at (\VV{1},\VV{2});
@@ -37,6 +39,7 @@
     \draw (\p) node[\placement] {$\p$};
   }
 \end{tikzpicture}
+% end_snippet
 
 \begin{tikzpicture}
   \tikzmath{

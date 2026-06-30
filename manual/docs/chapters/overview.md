@@ -34,7 +34,7 @@
 | `plane/rotate/origin={\A,\ang,\B}` | 平面向量 $\overline{OA}$ 绕原点旋转 `\ang` 角度得到 $\overline{OB}$ |
 | `plane/project/origin={\A,\B,\C}` | 平面向量 $\overline{OA}$ 在 $\overline{OB}$ 上的向量投影（$\overline{OC}$） |
 | `plane/reject/origin={\A,\B,\C}` | 平面向量 $\overline{OA}$ 在 $\overline{OB}$ 上的向量拒绝（$\overline{OC}$） |
-| `plane/reflect/origin={\A,\B,\C}` | vector reflection |
+| `plane/reflect/origin={\A,\B,\C}` | 平面向量 $\overline{OA}$ 关于 $\overline{OB}$ 的对称向量 $\overline{OC}$ |
 : 基于原点的向量运算{.striped}
 
 | 命令 | 描述 |
@@ -48,8 +48,8 @@
 | `plane/angle={\P,\A,\B,\a}` | 平面向量夹角，$a = \angle{APB}$, 有向角: $(-180^\circ,180^\circ]$ |
 | `plane/normalize={\P,\A,\B}` | 平面向量单位化，$OB= \overline{PA} / |\overline{PA}|$ |
 | `plane/rotate={\P,\A,\ang,\B}` | 平面向量 $\overline{PA}$ 绕点 $P$ 旋转 `\ang` 角度得到 $\overline{PB}$，$\overline{OB} = \overline{OP} + \overline{PB}$ |
-| `plane/project={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量投影（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
-| `plane/reject={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量拒绝（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
+| `plane/project={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量投影（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{PC}$ |
+| `plane/reject={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量拒绝（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{PC}$ |
 | `plane/reflect={\P,\A,\B,\C}` | 平面向量 $\overline{PA}$ 关于 $\overline{PB}$ 的对称向量 $\overline{PC}$，$\overline{OC} = \overline{OP} + \overline{PC}$ |
 : 基于任意点 $P$ 的向量运算{.striped}
 
@@ -91,8 +91,8 @@
 | `space/angle={\P,\A,\B,\a}` | 空间向量夹角，$a = \angle{APB}$，无向角: $[0^\circ,180^\circ]$ |
 | `space/normalize={\P,\A,\B}` | 空间向量单位化，$OB= \overline{PA} / |\overline{PA}|$ |
 | `space/rotate={\P,\U,\V,\ang,\W}` | 空间向量 $\overline{PV}$ 绕 $\overline{PU}$ 轴旋转 `\ang` 角度到达 $\overline{PW}$，$\overline{OW} = \overline{OP} + \overline{PW}$ |
-| `space/project={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量投影（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
-| `space/reject={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量拒绝（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{OC}$ |
+| `space/project={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量投影（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{PC}$ |
+| `space/reject={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 在 $\overline{PB}$ 上的向量拒绝（$\overline{PC}$），$\overline{OC} = \overline{OP} + \overline{PC}$ |
 | `space/reflect={\P,\A,\B,\C}` | 空间向量 $\overline{PA}$ 关于 $\overline{PB}$ 的对称向量 $\overline{PC}$，$\overline{OC} = \overline{OP} + \overline{PC}$ |
 : 基于任意点 $P$ 的向量运算{.striped}
 

@@ -29,7 +29,7 @@ $$\beta_3 = \alpha_3 - \cfrac{\langle \alpha_3, \beta_1 \rangle}{\langle \beta_1
 
 > **说明：** $\langle \cdot, \cdot \rangle$ 表示向量的内积（点积）。例如 $\langle \alpha_2, \beta_1 \rangle = \alpha_2 \cdot \beta_1$。
 
-#### 单位化（Orthogonalization $\to$ Orthonormalization）
+#### 单位化（Orthogonalization to Orthonormalization）
 
 如果你需要得到**标准正交基**（即长度全部为 1 的正交向量），只需要将得到的 $\beta_1, \beta_2, \beta_3$ 分别除以它们各自的模长（范数）：
 
@@ -38,9 +38,8 @@ $$e_1 = \cfrac{\beta_1}{\|\beta_1\|}, \quad e_2 = \cfrac{\beta_2}{\|\beta_2\|}, 
 具体计算示例
 
 假设已知三维向量：
-$\alpha_1 = (1, 1, 1)^T$
-$\alpha_2 = (0, 1, 1)^T$
-$\alpha_3 = (0, 0, 1)^T$
+
+$$\alpha_1 = (1, 1, 1)^T,\alpha_2 = (0, 1, 1)^T,\alpha_3 = (0, 0, 1)^T$$
 
 计算 $\beta_1$：
 
@@ -53,7 +52,9 @@ $$\beta_1 = \alpha_1 = (1, 1, 1)^T$$
 
 $$\beta_2 = (0, 1, 1)^T - \cfrac{2}{3} (1, 1, 1)^T = \left(-\cfrac{2}{3}, \cfrac{1}{3}, \cfrac{1}{3}\right)^T$$
 
-*(为了后续计算方便，通常也可以对 $\beta_2$ 进行按比例放大消除分母，比如取 $(-2, 1, 1)^T$，但这里我们严格按照公式继续)*
+::: note
+为了后续计算方便，通常也可以对 $\beta_2$ 进行按比例放大消除分母，比如取 $(-2, 1, 1)^T$，但这里我们严格按照公式继续。
+::: 
 
 计算 $\beta_3$：
 
