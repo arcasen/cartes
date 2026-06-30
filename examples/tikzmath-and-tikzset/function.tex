@@ -5,6 +5,7 @@
 
 \begin{document}
 
+% begin_snippet
 \begin{tikzpicture}
   \tikzmath{
     function f(\x) { return \x*\x; }; 
@@ -12,6 +13,7 @@
   \draw[help lines] (-3,-1) grid (3,5);
   \draw[thick, red] plot [domain=-2:2] (\x, {f(\x)});
 \end{tikzpicture}
+% end_snippet
 
 \end{document
 }
