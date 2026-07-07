@@ -35,7 +35,7 @@ $$\bm{l}_{directrix} = P \times Q$$
 #### 语法形式
 
 ::: {.messagebox title="Syntax"}
-- `conics/define/foci={\Fa,\Fb,\a,\C}`: 由焦点-准线定义推导圆锥曲线的系数矩阵
+- `conics/define/foci-axis={\Fa,\Fb,\a,\C}`: 由焦点-半长轴长定义推导圆锥曲线的系数矩阵
   - `\Fa,\Fb`: 焦点的齐次坐标（列向量），如果 $F_a,F_b$ 重合，返回圆的系数矩阵
   - `\a`: 半长轴长 Semi-major axis length，如果 $a>c$，返回椭圆的系数矩阵；如果 $a<c$，返回双曲线的系数矩阵；如果 $a=c$，报错（其中 $2c = |\overline{F_aF_b}|$）。
   - `\C`: 返回的圆锥曲线的系数矩阵

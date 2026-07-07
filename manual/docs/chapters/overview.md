@@ -154,7 +154,7 @@
 | `conics/rotation matrix={\ang,\R}` | 构造旋转矩阵，`\ang` 是旋转角度（deg） |
 | `conics/define/quadratic={\coefs,\C}` | 由二次曲线方程系数计算系数矩阵 |
 | `conics/define/focus-directrix={\F,\D,\e,\C}` | 由焦点-准线定义推导圆锥曲线的系数矩阵 |
-| `conics/define/foci-axis={\Fa,\Fb,\a,\C}` | 由焦点-准线定义推导圆锥曲线的系数矩阵 |
+| `conics/define/foci-axis={\Fa,\Fb,\a,\C}` | 由焦点-半长轴长定义推导圆锥曲线的系数矩阵 |
 | `conics/define/ellipse/foci-point={\Fa,\Fb,\P,\C}` | 由焦点和曲线上一点确定一个椭圆 |
 | `conics/define/hyperbola/foci-point={\Fa,\Fb,\P,\C}` | 由焦点和曲线上一点确定一个双曲线 |
 | `conics/define/circle={\A,\B,\C,\Circle}` | 求过 $A,B,C$ 三点的圆的系数矩阵 |
